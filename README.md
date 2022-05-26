@@ -2,7 +2,7 @@
 
 ## Welcome!
 
-Prefect integration for working with dbt
+`prefect-dbt` is a collection of Prefect integrations for working with dbt with your Prefect flows.
 
 ## Getting Started
 
