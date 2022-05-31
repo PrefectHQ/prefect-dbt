@@ -46,8 +46,6 @@ class DbtCloudAdministrativeClient:
         if options is None:
             options = TriggerJobRunOptions()
 
-        json = options.dict(exclude_none=True)
-        print(json)
         response = await self._admin_client.post(
             url=f"/jobs/{job_id}/run/",
             json=options.dict(exclude_none=True),
