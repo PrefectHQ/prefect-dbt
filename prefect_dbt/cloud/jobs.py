@@ -1,11 +1,17 @@
 """Module containing tasks and flows for interacting with dbt Cloud"""
 from typing import Optional
 
-from httpx import Response
+from httpx import HTTPStatusError, Response
 from prefect import task
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
+
+
+class JobRunTriggerFailed(Exception):
+    """Raised when a dbt Cloud job trigger fails"""
+
+    pass
 
 
 @task
@@ -26,7 +32,10 @@ async def trigger_job_run(
     Returns:
         The response from the dbt Cloud administrative API.
     """
-    async with dbt_cloud_credentials.get_administrative_client() as client:
-        response = await client.trigger_job_run(job_id=job_id, options=options)
-
+    try:
+        async with dbt_cloud_credentials.get_administrative_client() as client:
+            response = await client.trigger_job_run(job_id=job_id, options=options)
+    except HTTPStatusError as ex:
+        status = ex.response.json().get("status", {})
+        raise JobRunTriggerFailed(status.get("user_message")) from ex
     return response

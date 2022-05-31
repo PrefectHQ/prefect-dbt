@@ -45,9 +45,12 @@ class DbtCloudAdministrativeClient:
         """  # noqa
         if options is None:
             options = TriggerJobRunOptions()
+
+        json = options.dict(exclude_none=True)
+        print(json)
         response = await self._admin_client.post(
             url=f"/jobs/{job_id}/run/",
-            json=options.dict(exclude_none=True, exclude_unset=True),
+            json=options.dict(exclude_none=True),
         )
 
         response.raise_for_status()
@@ -66,6 +69,6 @@ class DbtCloudAdministrativeClient:
 
         return self
 
-    async def __aexit__(self):
+    async def __aexit__(self, *exc):
         self._closed = True
         await self._admin_client.__aexit__()

@@ -35,8 +35,8 @@ class TriggerJobRunOptions(BaseModel):
         description="Override the target.name context variable used when "
         "running this job",
     )
-    generate_docs_override: bool = Field(
-        default=False,
+    generate_docs_override: Optional[bool] = Field(
+        default=None,
         description="Override whether or not this job generates docs "
         "(true=yes, false=no).",
     )

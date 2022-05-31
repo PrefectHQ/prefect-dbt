@@ -12,3 +12,4 @@ mock; python_version < '3.8'
 mkdocs-gen-files
 interrogate
 coverage
+respx
