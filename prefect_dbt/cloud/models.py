@@ -1,7 +1,27 @@
 """Module containing models used for passing data to dbt Cloud"""
 from typing import List, Optional
 
+from prefect.context import FlowRunContext, TaskRunContext, get_run_context
 from pydantic import BaseModel, Field
+
+
+def default_cause_factory():
+    """
+    Factory function to populate the default cause for a job run to include information
+    from the Prefect run context.
+    """
+    cause = "Triggered via Prefect"
+
+    try:
+        context = get_run_context()
+        if isinstance(context, FlowRunContext):
+            cause = f"{cause} in flow run {context.flow_run.name}"
+        elif isinstance(context, TaskRunContext):
+            cause = f"{cause} in task run {context.task_run.name}"
+    except RuntimeError:
+        pass
+
+    return cause
 
 
 class TriggerJobRunOptions(BaseModel):
@@ -10,7 +30,7 @@ class TriggerJobRunOptions(BaseModel):
     """
 
     cause: str = Field(
-        default="Kicked off from Prefect",
+        default_factory=default_cause_factory,
         description="A text description of the reason for running this job.",
     )
     git_sha: Optional[str] = Field(
