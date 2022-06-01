@@ -58,7 +58,7 @@ class DbtCloudAdministrativeClient:
     async def __aenter__(self):
         if self._closed:
             raise RuntimeError(
-                "The client cannot be stared again after it has be closed."
+                "The client cannot be started again after it has been closed."
             )
         if self._started:
             raise RuntimeError("The client cannot be started more than once.")
