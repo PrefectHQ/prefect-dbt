@@ -6,7 +6,12 @@ from httpx import Response
 from prefect import flow
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
-from prefect_dbt.cloud.jobs import JobRunTriggerFailed, trigger_job_run
+from prefect_dbt.cloud.jobs import (
+    GetRunFailed,
+    JobRunTriggerFailed,
+    get_run,
+    trigger_job_run,
+)
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 
 
@@ -109,4 +114,39 @@ class TestTriggerJobRun:
                     api_key="my_api_key", account_id=123456789
                 ),
                 job_id=1,
+            )
+
+
+class TestGetRun:
+    @respx.mock(assert_all_called=True)
+    async def test_get_run(self, respx_mock):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": {"id": 10000}}))
+
+        response = await get_run.fn(
+            dbt_cloud_credentials=DbtCloudCredentials(
+                api_key="my_api_key", account_id=123456789
+            ),
+            run_id=12,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"data": {"id": 10000}}
+
+    @respx.mock(assert_all_called=True)
+    async def test_get_nonexistent_run(self, respx_mock):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(404, json={"status": {"user_message": "Not found!"}})
+        )
+        with pytest.raises(GetRunFailed, match="Not found!"):
+            await get_run.fn(
+                dbt_cloud_credentials=DbtCloudCredentials(
+                    api_key="my_api_key", account_id=123456789
+                ),
+                run_id=12,
             )
