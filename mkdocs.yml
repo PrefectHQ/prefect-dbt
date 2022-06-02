@@ -36,6 +36,9 @@ plugins:
 
 nav:
     - Home: index.md
-    - Tasks: tasks.md
-    - Flows: flows.md
+    - Cloud:
+      - Credentials: cloud/credentials.md
+      - Jobs: cloud/jobs.md
+      - Clients: cloud/clients.md
+      - Models: cloud/models.md
 
