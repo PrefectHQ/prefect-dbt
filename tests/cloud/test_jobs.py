@@ -7,8 +7,8 @@ from prefect import flow
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import (
-    GetRunFailed,
-    JobRunTriggerFailed,
+    DbtCloudGetRunFailed,
+    DbtCloudJobRunTriggerFailed,
     get_run,
     trigger_job_run,
 )
@@ -29,7 +29,7 @@ class TestTriggerJobRun:
             job_id=1,
         )
         assert response.status_code == 200
-        assert response.json() == {"data": {"id": 10000}}
+        assert response.json() == {"id": 10000}
 
     @respx.mock(assert_all_called=True)
     async def test_trigger_job_within_flow(self, respx_mock: respx.MockRouter):
@@ -51,7 +51,7 @@ class TestTriggerJobRun:
         task_state = flow_state.result()
         result = task_state.result()
         assert result.status_code == 200
-        assert result.json() == {"data": {"id": 10000}}
+        assert result.json() == {"id": 10000}
         request_body = json.loads(respx_mock.calls.last.request.content.decode())
         assert "Triggered via Prefect in task run" in request_body["cause"]
 
@@ -97,7 +97,7 @@ class TestTriggerJobRun:
             ),
         )
         assert response.status_code == 200
-        assert response.json() == {"data": {"id": 10000}}
+        assert response.json() == {"id": 10000}
 
     @respx.mock(assert_all_called=True)
     async def test_trigger_nonexistent_job(self, respx_mock):
@@ -108,7 +108,7 @@ class TestTriggerJobRun:
         ).mock(
             return_value=Response(404, json={"status": {"user_message": "Not found!"}})
         )
-        with pytest.raises(JobRunTriggerFailed, match="Not found!"):
+        with pytest.raises(DbtCloudJobRunTriggerFailed, match="Not found!"):
             await trigger_job_run.fn(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
@@ -133,7 +133,7 @@ class TestGetRun:
         )
 
         assert response.status_code == 200
-        assert response.json() == {"data": {"id": 10000}}
+        assert response.json() == {"id": 10000}
 
     @respx.mock(assert_all_called=True)
     async def test_get_nonexistent_run(self, respx_mock):
@@ -143,7 +143,7 @@ class TestGetRun:
         ).mock(
             return_value=Response(404, json={"status": {"user_message": "Not found!"}})
         )
-        with pytest.raises(GetRunFailed, match="Not found!"):
+        with pytest.raises(DbtCloudGetRunFailed, match="Not found!"):
             await get_run.fn(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
