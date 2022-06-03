@@ -71,7 +71,7 @@ class DbtCloudJobRunStatus(Enum):
     retries=3,
     retry_delay_seconds=10,
 )
-async def trigger_job_run(
+async def trigger_dbt_cloud_job_run(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
     options: Optional[TriggerJobRunOptions] = None,
@@ -173,7 +173,9 @@ async def trigger_job_run(
     retries=3,
     retry_delay_seconds=10,
 )
-async def get_run(dbt_cloud_credentials: DbtCloudCredentials, run_id: int) -> Dict:
+async def get_dbt_cloud_run_info(
+    dbt_cloud_credentials: DbtCloudCredentials, run_id: int
+) -> Dict:
     """
     A task to retrieve information about a dbt Cloud job run.
 
@@ -213,17 +215,71 @@ async def get_run(dbt_cloud_credentials: DbtCloudCredentials, run_id: int) -> Di
 
 
 @flow
-async def trigger_job_run_and_wait_for_completion(
+async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     max_wait_seconds: Optional[int] = None,
     poll_frequency_seconds: int = 10,
-):
+) -> Dict:
     """
     Flow that triggers a job run and waits for the triggered run to complete.
-    """
-    trigger_job_run_state = await trigger_job_run(
+
+    Args:
+        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
+        job_id: The ID of the job to trigger.
+        trigger_job_run_options: An optional TriggerJobRunOptions instance to
+            specify overrides for the triggered job run.
+        max_wait_seconds: Maximum number of seconds to wait for job to complete
+        poll_frequency_seconds: Number of seconds to wait in between checks for
+            run completion.
+
+    Returns:
+        The run data returned by the dbt Cloud administrative API.
+
+    Example:
+        Trigger a dbt Cloud job and wait for completion as a stand alone flow:
+        ```python
+        import asyncio
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+
+        asyncio.run(
+            trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=DbtCloudCredentials(
+                    api_key="my_api_key",
+                    account_id=123456789
+                ),
+                job_id=1
+            )
+        )
+        ```
+
+        Trigger a dbt Cloud job and wait for completion as a sub-flow:
+        ```python
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+
+        @flow
+        def my_flow():
+            ...
+            run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=DbtCloudCredentials(
+                    api_key="my_api_key",
+                    account_id=123456789
+                ),
+                job_id=1
+            )
+            ...
+
+        my_flow()
+        ```
+
+    """  # noqa
+    trigger_job_run_state = await trigger_dbt_cloud_job_run(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         options=trigger_job_run_options,
@@ -233,7 +289,7 @@ async def trigger_job_run_and_wait_for_completion(
 
     seconds_waited_for_run_completion = 0
     while not max_wait_seconds or seconds_waited_for_run_completion <= max_wait_seconds:
-        get_run_state = await get_run(
+        get_run_state = await get_dbt_cloud_run_info(
             dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
         )
         run_data = await get_run_state.result()

@@ -9,8 +9,8 @@ from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import (
     DbtCloudGetRunFailed,
     DbtCloudJobRunTriggerFailed,
-    get_run,
-    trigger_job_run,
+    get_dbt_cloud_run_info,
+    trigger_dbt_cloud_job_run,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 
@@ -29,7 +29,7 @@ class TestTriggerJobRun:
 
         @flow
         async def test_flow():
-            return await trigger_job_run(
+            return await trigger_dbt_cloud_job_run(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
                 ),
@@ -72,7 +72,7 @@ class TestTriggerJobRun:
 
         @flow
         async def test_flow():
-            return await trigger_job_run(
+            return await trigger_dbt_cloud_job_run(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
                 ),
@@ -110,7 +110,7 @@ class TestTriggerJobRun:
 
         @flow
         async def test_flow():
-            await trigger_job_run(
+            await trigger_dbt_cloud_job_run(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
                 ),
@@ -130,7 +130,7 @@ class TestGetRun:
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": {"id": 10000}}))
 
-        response = await get_run.fn(
+        response = await get_dbt_cloud_run_info.fn(
             dbt_cloud_credentials=DbtCloudCredentials(
                 api_key="my_api_key", account_id=123456789
             ),
@@ -148,7 +148,7 @@ class TestGetRun:
             return_value=Response(404, json={"status": {"user_message": "Not found!"}})
         )
         with pytest.raises(DbtCloudGetRunFailed, match="Not found!"):
-            await get_run.fn(
+            await get_dbt_cloud_run_info.fn(
                 dbt_cloud_credentials=DbtCloudCredentials(
                     api_key="my_api_key", account_id=123456789
                 ),
