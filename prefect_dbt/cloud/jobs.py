@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Dict, Optional
 
 from httpx import HTTPStatusError
-from prefect import flow, task
+from prefect import flow, get_run_logger, task
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
@@ -143,12 +143,27 @@ async def trigger_job_run(
         trigger_job_run_flow()
         ```
     """  # noqa
+    logger = get_run_logger()
+
+    logger.info(f"Triggering run for job with ID {job_id}")
+
     try:
         async with dbt_cloud_credentials.get_administrative_client() as client:
             response = await client.trigger_job_run(job_id=job_id, options=options)
     except HTTPStatusError as ex:
         raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
-    return response.json()["data"]
+
+    run_data = response.json()["data"]
+
+    logger.info(
+        f"Run successfully triggered for job with ID {job_id}. "
+        "You can view the status of this run at "
+        f"https://{dbt_cloud_credentials.domain}/#/accounts/"
+        f"{dbt_cloud_credentials.account_id}/projects/{run_data['project_id']}/"
+        f"runs/{run_data['id']}/"
+    )
+
+    return run_data
 
 
 @task(
