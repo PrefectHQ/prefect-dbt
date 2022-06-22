@@ -1,23 +1,30 @@
 import json
 
 import pytest
-import respx
 from httpx import Response
 from prefect import flow
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import (
     DbtCloudGetRunFailed,
+    DbtCloudJobRunCancelled,
+    DbtCloudJobRunFailed,
+    DbtCloudJobRunTimedOut,
     DbtCloudJobRunTriggerFailed,
     get_dbt_cloud_run_info,
     trigger_dbt_cloud_job_run,
+    trigger_dbt_cloud_job_run_and_wait_for_completion,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 
 
-class TestTriggerJobRun:
-    @respx.mock(assert_all_called=True)
-    async def test_trigger_job_with_no_options(self, respx_mock):
+@pytest.fixture
+def dbt_cloud_credentials():
+    return DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+
+class TestTriggerDbtCloudJobRun:
+    async def test_trigger_job_with_no_options(self, respx_mock, dbt_cloud_credentials):
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
             headers={"Authorization": "Bearer my_api_key"},
@@ -30,9 +37,7 @@ class TestTriggerJobRun:
         @flow
         async def test_flow():
             return await trigger_dbt_cloud_job_run(
-                dbt_cloud_credentials=DbtCloudCredentials(
-                    api_key="my_api_key", account_id=123456789
-                ),
+                dbt_cloud_credentials=dbt_cloud_credentials,
                 job_id=1,
             )
 
@@ -44,8 +49,7 @@ class TestTriggerJobRun:
         request_body = json.loads(respx_mock.calls.last.request.content.decode())
         assert "Triggered via Prefect in task run" in request_body["cause"]
 
-    @respx.mock(assert_all_called=True)
-    async def test_trigger_with_custom_options(self, respx_mock):
+    async def test_trigger_with_custom_options(self, respx_mock, dbt_cloud_credentials):
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
             headers={"Authorization": "Bearer my_api_key"},
@@ -73,9 +77,7 @@ class TestTriggerJobRun:
         @flow
         async def test_flow():
             return await trigger_dbt_cloud_job_run(
-                dbt_cloud_credentials=DbtCloudCredentials(
-                    api_key="my_api_key", account_id=123456789
-                ),
+                dbt_cloud_credentials=dbt_cloud_credentials,
                 job_id=1,
                 options=TriggerJobRunOptions(
                     cause="This is a custom cause",
@@ -99,8 +101,7 @@ class TestTriggerJobRun:
         result = task_state.result()
         assert result == {"id": 10000, "project_id": 12345}
 
-    @respx.mock(assert_all_called=True)
-    async def test_trigger_nonexistent_job(self, respx_mock):
+    async def test_trigger_nonexistent_job(self, respx_mock, dbt_cloud_credentials):
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
             headers={"Authorization": "Bearer my_api_key"},
@@ -110,10 +111,11 @@ class TestTriggerJobRun:
 
         @flow
         async def test_flow():
-            await trigger_dbt_cloud_job_run(
-                dbt_cloud_credentials=DbtCloudCredentials(
-                    api_key="my_api_key", account_id=123456789
-                ),
+            task_shorter_retry = trigger_dbt_cloud_job_run.with_options(
+                retries=1, retry_delay_seconds=1
+            )
+            await task_shorter_retry(
+                dbt_cloud_credentials=dbt_cloud_credentials,
                 job_id=1,
             )
 
@@ -122,25 +124,21 @@ class TestTriggerJobRun:
             flow_state.result()
 
 
-class TestGetRun:
-    @respx.mock(assert_all_called=True)
-    async def test_get_run(self, respx_mock):
+class TestGetDbtCloudRunInfo:
+    async def test_get_dbt_cloud_run_info(self, respx_mock, dbt_cloud_credentials):
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/",
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": {"id": 10000}}))
 
         response = await get_dbt_cloud_run_info.fn(
-            dbt_cloud_credentials=DbtCloudCredentials(
-                api_key="my_api_key", account_id=123456789
-            ),
+            dbt_cloud_credentials=dbt_cloud_credentials,
             run_id=12,
         )
 
         assert response == {"id": 10000}
 
-    @respx.mock(assert_all_called=True)
-    async def test_get_nonexistent_run(self, respx_mock):
+    async def test_get_nonexistent_run(self, respx_mock, dbt_cloud_credentials):
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/",
             headers={"Authorization": "Bearer my_api_key"},
@@ -149,8 +147,145 @@ class TestGetRun:
         )
         with pytest.raises(DbtCloudGetRunFailed, match="Not found!"):
             await get_dbt_cloud_run_info.fn(
-                dbt_cloud_credentials=DbtCloudCredentials(
-                    api_key="my_api_key", account_id=123456789
-                ),
+                dbt_cloud_credentials=dbt_cloud_credentials,
                 run_id=12,
             )
+
+
+class TestTriggerDbtCloudJobRunAndWaitForCompletion:
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_success(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": {"id": 10000, "status": 10}}))
+
+        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials, job_id=1
+        )
+        assert flow_state.result() == {"id": 10000, "status": 10}
+
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_success_with_wait(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            side_effect=[
+                Response(200, json={"data": {"id": 10000, "status": 1}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+                Response(200, json={"data": {"id": 10000, "status": 10}}),
+            ]
+        )
+
+        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            job_id=1,
+            poll_frequency_seconds=1,
+        )
+        assert flow_state.result() == {"id": 10000, "status": 10}
+
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_failure_with_wait(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            side_effect=[
+                Response(200, json={"data": {"id": 10000, "status": 1}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+                Response(200, json={"data": {"id": 10000, "status": 20}}),
+            ]
+        )
+
+        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            job_id=1,
+            poll_frequency_seconds=1,
+        )
+        with pytest.raises(DbtCloudJobRunFailed):
+            assert flow_state.result()
+
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_cancelled_with_wait(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            side_effect=[
+                Response(200, json={"data": {"id": 10000, "status": 1}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+                Response(200, json={"data": {"id": 10000, "status": 30}}),
+            ]
+        )
+
+        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            job_id=1,
+            poll_frequency_seconds=1,
+        )
+        with pytest.raises(DbtCloudJobRunCancelled):
+            assert flow_state.result()
+
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_timed_out(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            side_effect=[
+                Response(200, json={"data": {"id": 10000, "status": 1}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+                Response(200, json={"data": {"id": 10000, "status": 3}}),
+            ]
+        )
+
+        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            job_id=1,
+            poll_frequency_seconds=1,
+            max_wait_seconds=3,
+        )
+        with pytest.raises(DbtCloudJobRunTimedOut):
+            assert flow_state.result()

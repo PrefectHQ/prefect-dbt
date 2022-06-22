@@ -290,7 +290,9 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     seconds_waited_for_run_completion = 0
     while not max_wait_seconds or seconds_waited_for_run_completion <= max_wait_seconds:
         get_run_state = await get_dbt_cloud_run_info(
-            dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            run_id=run_id,
+            wait_for=[trigger_job_run_state],
         )
         run_data = await get_run_state.result()
         run_status_code = run_data.get("status")
