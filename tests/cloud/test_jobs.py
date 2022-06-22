@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 from httpx import Response
@@ -289,3 +290,32 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
         )
         with pytest.raises(DbtCloudJobRunTimedOut):
             assert flow_state.result()
+
+
+@pytest.fixture
+def real_dbt_cloud_job_id():
+    return os.environ.get("DBT_CLOUD_JOB_ID")
+
+
+@pytest.fixture
+def real_dbt_cloud_api_key():
+    return os.environ.get("DBT_CLOUD_API_KEY")
+
+
+@pytest.fixture
+def real_dbt_cloud_account_id():
+    return os.environ.get("DBT_CLOUD_ACCOUNT_ID")
+
+
+@pytest.mark.integration
+async def test_run_real_dbt_cloud_job(
+    real_dbt_cloud_job_id, real_dbt_cloud_api_key, real_dbt_cloud_account_id
+):
+    flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+        dbt_cloud_credentials=DbtCloudCredentials(
+            api_key=real_dbt_cloud_api_key, account_id=real_dbt_cloud_account_id
+        ),
+        job_id=real_dbt_cloud_job_id,
+        poll_frequency_seconds=1,
+    )
+    assert flow_state.result().get("status") == 10
