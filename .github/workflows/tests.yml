@@ -61,5 +61,8 @@ jobs:
       - name: Run integration tests
         env:
           PREFECT_ORION_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./orion-tests.db"
+          DBT_CLOUD_JOB_ID: ${{ secrets.DBT_CLOUD_JOB_ID }}
+          DBT_CLOUD_ACCOUNT_ID: ${{ secrets.DBT_CLOUD_ACCOUNT_ID }}
+          DBT_CLOUD_API_KEY: ${{ secrets.DBT_CLOUD_API_KEY }}
         run: |
           pytest tests -vv -m integration
