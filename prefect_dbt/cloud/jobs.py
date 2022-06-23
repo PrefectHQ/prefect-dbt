@@ -219,7 +219,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
-    max_wait_seconds: Optional[int] = None,
+    max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
 ) -> Dict:
     """
@@ -237,7 +237,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     Returns:
         The run data returned by the dbt Cloud administrative API.
 
-    Example:
+    Examples:
         Trigger a dbt Cloud job and wait for completion as a stand alone flow:
         ```python
         import asyncio
@@ -278,39 +278,71 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         my_flow()
         ```
 
+        Trigger a dbt Cloud job with overrides:
+        ```python
+        import asyncio
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+        from prefect_dbt.cloud.models import TriggerJobRunOptions
+
+        asyncio.run(
+            trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=DbtCloudCredentials(
+                    api_key="my_api_key",
+                    account_id=123456789
+                ),
+                job_id=1,
+                trigger_job_run_options=TriggerJobRunOptions(
+                    git_branch="staging",
+                    schema_override="dbt_cloud_pr_123",
+                    dbt_version_override="0.18.0",
+                    target_name_override="staging",
+                    timeout_seconds_override=3000,
+                    generate_docs_override=True,
+                    threads_override=8,
+                    steps_override=[
+                        "dbt seed",
+                        "dbt run --fail-fast",
+                        "dbt test --fail fast",
+                    ],
+                ),
+            )
+        )
+        ```
+
     """  # noqa
-    trigger_job_run_state = await trigger_dbt_cloud_job_run(
+    trigger_job_run_future = await trigger_dbt_cloud_job_run(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         options=trigger_job_run_options,
     )
-    triggered_run_data = await trigger_job_run_state.result()
+    triggered_run_data = await trigger_job_run_future.result()
     run_id = triggered_run_data["id"]
 
     seconds_waited_for_run_completion = 0
-    while not max_wait_seconds or seconds_waited_for_run_completion <= max_wait_seconds:
-        get_run_state = await get_dbt_cloud_run_info(
+    while seconds_waited_for_run_completion <= max_wait_seconds:
+        get_run_future = await get_dbt_cloud_run_info(
             dbt_cloud_credentials=dbt_cloud_credentials,
             run_id=run_id,
-            wait_for=[trigger_job_run_state],
+            wait_for=[trigger_job_run_future],
         )
-        run_data = await get_run_state.result()
+        run_data = await get_run_future.result()
         run_status_code = run_data.get("status")
-        if DbtCloudJobRunStatus.is_terminal_status_code(run_status_code):
-            if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
-                return run_data
-            elif run_status_code == DbtCloudJobRunStatus.FAILED.value:
-                raise DbtCloudJobRunFailed(
-                    f"Triggered job run with ID: {run_id} failed."
-                )
-            elif run_status_code == DbtCloudJobRunStatus.CANCELLED.value:
-                raise DbtCloudJobRunCancelled(
-                    f"Triggered job run with ID: {run_id} was cancelled."
-                )
+
+        if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
+            return run_data
+        elif run_status_code == DbtCloudJobRunStatus.FAILED.value:
+            raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
+        elif run_status_code == DbtCloudJobRunStatus.CANCELLED.value:
+            raise DbtCloudJobRunCancelled(
+                f"Triggered job run with ID: {run_id} was cancelled."
+            )
 
         await asyncio.sleep(poll_frequency_seconds)
         seconds_waited_for_run_completion += poll_frequency_seconds
 
     raise DbtCloudJobRunTimedOut(
-        f"Max wait time exceeded while waiting for job run with ID: {run_id}"
+        f"Max wait time of {max_wait_seconds} seconds exceeded while waiting "
+        "for job run with ID: {run_id}"
     )
