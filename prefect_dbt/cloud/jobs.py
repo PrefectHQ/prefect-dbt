@@ -53,7 +53,6 @@ class DbtCloudJobRunStatus(Enum):
     SUCCESS = 10
     FAILED = 20
     CANCELLED = 30
-    TERMINAL_STATUSES = (SUCCESS, FAILED, CANCELLED)
 
     @classmethod
     def is_terminal_status_code(cls, status_code: int) -> bool:
@@ -61,7 +60,7 @@ class DbtCloudJobRunStatus(Enum):
         Returns True if a status code is terminal for a job run.
         Return False otherwise.
         """
-        return status_code in cls.TERMINAL_STATUSES.value
+        return status_code in [cls.SUCCESS.value, cls.FAILED.value, cls.CANCELLED.value]
 
 
 @task(
