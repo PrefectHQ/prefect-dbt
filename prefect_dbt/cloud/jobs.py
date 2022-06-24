@@ -157,9 +157,9 @@ async def trigger_dbt_cloud_job_run(
     logger.info(
         f"Run successfully triggered for job with ID {job_id}. "
         "You can view the status of this run at "
-        f"https://{dbt_cloud_credentials.domain}/#/accounts/"
+        f"\033[1;34;40mhttps://{dbt_cloud_credentials.domain}/#/accounts/"
         f"{dbt_cloud_credentials.account_id}/projects/{run_data['project_id']}/"
-        f"runs/{run_data['id']}/"
+        f"runs/{run_data['id']}/\x1b[0m"
     )
 
     return run_data
@@ -311,6 +311,8 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         ```
 
     """  # noqa
+    logger = get_run_logger()
+
     trigger_job_run_future = await trigger_dbt_cloud_job_run(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
@@ -328,6 +330,8 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         )
         run_data = await get_run_future.result()
         run_status_code = run_data.get("status")
+
+        logger.info(f"Job run status is {DbtCloudJobRunStatus(run_status_code).name}")
 
         if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
             return run_data
