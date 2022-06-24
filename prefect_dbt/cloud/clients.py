@@ -55,6 +55,23 @@ class DbtCloudAdministrativeClient:
 
         return response
 
+    async def get_run(self, run_id: int) -> Response:
+        """
+        Sends a request to the [get run endpoint](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getRunById)
+        to get details about a job run.
+
+        Args:
+            run_id: The ID of the run to get details for.
+
+        Returns:
+            The response from the dbt Cloud administrative API.
+        """  # noqa
+        response = await self._admin_client.get(f"/runs/{run_id}/")
+
+        response.raise_for_status()
+
+        return response
+
     async def __aenter__(self):
         if self._closed:
             raise RuntimeError(
