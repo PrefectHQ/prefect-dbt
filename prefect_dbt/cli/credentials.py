@@ -58,16 +58,18 @@ class DbtCliCredentials:
         port: int = None,
         **profile_kwargs,
     ):
-        self.profile_kwargs = {
+        self.profile_name = profile_name
+        self.profile_target = profile_target
+        stripped_profile_kwargs = {
             "user": user,
             "password": password,
             "host": host,
             "port": port,
             **profile_kwargs,
         }
-        for key, val in self.profile_kwargs:
-            if val is None:
-                self.profile_kwargs.pop(key)
+        for key, val in stripped_profile_kwargs.items():
+            if val is not None:
+                self.profile_kwargs[key] = val
 
     def get_profile(self):
         """
