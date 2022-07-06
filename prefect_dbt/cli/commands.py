@@ -29,12 +29,13 @@ def trigger_dbt_cli_command(
     profiles_dir: The directory to search for the profiles.yml file. If this is not set,
         will try using the DBT_PROFILES_DIR environment variable, but if that's also not
         set, will use the default directory `$HOME/.dbt/`.
-    overwrite_profiles: Whether existing profiles.yml file should be overwritten; defaults to `False`
-    dbt_cli_credentials: Credentials class to store the profile written to profiles.yml.
+    overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
+        should be overwritten with a new profile.
+    dbt_cli_credentials: Credentials class containing the profile written to profiles.yml.
         Note! This has no effect if profiles.yml already exists under profile_dir and
         overwrite_profiles is set to False.
     set_dbt_profiles_dir_env_var: Whether DBT_PROFILES_DIR should be set to the
-        utilized profiles_dir; defaults to `True`
+        utilized profiles_dir.
     shell_run_command_kwargs: Additional keyword arguments to pass to
         [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
 
