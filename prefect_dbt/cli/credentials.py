@@ -32,12 +32,13 @@ class DbtCliCredentials:
             client.trigger_job_run(job_id=1)
         ```
     """
+
     profile_name: str
     profile_target: str
-    user: str = None,
-    password: str = None,
-    host: str = None,
-    port: int = None,
+    user: str = (None,)
+    password: str = (None,)
+    host: str = (None,)
+    port: int = (None,)
 
     def __init__(
         self,
@@ -47,14 +48,14 @@ class DbtCliCredentials:
         password: str = None,
         host: str = None,
         port: int = None,
-        **profile_kwargs
+        **profile_kwargs,
     ):
         self.profile_kwargs = {
             "user": user,
             "password": password,
             "host": host,
             "port": port,
-            **profile_kwargs
+            **profile_kwargs,
         }
         for key, val in self.profile_kwargs:
             if val is None:
@@ -66,9 +67,7 @@ class DbtCliCredentials:
         """
         profile = {
             self.profile_name: {
-                "outputs": {
-                    self.profile_target: self.profile_kwargs
-                },
+                "outputs": {self.profile_target: self.profile_kwargs},
                 "target": self.profile_target,
             }
         }

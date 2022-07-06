@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
-from typing import Any, List, Optional, Union, Dict
+from typing import Any, Dict, List, Optional, Union
 
 import yaml
-from prefect import task, get_run_logger
-
+from prefect import get_run_logger, task
 from prefect_shell.utils import shell_run_command
+
 from prefect_dbt.cli.credentials import DbtCliCredentials
 
 
