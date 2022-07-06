@@ -22,23 +22,31 @@ class DbtCliCredentials:
         **profile_kwargs
 
     Examples:
-        Use DbtCliCredentials instance to trigger a job run:
+        Get dbt profile from DbtCliCredentials:
         ```python
         from prefect_dbt.cli import DbtCliCredentials
-
-        credentials = DbtCliCredentials()
-
-        async with dbt_cli_credentials.get_administrative_client() as client:
-            client.trigger_job_run(job_id=1)
+        dbt_cli_credentials = DbtCliCredentials(
+            profile_name="jaffle_shop",
+            profile_target="dev",
+            user="snowflake_user",
+            password="snowflake_password",
+            role="snowflake_role",
+            account="snowflake_account",
+            schema="schema",
+            database="database",
+            warehouse="warehouse",
+            threads=4,
+        )
+        profile = dbt_cli_credentials.get_profile()
         ```
     """
 
     profile_name: str
     profile_target: str
-    user: str = (None,)
-    password: str = (None,)
-    host: str = (None,)
-    port: int = (None,)
+    user: str = None
+    password: str = None
+    host: str = None
+    port: int = None
 
     def __init__(
         self,

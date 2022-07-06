@@ -10,7 +10,7 @@ from prefect_dbt.cli.credentials import DbtCliCredentials
 
 
 @task
-def trigger_dbt_cli_command(
+async def trigger_dbt_cli_command(
     command: str,
     profiles_dir: Optional[Union[Path, str]] = None,
     overwrite_profiles: bool = False,
@@ -42,6 +42,37 @@ def trigger_dbt_cli_command(
     Returns:
         If return_all (default is False) is passed to shell_run_command_kwargs,
         returns all lines as a list; else the last line as a string.
+
+    Examples:
+        Execute `dbt run`.
+        ```python
+        from prefect import flow, task
+        from prefect_dbt.cli import DbtCliCredentials
+        from prefect_dbt.cli.commands import trigger_dbt_cli_command
+
+        @flow
+        def trigger_dbt_cli_command_flow():
+            dbt_cli_credentials = DbtCliCredentials(
+                profile_name="jaffle_shop",
+                profile_target="dev",
+                user="snowflake_user",
+                password="snowflake_password",
+                role="snowflake_role",
+                account="snowflake_account",
+                schema="schema",
+                database="database",
+                warehouse="warehouse",
+                threads=4,
+            )
+            result = trigger_dbt_cli_command(
+                "dbt run",
+                overwrite_profiles=True,
+                dbt_cli_credentials=dbt_cli_credentials
+            )
+            return result
+
+        trigger_dbt_cli_command_flow()
+        ```
     """  # noqa
     # check if variable is set, if not check env, if not use expected default
     logger = get_run_logger()
@@ -73,4 +104,5 @@ def trigger_dbt_cli_command(
 
     logger.info(f"Running dbt command: {command}")
     shell_run_command_kwargs = shell_run_command_kwargs or {}
-    return shell_run_command(command=command, **shell_run_command_kwargs)
+    result = await shell_run_command(command=command, **shell_run_command_kwargs)
+    return result
