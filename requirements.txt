@@ -1,1 +1,2 @@
-prefect>=2.0a13
+prefect>=2.0b8
+prefect_shell>=0.1.0
