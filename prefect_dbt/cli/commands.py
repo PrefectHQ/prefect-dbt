@@ -13,10 +13,10 @@ from prefect_dbt.cli.credentials import DbtCliCredentials
 async def trigger_dbt_cli_command(
     command: str,
     profiles_dir: Optional[Union[Path, str]] = None,
+    project_dir: Optional[Union[Path, str]] = None,
     overwrite_profiles: bool = False,
     dbt_cli_credentials: DbtCliCredentials = None,
-    set_dbt_profiles_dir_env_var: bool = True,
-    shell_run_command_kwargs: Dict[str, Any] = None,
+    **shell_run_command_kwargs: Dict[str, Any],
 ) -> Union[List, str]:
     """
     Task for running dbt commands.
@@ -26,17 +26,18 @@ async def trigger_dbt_cli_command(
     CLI shell command.
 
     command: The dbt command to be executed.
-    profiles_dir: The directory to search for the profiles.yml file. If this is not set,
+    profiles_dir: The directory to search for the profiles.yml file. Setting this
+        appends the `--profiles-dir` option to the command provided. If this is not set,
         will try using the DBT_PROFILES_DIR environment variable, but if that's also not
         set, will use the default directory `$HOME/.dbt/`.
+    project_dir: The directory to search for the dbt_project.yml file.
+        Default is the current working directory and its parents.
     overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
         should be overwritten with a new profile.
     dbt_cli_credentials: Credentials class containing the profile written to profiles.yml.
-        Note! This has no effect if profiles.yml already exists under profile_dir and
-        overwrite_profiles is set to False.
-    set_dbt_profiles_dir_env_var: Whether DBT_PROFILES_DIR should be set to the
-        utilized profiles_dir.
-    shell_run_command_kwargs: Additional keyword arguments to pass to
+        Note! This is optional and has no effect if profiles.yml already exists under profile_dir
+        and overwrite_profiles is set to False.
+    **shell_run_command_kwargs: Additional keyword arguments to pass to
         [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
 
     Returns:
@@ -78,7 +79,7 @@ async def trigger_dbt_cli_command(
     logger = get_run_logger()
     if profiles_dir is None:
         profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
-    profiles_dir = Path(profiles_dir)
+    profiles_dir = Path(profiles_dir).expanduser()
     logger.debug(f"Using this profiles directory: {profiles_dir}")
 
     # https://docs.getdbt.com/dbt-cli/configure-your-profile
@@ -86,6 +87,7 @@ async def trigger_dbt_cli_command(
     # regardless of which directory it is in.
     profiles_path = profiles_dir / "profiles.yml"
 
+    # write the profile if overwrite or no profiles exist
     if overwrite_profiles or not profiles_path.exists():
         if dbt_cli_credentials is None:
             raise ValueError("dbt_cli_credentials must be set for writing profiles!")
@@ -99,10 +101,15 @@ async def trigger_dbt_cli_command(
             f"already exists, the profile within dbt_cli_credentials was NOT used"
         )
 
-    if set_dbt_profiles_dir_env_var:
-        os.environ["DBT_PROFILES_DIR"] = profiles_dir
+    # append the commands
+    command += " --profiles-dir {profiles_dir}"
+    if project_dir is not None:
+        project_dir = Path(project_dir).expanduser()
+        command += " --project-dir {project_dir}"
+
+    # fix up empty shell_run_command_kwargs
+    shell_run_command_kwargs = shell_run_command_kwargs or {}
 
     logger.info(f"Running dbt command: {command}")
-    shell_run_command_kwargs = shell_run_command_kwargs or {}
     result = await shell_run_command(command=command, **shell_run_command_kwargs)
     return result
