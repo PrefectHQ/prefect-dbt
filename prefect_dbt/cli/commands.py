@@ -47,7 +47,7 @@ async def trigger_dbt_cli_command(
     Examples:
         Execute `dbt run`.
         ```python
-        from prefect import flow, task
+        from prefect import flow
         from prefect_dbt.cli import DbtCliCredentials
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
 
