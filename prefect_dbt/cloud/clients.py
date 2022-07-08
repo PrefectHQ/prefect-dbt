@@ -89,9 +89,7 @@ class DbtCloudAdministrativeClient:
         Returns:
             The response from the dbt Cloud administrative API.
         """  # noqa
-        params = dict()
-        if step:
-            params["step"] = step
+        params = {"step": step} if step else None
         response = await self._admin_client.get(
             f"/runs/{run_id}/artifacts/", params=params
         )
@@ -119,9 +117,7 @@ class DbtCloudAdministrativeClient:
         Returns:
             The response from the dbt Cloud administrative API.
         """  # noqa
-        params = dict()
-        if step:
-            params["step"] = step
+        params = {"step": step} if step else None
         response = await self._admin_client.get(
             f"/runs/{run_id}/artifacts/{path}", params=params
         )
