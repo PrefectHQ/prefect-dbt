@@ -77,7 +77,7 @@ class DbtCloudAdministrativeClient:
     ) -> Response:
         """
         Sends a request to the [list run artifacts endpoint](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/listArtifactsByRunId)
-        to fetch a list of artifact files generated for a completed run.
+        to fetch a list of paths of artifacts generated for a completed run.
 
         Args:
             run_id: The ID of the run to list run artifacts for.
@@ -94,6 +94,36 @@ class DbtCloudAdministrativeClient:
             params["step"] = step
         response = await self._admin_client.get(
             f"/runs/{run_id}/artifacts/", params=params
+        )
+
+        response.raise_for_status()
+
+        return response
+
+    async def get_run_artifact(
+        self, run_id: int, path: str, step: Optional[int] = None
+    ) -> Response:
+        """
+        Sends a request to the [get run artifact endpoint](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getArtifactsByRunId)
+        to fetch an artifact generated for a completed run.
+
+        Args:
+            run_id: The ID of the run to list run artifacts for.
+            path: The relative path to the run artifact (e.g. manifest.json, catalog.json,
+                run_results.json)
+            step: The index of the step in the run to query for artifacts. The
+                first step in the run has the index 1. If the step parameter is
+                omitted, then this method will return the artifacts compiled
+                for the last step in the run.
+
+        Returns:
+            The response from the dbt Cloud administrative API.
+        """  # noqa
+        params = dict()
+        if step:
+            params["step"] = step
+        response = await self._admin_client.get(
+            f"/runs/{run_id}/artifacts/{path}", params=params
         )
 
         response.raise_for_status()

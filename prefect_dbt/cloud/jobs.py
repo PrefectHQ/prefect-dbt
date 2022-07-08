@@ -290,7 +290,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
                 run_data["artifact_paths"] = await list_run_artifacts_state.result()
                 return run_data
             except DbtCloudListRunArtifactsFailed as ex:
-                logger.warn(
+                logger.warning(
                     "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
                     run_id,
                     ex,

@@ -20,6 +20,12 @@ class DbtCloudListRunArtifactsFailed(Exception):
     pass
 
 
+class DbtCloudGetRunArtifactFailed(Exception):
+    """Raised when unable to get a dbt Cloud run artifact"""
+
+    pass
+
+
 @task(
     name="Get dbt Cloud job run details",
     description="Retrieves details of a dbt Cloud job run "
@@ -100,7 +106,7 @@ async def list_dbt_cloud_run_artifacts(
         from prefect_dbt.cloud.jobs import list_dbt_cloud_run_artifacts
 
         @flow
-        def get_run_flow():
+        def list_artifacts_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
             return list_dbt_cloud_run_artifacts(
@@ -108,7 +114,7 @@ async def list_dbt_cloud_run_artifacts(
                 run_id=42
             )
 
-        get_run_flow()
+        list_artifacts_flow()
         ```
     """  # noqa
     try:
@@ -117,3 +123,63 @@ async def list_dbt_cloud_run_artifacts(
     except HTTPStatusError as ex:
         raise DbtCloudListRunArtifactsFailed(extract_user_message(ex)) from ex
     return response.json()["data"]
+
+
+@task(
+    name="Get dbt Cloud job artifact",
+    description="Fetches an artifact from a completed run.",
+    retries=3,
+    retry_delay_seconds=10,
+)
+async def get_dbt_cloud_run_artifact(
+    dbt_cloud_credentials: DbtCloudCredentials,
+    run_id: int,
+    path: str,
+    step: Optional[int] = None,
+):
+    """
+    A task to get an artifact generated for a completed run.
+
+    Args:
+        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
+        run_id: The ID of the run to list run artifacts for.
+        path: The relative path to the run artifact (e.g. manifest.json, catalog.json,
+            run_results.json)
+        step: The index of the step in the run to query for artifacts. The
+            first step in the run has the index 1. If the step parameter is
+            omitted, then this method will return the artifacts compiled
+            for the last step in the run.
+
+    Returns:
+        The contents of the requested manifest.
+
+    Example:
+        Get an artifact of a dbt Cloud job run:
+        ```python
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import get_dbt_cloud_run_artifact
+
+        @flow
+        def get_artifact_flow():
+            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+            return get_dbt_cloud_run_artifact(
+                dbt_cloud_credentials=credentials,
+                run_id=42,
+                path="manifest.json"
+            )
+
+        get_artifact_flow()
+        ```
+    """  # noqa
+
+    try:
+        async with dbt_cloud_credentials.get_administrative_client() as client:
+            response = await client.get_run_artifact(
+                run_id=run_id, path=path, step=step
+            )
+    except HTTPStatusError as ex:
+        raise DbtCloudGetRunArtifactFailed(extract_user_message(ex)) from ex
+    return response.json()
