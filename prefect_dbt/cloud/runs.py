@@ -1,5 +1,5 @@
 """Module containing tasks and flows for interacting with dbt Cloud job runs"""
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from httpx import HTTPStatusError
 from prefect import task
@@ -136,9 +136,10 @@ async def get_dbt_cloud_run_artifact(
     run_id: int,
     path: str,
     step: Optional[int] = None,
-):
+) -> Union[Dict, str]:
     """
-    A task to get an artifact generated for a completed run.
+    A task to get an artifact generated for a completed run. The requested artifact
+    is saved to a file in the current working directory.
 
     Args:
         dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
@@ -151,9 +152,10 @@ async def get_dbt_cloud_run_artifact(
             for the last step in the run.
 
     Returns:
-        The contents of the requested manifest.
+        The contents of the requested manifest. Returns a `Dict` if the
+            requested artifact is a JSON file and a `str` otherwise.
 
-    Example:
+    Examples:
         Get an artifact of a dbt Cloud job run:
         ```python
         from prefect import flow
@@ -173,6 +175,31 @@ async def get_dbt_cloud_run_artifact(
 
         get_artifact_flow()
         ```
+
+        Get an artifact of a dbt Cloud job run and write it to a file:
+        ```python
+        import json
+
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import get_dbt_cloud_run_artifact
+
+        @flow
+        def get_artifact_flow():
+            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+            get_run_artifact_future = get_dbt_cloud_run_artifact(
+                dbt_cloud_credentials=credentials,
+                run_id=42,
+                path="manifest.json"
+            )
+
+            with open("manifest.json", "w") as file:
+                json.dump(get_run_artifact_future.result(), file)
+
+        get_artifact_flow()
+        ```
     """  # noqa
 
     try:
@@ -182,4 +209,10 @@ async def get_dbt_cloud_run_artifact(
             )
     except HTTPStatusError as ex:
         raise DbtCloudGetRunArtifactFailed(extract_user_message(ex)) from ex
-    return response.json()
+
+    if path.endswith(".json"):
+        artifact_contents = response.json()
+    else:
+        artifact_contents = response.text
+
+    return artifact_contents

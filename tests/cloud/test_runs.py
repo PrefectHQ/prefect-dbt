@@ -111,6 +111,20 @@ class TestDbtCloudGetRunArtifact:
             }
         }
 
+    async def test_get_non_json_artifact(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/artifacts/compiled/dbt_artifacts/models/dim_dbt__current_models.sql",  # noqa
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, text="Hi! I'm some SQL!"))
+
+        response = await get_dbt_cloud_run_artifact.fn(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            run_id=12,
+            path="compiled/dbt_artifacts/models/dim_dbt__current_models.sql",
+        )
+
+        assert response == "Hi! I'm some SQL!"
+
     async def test_get_artifact_with_step(self, respx_mock, dbt_cloud_credentials):
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/artifacts/manifest.json?step=1",  # noqa
