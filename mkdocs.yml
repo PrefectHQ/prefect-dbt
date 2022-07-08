@@ -39,6 +39,7 @@ nav:
     - Cloud:
       - Credentials: cloud/credentials.md
       - Jobs: cloud/jobs.md
+      - Runs: cloud/runs.md
       - Clients: cloud/clients.md
       - Models: cloud/models.md
 
