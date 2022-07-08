@@ -1,5 +1,5 @@
 """Module containing clients for interacting with the dbt Cloud API"""
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import prefect
 from httpx import AsyncClient, Response
@@ -27,6 +27,26 @@ class DbtCloudAdministrativeClient:
                 "user-agent": f"prefect-{prefect.__version__}",
             },
             base_url=f"https://{domain}/api/v2/accounts/{account_id}",
+        )
+
+    async def call_endpoint(
+        self, http_method: str, path: str, params: Dict[str, Any], json: Dict[str, Any]
+    ) -> Response:
+        """
+        Call an endpoint in the dbt Cloud API.
+
+        Args:
+            path: The partial path for the request (e.g. /projects/). Will be appended
+                onto the base URL as determined by the client configuration.
+            http_method: HTTP method to call on the endpoint.
+            params: Query parameters to include in the request.
+            json: JSON serializable body to send in the request.
+
+        Returns:
+            The response from the dbt Cloud administrative API.
+        """
+        return await self._admin_client.request(
+            method=http_method, url=path, params=params, json=json
         )
 
     async def trigger_job_run(

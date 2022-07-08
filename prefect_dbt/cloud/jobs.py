@@ -164,7 +164,11 @@ async def trigger_dbt_cloud_job_run(
     return run_data
 
 
-@flow
+@flow(
+    name="Trigger dbt Cloud job run and wait for completions",
+    description="Triggers a dbt Cloud job run and waits for the"
+    "triggered run to complete.",
+)
 async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
