@@ -161,7 +161,7 @@ async def get_dbt_cloud_run_artifact(
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import get_dbt_cloud_run_artifact
+        from prefect_dbt.cloud.runs import get_dbt_cloud_run_artifact
 
         @flow
         def get_artifact_flow():
