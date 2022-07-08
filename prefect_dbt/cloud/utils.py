@@ -34,8 +34,8 @@ async def call_dbt_cloud_administrative_api_endpoint(
     dbt_cloud_credentials: DbtCloudCredentials,
     path: str,
     http_method: str,
-    params: Dict[str, Any],
-    json: Dict[str, Any],
+    params: Optional[Dict[str, Any]] = None,
+    json: Optional[Dict[str, Any]] = None,
 ) -> Any:
     """
     Task that calls a specified endpoint in the dbt Cloud administrative API. Use this
@@ -53,7 +53,27 @@ async def call_dbt_cloud_administrative_api_endpoint(
         The body of the response. If the body is JSON serializable, then the result of
             `json.loads` with the body as the input will be returned. Otherwise, the
             body will be returned directly.
-    """
+
+    Example:
+        List projects for an account:
+        ```python
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.utils import call_dbt_cloud_administrative_api_endpoint
+
+        @flow
+        def get_projects_flow():
+            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+            future = call_dbt_cloud_administrative_api_endpoint(
+                dbt_cloud_credentials=credentials,
+                path="/projects/",
+                http_method="get",
+            )
+            return future.result()["data"]
+        ```
+    """  # noqa
     async with dbt_cloud_credentials.get_administrative_client() as client:
         response = await client.call_endpoint(
             http_method=http_method, path=path, params=params, json=json

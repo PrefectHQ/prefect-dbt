@@ -30,7 +30,11 @@ class DbtCloudAdministrativeClient:
         )
 
     async def call_endpoint(
-        self, http_method: str, path: str, params: Dict[str, Any], json: Dict[str, Any]
+        self,
+        http_method: str,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """
         Call an endpoint in the dbt Cloud API.
@@ -45,9 +49,13 @@ class DbtCloudAdministrativeClient:
         Returns:
             The response from the dbt Cloud administrative API.
         """
-        return await self._admin_client.request(
+        response = await self._admin_client.request(
             method=http_method, url=path, params=params, json=json
         )
+
+        response.raise_for_status()
+
+        return response
 
     async def trigger_job_run(
         self, job_id: int, options: Optional[TriggerJobRunOptions] = None
