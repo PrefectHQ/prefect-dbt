@@ -78,7 +78,7 @@ async def call_dbt_cloud_administrative_api_endpoint(
         response = await client.call_endpoint(
             http_method=http_method, path=path, params=params, json=json
         )
-        try:
-            return response.json()
-        except JSONDecodeError:
-            return response.text
+    try:
+        return response.json()
+    except JSONDecodeError:
+        return response.text
