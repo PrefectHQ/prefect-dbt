@@ -70,7 +70,14 @@ def test_trigger_dbt_cli_command_run_twice_overwrite(
         "config": {},
         "prefecto": {
             "target": "testing",
-            "outputs": {"testing": {"type": "custom", "account": "fake"}},
+            "outputs": {
+                "testing": {
+                    "type": "custom",
+                    "schema": "schema",
+                    "threads": 4,
+                    "account": "fake",
+                }
+            },
         },
     }
     assert actual == expected
