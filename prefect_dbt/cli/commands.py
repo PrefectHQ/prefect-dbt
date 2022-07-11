@@ -102,13 +102,15 @@ async def trigger_dbt_cli_command(
         )
 
     # append the commands
-    command += " --profiles-dir {profiles_dir}"
+    command += f" --profiles-dir {profiles_dir}"
     if project_dir is not None:
         project_dir = Path(project_dir).expanduser()
-        command += " --project-dir {project_dir}"
+        command += f" --project-dir {project_dir}"
 
     # fix up empty shell_run_command_kwargs
     shell_run_command_kwargs = shell_run_command_kwargs or {}
+    if "logger" not in shell_run_command_kwargs:
+        shell_run_command_kwargs["logger"] = logger
 
     logger.info(f"Running dbt command: {command}")
     result = await shell_run_command(command=command, **shell_run_command_kwargs)

@@ -10,7 +10,7 @@ class DbtCliCredentials:
     have to be provided; instead, visit the [Available adapters](
     https://docs.getdbt.com/docs/available-adapters) page and
     browse the desired adapter's Profile Setup documentation
-    for valid keys to pass into profile_kwargs.
+    for valid keys to pass to the class.
 
     Args:
         profile_name: Profile name used for populating profiles.yml.
