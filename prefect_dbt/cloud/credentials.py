@@ -7,12 +7,13 @@ from prefect_dbt.cloud.clients import DbtCloudAdministrativeClient
 
 class DbtCloudCredentials(Block):
     """
-    Credentials class for credential use across dbt Cloud tasks and flows.
+    Credentials block for credential use across dbt Cloud tasks and flows.
 
     Args:
-        api_key: API key to authenticate with the dbt Cloud administrative API.
-        account_id: ID of dbt Cloud account with which to interact.
-        domain: Domain at which the dbt Cloud API is hosted.
+        api_key (SecretStr): API key to authenticate with the dbt Cloud
+            administrative API.
+        account_id (int): ID of dbt Cloud account with which to interact.
+        domain (Optional[str]): Domain at which the dbt Cloud API is hosted.
 
     Examples:
         Use DbtCloudCredentials instance to trigger a job run:

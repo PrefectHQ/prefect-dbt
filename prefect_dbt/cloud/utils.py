@@ -54,7 +54,7 @@ async def call_dbt_cloud_administrative_api_endpoint(
             `json.loads` with the body as the input will be returned. Otherwise, the
             body will be returned directly.
 
-    Example:
+    Examples:
         List projects for an account:
         ```python
         from prefect import flow
@@ -69,7 +69,42 @@ async def call_dbt_cloud_administrative_api_endpoint(
             future = call_dbt_cloud_administrative_api_endpoint(
                 dbt_cloud_credentials=credentials,
                 path="/projects/",
-                http_method="get",
+                http_method="GET",
+            )
+            return future.result()["data"]
+        ```
+
+        Create a new job:
+        ```python
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.utils import call_dbt_cloud_administrative_api_endpoint
+
+
+        @flow
+        def create_job_flow():
+            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+            future = call_dbt_cloud_administrative_api_endpoint(
+                dbt_cloud_credentials=credentials,
+                path="/jobs/",
+                http_method="POST",
+                json={
+                    "account_id": 123456789,
+                    "project_id": 100,
+                    "environment_id": 10,
+                    "name": "Nightly run",
+                    "dbt_version": "0.17.1",
+                    "triggers": {"github_webhook": True, "schedule": True},
+                    "execute_steps": ["dbt run", "dbt test", "dbt source snapshot-freshness"],
+                    "settings": {"threads": 4, "target_name": "prod"},
+                    "state": 1,
+                    "schedule": {
+                        "date": {"type": "every_day"},
+                        "time": {"type": "every_hour", "interval": 1},
+                    },
+                },
             )
             return future.result()["data"]
         ```
