@@ -45,6 +45,7 @@ class DbtCloudCredentials(Block):
     """
 
     _block_type_name = "dbt Cloud Credentials"
+    _logo_url = "https://asset.brandfetch.io/idofJOT4bu/idxrwTdDC-.svg"
     _code_example = """/
     ```python
         from prefect_dbt.cloud import DbtCloudCredentials
