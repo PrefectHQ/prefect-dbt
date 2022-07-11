@@ -1,1 +1,1 @@
-from .credentials import DbtCliCredentials  # noqa
+from .credentials import DbtCliProfile  # noqa

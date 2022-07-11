@@ -1,84 +1,84 @@
 """Module containing credentials for interacting with dbt CLI"""
 from dataclasses import dataclass
+from typing import Any, Dict
 
 
 @dataclass
-class DbtCliCredentials:
+class DbtCliProfile:
     """
-    Credentials class for credential use across dbt CLI tasks and flows.
-    Besides profile_name and profile_target, not all of the built-in args
-    have to be provided; instead, visit the [Available adapters](
-    https://docs.getdbt.com/docs/available-adapters) page and
-    browse the desired adapter's Profile Setup documentation
-    for valid keys to pass to the class.
+    Profile for use across dbt CLI tasks and flows.
 
     Args:
-        profile_name: Profile name used for populating profiles.yml.
-        profile_target: The default target your dbt project will use.
-        user: The user name used to authenticate.
-        password: The password used to authenticate.
-        host: The host address of the database.
-        port: The port to connect to the database.
-        **profile_kwargs
+        name: Profile name used for populating profiles.yml.
+        target: The default target your dbt project will use.
+        target_configs: Target configs contain credentials and
+            settings, specific to the warehouse you're connecting to.
+            To find valid keys, head to the [Available adapters](
+            https://docs.getdbt.com/docs/available-adapters) page and
+            click the desired adapter's "Profile Setup" hyperlink.
+        global_configs: Global configs control things like the visual output
+            of logs, the manner in which dbt parses your project,
+            and what to do when dbt finds a version mismatch
+            or a failing model. Valid keys can be found [here](
+            https://docs.getdbt.com/reference/global-configs)
 
     Examples:
-        Get dbt profile from DbtCliCredentials:
+        Get a dbt Snowflake profile from DbtCliProfile:
         ```python
-        from prefect_dbt.cli import DbtCliCredentials
-        dbt_cli_credentials = DbtCliCredentials(
-            profile_name="jaffle_shop",
-            profile_target="dev",
-            user="snowflake_user",
-            password="snowflake_password",
-            role="snowflake_role",
-            account="snowflake_account",
-            schema="schema",
+        from prefect_dbt.cli import DbtCliProfile
+        target_configs = dict(
+            type="snowflake",
+            account="account",
+
+            user="user",
+            password="password",
+
+            role="role",
             database="database",
             warehouse="warehouse",
+            schema="schema",
             threads=4,
+            client_session_keep_alive=False,
+            query_tag="query_tag",
         )
-        profile = dbt_cli_credentials.get_profile()
+        global_configs = dict(
+            send_anonymous_usage_stats=False,
+            use_colors=True,
+            partial_parse=False,
+            printer_width=88,
+            write_json=True,
+            warn_error=False,
+            log_format=True,
+            debug=True,
+            version_check=True,
+            fail_fast=True,
+            use_experimental_parser=True,
+            static_parser=False
+        )
+        dbt_cli_profile = DbtCliProfile(
+            name="jaffle_shop",
+            target="dev",
+            target_configs=target_configs,
+            global_configs=global_configs,
+        )
+        profile = dbt_cli_profile.get_profile()
         ```
     """
 
-    profile_name: str
-    profile_target: str
-    user: str = None
-    password: str = None
-    host: str = None
-    port: int = None
-
-    def __init__(
-        self,
-        profile_name: str,
-        profile_target: str,
-        user: str = None,
-        password: str = None,
-        host: str = None,
-        port: int = None,
-        **profile_kwargs,
-    ):
-        self.profile_name = profile_name
-        self.profile_target = profile_target
-        stripped_profile_kwargs = {
-            "user": user,
-            "password": password,
-            "host": host,
-            "port": port,
-            **profile_kwargs,
-        }
-        for key, val in stripped_profile_kwargs.items():
-            if val is not None:
-                self.profile_kwargs[key] = val
+    name: str
+    target: str
+    target_configs: Dict[str, Any]
+    global_configs: Dict[str, Any] = None
 
     def get_profile(self):
         """
         Returns the class's profile.
         """
         profile = {
-            self.profile_name: {
-                "outputs": {self.profile_target: self.profile_kwargs},
-                "target": self.profile_target,
-            }
+            "config": self.global_configs or {},
+            self.name: {
+                "target": self.target,
+                "outputs": {self.target: self.target_configs},
+            },
         }
         return profile
