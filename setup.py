@@ -26,7 +26,7 @@ setup(
     packages=find_packages(exclude=("tests", "docs")),
     python_requires=">=3.7",
     install_requires=install_requires,
-    extras_require={"dev": dev_requires},
+    extras_require={"dev": dev_requires, "cli": ["dbt_core>=1.1.1"]},
     entry_points={
         "prefect.collections": [
             "DbtCloudCredentials = prefect_dbt.cloud.credentials",

@@ -1,5 +1,7 @@
+"""Module containing tasks and flows for interacting with dbt CLI"""
 import os
 from pathlib import Path
+from shutil import which
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
@@ -85,7 +87,12 @@ async def trigger_dbt_cli_command(
     """  # noqa
     # check if variable is set, if not check env, if not use expected default
     logger = get_run_logger()
-    if not command.startswith("dbt"):
+    if not which("dbt"):
+        raise ImportError(
+            "dbt-core needs to be installed to use this task; run "
+            '`pip install "prefect-dbt[cli]"'
+        )
+    elif not command.startswith("dbt"):
         await shell_run_command.fn(command="dbt --help")
         raise ValueError(
             "Command is not a valid dbt sub-command; see dbt --help above,"
@@ -106,15 +113,15 @@ async def trigger_dbt_cli_command(
     # write the profile if overwrite or no profiles exist
     if overwrite_profiles or not profiles_path.exists():
         if dbt_cli_profile is None:
-            raise ValueError("dbt_cli_profile must be set for writing profiles!")
+            raise ValueError("Provide `dbt_cli_profile` keyword for writing profiles")
         profile = dbt_cli_profile.get_profile()
         profiles_dir.mkdir(exist_ok=True)
         with open(profiles_path, "w+") as f:
             yaml.dump(profile, f, default_flow_style=False)
     elif dbt_cli_profile is not None:
-        logger.warning(
+        raise ValueError(
             f"Since overwrite_profiles is False and profiles_path ({profiles_path}) "
-            f"already exists, the profile within dbt_cli_profile was NOT used"
+            f"already exists, the profile within dbt_cli_profile could not be used"
         )
 
     # append the options
