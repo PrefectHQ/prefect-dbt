@@ -1,7 +1,45 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from prefect.blocks.core import Block
+from pydantic import BaseModel, Extra, Field
+
+
+class TargetConfigs(BaseModel, extra=Extra.allow):
+    """
+    Target configs contain credentials and
+    settings, specific to the warehouse you're connecting to.
+    To find valid keys, head to the [Available adapters](
+    https://docs.getdbt.com/docs/available-adapters) page and
+    click the desired adapter's "Profile Setup" hyperlink.
+    """
+
+    type: str
+    schema_: str = Field(alias="schema")
+    threads: int = 4
+
+
+class GlobalConfigs(BaseModel, extra=Extra.allow):
+    """
+    Global configs control things like the visual output
+    of logs, the manner in which dbt parses your project,
+    and what to do when dbt finds a version mismatch
+    or a failing model. Valid keys can be found [here](
+    https://docs.getdbt.com/reference/global-configs)
+    """
+
+    send_anonymous_usage_stats: bool = None
+    use_colors: bool = None
+    partial_parse: bool = None
+    printer_width: int = None
+    write_json: bool = None
+    warn_error: bool = None
+    log_format: bool = None
+    debug: bool = None
+    version_check: bool = None
+    fail_fast: bool = None
+    use_experimental_parser: bool = None
+    static_parser: bool = None
 
 
 class DbtCliProfile(Block):
@@ -20,7 +58,7 @@ class DbtCliProfile(Block):
             of logs, the manner in which dbt parses your project,
             and what to do when dbt finds a version mismatch
             or a failing model. Valid keys can be found [here](
-            https://docs.getdbt.com/reference/global-configs)
+            https://docs.getdbt.com/reference/global-configs).
 
     Examples:
         Get a dbt Snowflake profile from DbtCliProfile:
@@ -82,13 +120,29 @@ class DbtCliProfile(Block):
 
     name: str
     target: str
-    target_configs: Dict[str, Any]
-    global_configs: Optional[Dict[str, Any]] = None
+    target_configs: Union[TargetConfigs, Dict[str, Any]]
+    global_configs: Union[GlobalConfigs, Optional[Dict[str, Any]]] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if "type" not in self.target_configs:
-            raise ValueError("A `type` must be specified in `target_configs`")
+        self.target_configs = self._parse_configs(self.target_configs, TargetConfigs)
+        self.global_configs = self._parse_configs(self.global_configs, GlobalConfigs)
+
+    @staticmethod
+    def _parse_configs(
+        configs: Union[BaseModel, Dict[str, Any]], base_model: BaseModel
+    ) -> Dict[str, Any]:
+        """
+        Helper function to parse configs when passed either as
+        dict or pydantic model.
+        """
+        if isinstance(configs, dict):
+            base_model.validate(configs)
+        else:
+            configs = {
+                k.rstrip("_"): v for k, v in configs.dict().items() if v is not None
+            }
+        return configs
 
     def get_profile(self):
         """

@@ -50,6 +50,7 @@ def dbt_cli_profile():
 def dbt_cli_profile_bare():
     target_configs = dict(
         type="custom",
+        schema="schema",
         account="fake",
     )
     return DbtCliProfile(
