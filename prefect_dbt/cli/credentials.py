@@ -63,9 +63,11 @@ class DbtCliProfile(Block):
     Examples:
         Get a dbt Snowflake profile from DbtCliProfile:
         ```python
-        from prefect_dbt.cli import DbtCliProfile
+        from prefect_dbt.cli.credentials import (
+            DbtCliProfile, TargetConfigs, GlobalConfigs
+        )
 
-        target_configs = dict(
+        target_configs = TargetConfigs(
             type="snowflake",
             account="account",
 
@@ -80,7 +82,7 @@ class DbtCliProfile(Block):
             client_session_keep_alive=False,
             query_tag="query_tag",
         )
-        global_configs = dict(
+        global_configs = GlobalConfigs(
             send_anonymous_usage_stats=False,
             use_colors=True,
             partial_parse=False,
