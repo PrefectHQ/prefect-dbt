@@ -28,7 +28,10 @@ setup(
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
     entry_points={
-        "prefect.collections": ["DbtCloudCredentials = prefect_dbt.cloud.credentials"]
+        "prefect.collections": [
+            "DbtCloudCredentials = prefect_dbt.cloud.credentials",
+            "DbtCliProfile = prefect_dbt.cli.credentials",
+        ]
     },
     classifiers=[
         "Natural Language :: English",

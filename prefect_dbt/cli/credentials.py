@@ -2,9 +2,11 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
+from prefect.blocks.core import Block
+
 
 @dataclass
-class DbtCliProfile:
+class DbtCliProfile(Block):
     """
     Profile for use across dbt CLI tasks and flows.
 
@@ -26,6 +28,7 @@ class DbtCliProfile:
         Get a dbt Snowflake profile from DbtCliProfile:
         ```python
         from prefect_dbt.cli import DbtCliProfile
+
         target_configs = dict(
             type="snowflake",
             account="account",
@@ -63,7 +66,21 @@ class DbtCliProfile:
         )
         profile = dbt_cli_profile.get_profile()
         ```
+
+    Load saved dbt CLI profile:
+        ```python
+        from prefect_dbt.cloud import DbtCliProfile
+        profile = DbtCliProfile.load("my-dbt-credentials").get_profile()
+        ```
     """
+
+    _block_type_name = "dbt CLI Profile"
+    _logo_url = "https://asset.brandfetch.io/idofJOT4bu/idxrwTdDC-.svg"
+    _code_example = """/
+    ```python
+        from prefect_dbt.cli import DbtCliProfile
+        dbt_cli_profile = DbtCliProfile.load("BLOCK_NAME")
+    ```"""
 
     name: str
     target: str

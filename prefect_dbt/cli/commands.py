@@ -45,7 +45,7 @@ async def trigger_dbt_cli_command(
         returns all lines as a list; else the last line as a string.
 
     Examples:
-        Execute `dbt run`.
+        Execute `dbt debug`.
         ```python
         from prefect import flow
         from prefect_dbt.cli import DbtCliProfile
@@ -53,9 +53,6 @@ async def trigger_dbt_cli_command(
 
         @flow
         def trigger_dbt_cli_command_flow():
-            from prefect_dbt.cli import DbtCliProfile
-            from prefect_dbt.cli.commands import trigger_dbt_cli_command
-
             target_configs = dict(
                 type="snowflake",
                 account="account",
@@ -77,7 +74,7 @@ async def trigger_dbt_cli_command(
                 target_configs=target_configs,
             )
             result = trigger_dbt_cli_command(
-                "dbt run",
+                "dbt debug",
                 overwrite_profiles=True,
                 dbt_cli_profile=dbt_cli_profile
             )
