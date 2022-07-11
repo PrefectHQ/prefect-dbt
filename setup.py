@@ -11,6 +11,9 @@ with open("requirements-dev.txt") as dev_requires_file:
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
+extras_require = {"cli": ["dbt_core>=1.1.1"]}
+extras_require["dev"] = dev_requires + extras_require["cli"]
+
 setup(
     name="prefect-dbt",
     description="Prefect integration for working with dbt",
@@ -26,7 +29,7 @@ setup(
     packages=find_packages(exclude=("tests", "docs")),
     python_requires=">=3.7",
     install_requires=install_requires,
-    extras_require={"dev": dev_requires, "cli": ["dbt_core>=1.1.1"]},
+    extras_require=extras_require,
     entry_points={
         "prefect.collections": [
             "DbtCloudCredentials = prefect_dbt.cloud.credentials",
