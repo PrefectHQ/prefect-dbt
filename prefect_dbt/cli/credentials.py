@@ -140,10 +140,12 @@ class DbtCliProfile(Block):
         """
         if isinstance(configs, dict):
             base_model.validate(configs)
-        else:
+        elif isinstance(configs, BaseModel):
             configs = {
                 k.rstrip("_"): v for k, v in configs.dict().items() if v is not None
             }
+        else:
+            configs = {}
         return configs
 
     def get_profile(self):
