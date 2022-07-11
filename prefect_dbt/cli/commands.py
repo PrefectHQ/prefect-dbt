@@ -77,6 +77,14 @@ async def trigger_dbt_cli_command(
     """  # noqa
     # check if variable is set, if not check env, if not use expected default
     logger = get_run_logger()
+    if not command.startswith("dbt"):
+        await shell_run_command.fn(command="dbt --help")
+        raise ValueError(
+            "Command is not a valid dbt sub-command; see dbt --help above,"
+            "or use prefect_shell.commands.shell_run_command for non-dbt related "
+            "commands instead"
+        )
+
     if profiles_dir is None:
         profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
     profiles_dir = Path(profiles_dir).expanduser()
@@ -101,7 +109,7 @@ async def trigger_dbt_cli_command(
             f"already exists, the profile within dbt_cli_credentials was NOT used"
         )
 
-    # append the commands
+    # append the options
     command += f" --profiles-dir {profiles_dir}"
     if project_dir is not None:
         project_dir = Path(project_dir).expanduser()
