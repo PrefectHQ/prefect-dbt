@@ -1,11 +1,9 @@
 """Module containing credentials for interacting with dbt CLI"""
-from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
 
 
-@dataclass
 class DbtCliProfile(Block):
     """
     Profile for use across dbt CLI tasks and flows.
@@ -85,7 +83,12 @@ class DbtCliProfile(Block):
     name: str
     target: str
     target_configs: Dict[str, Any]
-    global_configs: Dict[str, Any] = None
+    global_configs: Optional[Dict[str, Any]] = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "type" not in self.target_configs:
+            raise ValueError("A `type` must be specified in `target_configs`")
 
     def get_profile(self):
         """
