@@ -34,7 +34,7 @@ async def trigger_dbt_cli_command(
         Default is the current working directory and its parents.
     overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
         should be overwritten with a new profile.
-    dbt_cli_profile: Credentials class containing the profile written to profiles.yml.
+    dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
         Note! This is optional and has no effect if profiles.yml already exists under profile_dir
         and overwrite_profiles is set to False.
     **shell_run_command_kwargs: Additional keyword arguments to pass to
