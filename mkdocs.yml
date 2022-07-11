@@ -42,4 +42,5 @@ nav:
       - Runs: cloud/runs.md
       - Clients: cloud/clients.md
       - Models: cloud/models.md
+      - Utils: cloud/utils.md
 

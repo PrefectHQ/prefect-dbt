@@ -1,5 +1,5 @@
 """Module containing clients for interacting with the dbt Cloud API"""
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import prefect
 from httpx import AsyncClient, Response
@@ -29,6 +29,34 @@ class DbtCloudAdministrativeClient:
             base_url=f"https://{domain}/api/v2/accounts/{account_id}",
         )
 
+    async def call_endpoint(
+        self,
+        http_method: str,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+    ) -> Response:
+        """
+        Call an endpoint in the dbt Cloud API.
+
+        Args:
+            path: The partial path for the request (e.g. /projects/). Will be appended
+                onto the base URL as determined by the client configuration.
+            http_method: HTTP method to call on the endpoint.
+            params: Query parameters to include in the request.
+            json: JSON serializable body to send in the request.
+
+        Returns:
+            The response from the dbt Cloud administrative API.
+        """
+        response = await self._admin_client.request(
+            method=http_method, url=path, params=params, json=json
+        )
+
+        response.raise_for_status()
+
+        return response
+
     async def trigger_job_run(
         self, job_id: int, options: Optional[TriggerJobRunOptions] = None
     ) -> Response:
@@ -46,14 +74,11 @@ class DbtCloudAdministrativeClient:
         if options is None:
             options = TriggerJobRunOptions()
 
-        response = await self._admin_client.post(
-            url=f"/jobs/{job_id}/run/",
+        return await self.call_endpoint(
+            path=f"/jobs/{job_id}/run/",
+            http_method="POST",
             json=options.dict(exclude_none=True),
         )
-
-        response.raise_for_status()
-
-        return response
 
     async def get_run(self, run_id: int) -> Response:
         """
@@ -66,11 +91,7 @@ class DbtCloudAdministrativeClient:
         Returns:
             The response from the dbt Cloud administrative API.
         """  # noqa
-        response = await self._admin_client.get(f"/runs/{run_id}/")
-
-        response.raise_for_status()
-
-        return response
+        return await self.call_endpoint(path=f"/runs/{run_id}/", http_method="GET")
 
     async def list_run_artifacts(
         self, run_id: int, step: Optional[int] = None
@@ -90,13 +111,9 @@ class DbtCloudAdministrativeClient:
             The response from the dbt Cloud administrative API.
         """  # noqa
         params = {"step": step} if step else None
-        response = await self._admin_client.get(
-            f"/runs/{run_id}/artifacts/", params=params
+        return await self.call_endpoint(
+            path=f"/runs/{run_id}/artifacts/", http_method="GET", params=params
         )
-
-        response.raise_for_status()
-
-        return response
 
     async def get_run_artifact(
         self, run_id: int, path: str, step: Optional[int] = None
@@ -118,13 +135,9 @@ class DbtCloudAdministrativeClient:
             The response from the dbt Cloud administrative API.
         """  # noqa
         params = {"step": step} if step else None
-        response = await self._admin_client.get(
-            f"/runs/{run_id}/artifacts/{path}", params=params
+        return await self.call_endpoint(
+            path=f"/runs/{run_id}/artifacts/{path}", http_method="GET", params=params
         )
-
-        response.raise_for_status()
-
-        return response
 
     async def __aenter__(self):
         if self._closed:
