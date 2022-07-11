@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from prefect import get_run_logger, task
-from prefect_shell.utils import shell_run_command
+from prefect_shell.commands import shell_run_command
 
 from prefect_dbt.cli.credentials import DbtCliCredentials
 
@@ -109,9 +109,7 @@ async def trigger_dbt_cli_command(
 
     # fix up empty shell_run_command_kwargs
     shell_run_command_kwargs = shell_run_command_kwargs or {}
-    if "logger" not in shell_run_command_kwargs:
-        shell_run_command_kwargs["logger"] = logger
 
     logger.info(f"Running dbt command: {command}")
-    result = await shell_run_command(command=command, **shell_run_command_kwargs)
+    result = await shell_run_command.fn(command=command, **shell_run_command_kwargs)
     return result
