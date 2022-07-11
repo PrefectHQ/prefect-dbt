@@ -1,4 +1,4 @@
-"""Module containing tasks and flows for interacting with dbt Cloud"""
+"""Module containing tasks and flows for interacting with dbt Cloud jobs"""
 import asyncio
 from enum import Enum
 from typing import Dict, Optional
@@ -8,17 +8,16 @@ from prefect import flow, get_run_logger, task
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
+from prefect_dbt.cloud.runs import (
+    DbtCloudListRunArtifactsFailed,
+    get_dbt_cloud_run_info,
+    list_dbt_cloud_run_artifacts,
+)
 from prefect_dbt.cloud.utils import extract_user_message
 
 
 class DbtCloudJobRunTriggerFailed(Exception):
     """Raised when a dbt Cloud job trigger fails"""
-
-    pass
-
-
-class DbtCloudGetRunFailed(Exception):
-    """Raised when unable to retrieve dbt Cloud run"""
 
     pass
 
@@ -165,55 +164,11 @@ async def trigger_dbt_cloud_job_run(
     return run_data
 
 
-@task(
-    name="Get dbt Cloud job run details",
-    description="Retrieves details of a dbt Cloud job run "
-    "for the run with the given run_id.",
-    retries=3,
-    retry_delay_seconds=10,
+@flow(
+    name="Trigger dbt Cloud job run and wait for completions",
+    description="Triggers a dbt Cloud job run and waits for the"
+    "triggered run to complete.",
 )
-async def get_dbt_cloud_run_info(
-    dbt_cloud_credentials: DbtCloudCredentials, run_id: int
-) -> Dict:
-    """
-    A task to retrieve information about a dbt Cloud job run.
-
-    Args:
-        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
-        run_id: The ID of the job to trigger.
-
-    Returns:
-        The run data returned by the dbt Cloud administrative API.
-
-    Example:
-        Get status of a dbt Cloud job run:
-        ```python
-        from prefect import flow
-
-        from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import get_run
-
-        @flow
-        def get_run_flow():
-            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
-
-            return get_run(
-                dbt_cloud_credentials=credentials,
-                run_id=42
-            )
-
-        get_run_flow()
-        ```
-    """  # noqa
-    try:
-        async with dbt_cloud_credentials.get_administrative_client() as client:
-            response = await client.get_run(run_id=run_id)
-    except HTTPStatusError as ex:
-        raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
-    return response.json()["data"]
-
-
-@flow
 async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
@@ -311,6 +266,8 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         ```
 
     """  # noqa
+    logger = get_run_logger()
+
     trigger_job_run_future = await trigger_dbt_cloud_job_run(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
@@ -330,18 +287,37 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         run_status_code = run_data.get("status")
 
         if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
+            try:
+                list_run_artifacts_state = await list_dbt_cloud_run_artifacts(
+                    dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
+                )
+                run_data["artifact_paths"] = await list_run_artifacts_state.result()
+                return run_data
+            except DbtCloudListRunArtifactsFailed as ex:
+                logger.warning(
+                    "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
+                    run_id,
+                    ex,
+                )
+
             return run_data
         elif run_status_code == DbtCloudJobRunStatus.FAILED.value:
             raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
         elif run_status_code == DbtCloudJobRunStatus.CANCELLED.value:
             raise DbtCloudJobRunCancelled(
-                f"Triggered job run with ID: {run_id} was cancelled."
+                f"Triggered job run with ID {run_id} was cancelled."
             )
 
+        logger.info(
+            "dbt Cloud job run with ID %i has status %s. Waiting for %i seconds.",
+            run_id,
+            DbtCloudJobRunStatus(run_status_code).name,
+            poll_frequency_seconds,
+        )
         await asyncio.sleep(poll_frequency_seconds)
         seconds_waited_for_run_completion += poll_frequency_seconds
 
     raise DbtCloudJobRunTimedOut(
         f"Max wait time of {max_wait_seconds} seconds exceeded while waiting "
-        "for job run with ID: {run_id}"
+        "for job run with ID {run_id}"
     )

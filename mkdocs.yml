@@ -39,8 +39,11 @@ nav:
     - Cloud:
       - Credentials: cloud/credentials.md
       - Jobs: cloud/jobs.md
+      - Runs: cloud/runs.md
       - Clients: cloud/clients.md
       - Models: cloud/models.md
+      - Utils: cloud/utils.md
     - CLI:
       - Credentials: cli/credentials.md
       - CLI: cli/commands.md
+
