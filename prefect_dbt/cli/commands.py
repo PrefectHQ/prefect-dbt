@@ -47,7 +47,20 @@ async def trigger_dbt_cli_command(
         returns all lines as a list; else the last line as a string.
 
     Examples:
-        Execute `dbt debug`.
+        Execute `dbt debug` with a pre-populated profiles.yml.
+        ```python
+        from prefect import flow
+        from prefect_dbt.cli.commands import trigger_dbt_cli_command
+
+        @flow
+        def trigger_dbt_cli_command_flow():
+            result = trigger_dbt_cli_command("dbt debug")
+            return result
+
+        trigger_dbt_cli_command_flow()
+        ```
+
+        Execute `dbt debug` without a pre-populated profiles.yml.
         ```python
         from prefect import flow
         from prefect_dbt.cli import DbtCliProfile
