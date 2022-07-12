@@ -1,5 +1,5 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
 from pydantic import BaseModel, Extra, Field
@@ -122,31 +122,25 @@ class DbtCliProfile(Block):
 
     name: str
     target: str
-    target_configs: Union[TargetConfigs, Dict[str, Any]]
-    global_configs: Union[GlobalConfigs, Optional[Dict[str, Any]]] = None
+    target_configs: TargetConfigs
+    global_configs: Optional[GlobalConfigs] = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.target_configs = self._parse_configs(self.target_configs, TargetConfigs)
-        self.global_configs = self._parse_configs(self.global_configs, GlobalConfigs)
+    def block_initialization(self):
+        self.target_configs = self._parse_configs(self.target_configs)
+        self.global_configs = self._parse_configs(self.global_configs)
 
     @staticmethod
-    def _parse_configs(
-        configs: Union[BaseModel, Dict[str, Any]], base_model: BaseModel
-    ) -> Dict[str, Any]:
+    def _parse_configs(configs: BaseModel) -> Dict[str, Any]:
         """
         Helper function to parse configs when passed either as
         dict or pydantic model.
         """
-        if isinstance(configs, dict):
-            base_model.validate(configs)
+        if configs is None:
+            return {}
         elif isinstance(configs, BaseModel):
-            configs = {
+            return {
                 k.rstrip("_"): v for k, v in configs.dict().items() if v is not None
             }
-        else:
-            configs = {}
-        return configs
 
     def get_profile(self):
         """

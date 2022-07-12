@@ -63,12 +63,12 @@ async def trigger_dbt_cli_command(
         Execute `dbt debug` without a pre-populated profiles.yml.
         ```python
         from prefect import flow
-        from prefect_dbt.cli import DbtCliProfile
+        from prefect_dbt.cli.credentials import DbtCliProfile, TargetConfigs
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
 
         @flow
         def trigger_dbt_cli_command_flow():
-            target_configs = dict(
+            target_configs = TargetConfigs(
                 type="snowflake",
                 account="account",
 
@@ -135,7 +135,7 @@ async def trigger_dbt_cli_command(
         raise ValueError(
             f"Since overwrite_profiles is False and profiles_path ({profiles_path}) "
             f"already exists, the profile within dbt_cli_profile could not be used; "
-            f"if you prefer to use the existing profile, do not pass dbt_cli_profile"
+            f"if the existing profile is satisfactory, do not pass dbt_cli_profile"
         )
 
     # append the options
