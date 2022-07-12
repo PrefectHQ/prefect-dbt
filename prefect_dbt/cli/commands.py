@@ -131,6 +131,7 @@ async def trigger_dbt_cli_command(
         profiles_dir.mkdir(exist_ok=True)
         with open(profiles_path, "w+") as f:
             yaml.dump(profile, f, default_flow_style=False)
+        logger.info(f"Wrote profile to {profiles_path}")
     elif dbt_cli_profile is not None:
         raise ValueError(
             f"Since overwrite_profiles is False and profiles_path ({profiles_path}) "

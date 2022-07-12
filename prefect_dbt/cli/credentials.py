@@ -47,17 +47,18 @@ class DbtCliProfile(Block):
     Profile for use across dbt CLI tasks and flows.
 
     Args:
-        name: Profile name used for populating profiles.yml.
-        target: The default target your dbt project will use.
-        target_configs: Target configs contain credentials and
+        name (str): Profile name used for populating profiles.yml.
+        target (str): The default target your dbt project will use.
+        target_configs (TargetConfigs): Target configs contain credentials and
             settings, specific to the warehouse you're connecting to.
             To find valid keys, head to the [Available adapters](
             https://docs.getdbt.com/docs/available-adapters) page and
             click the desired adapter's "Profile Setup" hyperlink.
-        global_configs: Global configs control things like the visual output
-            of logs, the manner in which dbt parses your project,
-            and what to do when dbt finds a version mismatch
-            or a failing model. Valid keys can be found [here](
+        global_configs (GlobalConfigs): Global configs control
+            things like the visual output of logs, the manner
+            in which dbt parses your project, and what to do when
+            dbt finds a version mismatch or a failing model.
+            Valid keys can be found [here](
             https://docs.getdbt.com/reference/global-configs).
 
     Examples:
