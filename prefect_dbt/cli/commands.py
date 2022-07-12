@@ -134,7 +134,8 @@ async def trigger_dbt_cli_command(
     elif dbt_cli_profile is not None:
         raise ValueError(
             f"Since overwrite_profiles is False and profiles_path ({profiles_path}) "
-            f"already exists, the profile within dbt_cli_profile could not be used"
+            f"already exists, the profile within dbt_cli_profile could not be used; "
+            f"if you prefer to use the existing profile, do not pass dbt_cli_profile"
         )
 
     # append the options
