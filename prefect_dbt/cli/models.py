@@ -1,4 +1,4 @@
-"""Module containing models for interacting with target configs"""
+"""Module containing models for configs"""
 from pathlib import Path
 from typing import Optional, Union
 
