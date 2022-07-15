@@ -1,45 +1,11 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel
 
-
-class TargetConfigs(BaseModel, extra=Extra.allow):
-    """
-    Target configs contain credentials and
-    settings, specific to the warehouse you're connecting to.
-    To find valid keys, head to the [Available adapters](
-    https://docs.getdbt.com/docs/available-adapters) page and
-    click the desired adapter's "Profile Setup" hyperlink.
-    """
-
-    type: str
-    schema_: str = Field(alias="schema")
-    threads: int = 4
-
-
-class GlobalConfigs(BaseModel, extra=Extra.allow):
-    """
-    Global configs control things like the visual output
-    of logs, the manner in which dbt parses your project,
-    and what to do when dbt finds a version mismatch
-    or a failing model. Valid keys can be found [here](
-    https://docs.getdbt.com/reference/global-configs)
-    """
-
-    send_anonymous_usage_stats: bool = None
-    use_colors: bool = None
-    partial_parse: bool = None
-    printer_width: int = None
-    write_json: bool = None
-    warn_error: bool = None
-    log_format: bool = None
-    debug: bool = None
-    version_check: bool = None
-    fail_fast: bool = None
-    use_experimental_parser: bool = None
-    static_parser: bool = None
+if TYPE_CHECKING:
+    from prefect_dbt.cli.models import GlobalConfigs, TargetConfigs
 
 
 class DbtCliProfile(Block):
@@ -64,11 +30,13 @@ class DbtCliProfile(Block):
     Examples:
         Get a dbt Snowflake profile from DbtCliProfile:
         ```python
-        from prefect_dbt.cli.credentials import (
-            DbtCliProfile, TargetConfigs, GlobalConfigs
+        from prefect_dbt.cli import DbtCliProfile
+        from prefect_dbt.cli.models import (
+            SnowflakeUserPasswordTargetConfigs,
+            GlobalConfigs
         )
 
-        target_configs = TargetConfigs(
+        target_configs = SnowflakeUserPasswordTargetConfigs(
             type="snowflake",
             account="account",
 
@@ -123,8 +91,8 @@ class DbtCliProfile(Block):
 
     name: str
     target: str
-    target_configs: TargetConfigs
-    global_configs: Optional[GlobalConfigs] = None
+    target_configs: "TargetConfigs"
+    global_configs: Optional["GlobalConfigs"] = None
 
     def block_initialization(self):
         self.target_configs = self._parse_configs(self.target_configs)

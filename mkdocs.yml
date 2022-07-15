@@ -46,4 +46,4 @@ nav:
     - CLI:
       - Credentials: cli/credentials.md
       - CLI: cli/commands.md
-
+      - Models: cli/models.md
