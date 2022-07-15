@@ -1,11 +1,10 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from prefect_dbt.cli.models import GlobalConfigs, TargetConfigs
+from prefect_dbt.cli.models import GlobalConfigs, TargetConfigs
 
 
 class DbtCliProfile(Block):
@@ -91,8 +90,8 @@ class DbtCliProfile(Block):
 
     name: str
     target: str
-    target_configs: "TargetConfigs"
-    global_configs: Optional["GlobalConfigs"] = None
+    target_configs: TargetConfigs
+    global_configs: Optional[GlobalConfigs] = None
 
     def block_initialization(self):
         self.target_configs = self._parse_configs(self.target_configs)

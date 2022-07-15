@@ -63,12 +63,13 @@ async def trigger_dbt_cli_command(
         Execute `dbt debug` without a pre-populated profiles.yml.
         ```python
         from prefect import flow
-        from prefect_dbt.cli.credentials import DbtCliProfile, TargetConfigs
+        from prefect_dbt.cli.credentials import DbtCliProfile
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
+        from prefect_dbt.cli.models import SnowflakeUserPasswordTargetConfigs
 
         @flow
         def trigger_dbt_cli_command_flow():
-            target_configs = TargetConfigs(
+            target_configs = SnowflakeUserPasswordTargetConfigs(
                 type="snowflake",
                 account="account",
 
