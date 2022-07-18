@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from prefect.blocks.core import Block
 from pydantic import BaseModel
 
-from prefect_dbt.cli.models import GlobalConfigs, TargetConfigs
+from prefect_dbt.cli.configs.snowflake import GlobalConfigs, TargetConfigs
 
 
 class DbtCliProfile(Block):
@@ -30,9 +30,9 @@ class DbtCliProfile(Block):
         Get a dbt Snowflake profile from DbtCliProfile:
         ```python
         from prefect_dbt.cli import DbtCliProfile
-        from prefect_dbt.cli.models import (
-            SnowflakeUserPasswordTargetConfigs,
-            GlobalConfigs
+        from prefect_dbt.cli.configs import GlobalConfigs
+        from prefect_dbt.cli.configs.snowflake import (
+            SnowflakeUserPasswordTargetConfigs
         )
 
         target_configs = SnowflakeUserPasswordTargetConfigs(
@@ -75,7 +75,7 @@ class DbtCliProfile(Block):
 
     Load saved dbt CLI profile:
         ```python
-        from prefect_dbt.cloud import DbtCliProfile
+        from prefect_dbt.cli import DbtCliProfile
         profile = DbtCliProfile.load("my-dbt-credentials").get_profile()
         ```
     """

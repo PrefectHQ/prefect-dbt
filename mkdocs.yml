@@ -46,4 +46,6 @@ nav:
     - CLI:
       - Credentials: cli/credentials.md
       - CLI: cli/commands.md
-      - Models: cli/models.md
+      - Configs:
+        - Base: cli/configs/base
+        - Snowflake: cli/configs/snowflake

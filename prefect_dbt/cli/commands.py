@@ -65,7 +65,7 @@ async def trigger_dbt_cli_command(
         from prefect import flow
         from prefect_dbt.cli.credentials import DbtCliProfile
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
-        from prefect_dbt.cli.models import SnowflakeUserPasswordTargetConfigs
+        from prefect_dbt.cli.configs.snowflake import SnowflakeUserPasswordTargetConfigs
 
         @flow
         def trigger_dbt_cli_command_flow():
