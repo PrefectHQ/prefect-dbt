@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from prefect.blocks.core import Block
 from pydantic import BaseModel
 
-from prefect_dbt.cli.configs.snowflake import GlobalConfigs, TargetConfigs
+from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 
 
 class DbtCliProfile(Block):
