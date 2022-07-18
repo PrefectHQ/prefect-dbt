@@ -30,7 +30,7 @@ class GlobalConfigs(BaseModel, extra=Extra.allow):
     of logs, the manner in which dbt parses your project,
     and what to do when dbt finds a version mismatch
     or a failing model. Valid keys can be found [here](
-    https://docs.getdbt.com/reference/global-configs)
+    https://docs.getdbt.com/reference/global-configs).
     """
 
     send_anonymous_usage_stats: Optional[bool] = None
