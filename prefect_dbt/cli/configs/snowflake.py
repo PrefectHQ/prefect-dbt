@@ -19,6 +19,18 @@ class SnowflakeTargetConfigs(TargetConfigs, extra=Extra.allow):
     To find valid keys, head to the [Snowflake Profile](
     https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile)
     page.
+
+    Args:
+        account:
+        role:
+        database:
+        warehouse:
+        client_session_keep_alive:
+        query_tag:
+        connect_retries:
+        connect_timeout:
+        retry_on_database_errors:
+        retry_all:
     """
 
     account: str
@@ -36,9 +48,14 @@ class SnowflakeTargetConfigs(TargetConfigs, extra=Extra.allow):
 class SnowflakeUserPasswordTargetConfigs(SnowflakeTargetConfigs, extra=Extra.allow):
     """
     Target configs contain credentials and settings, specific to Snowflake,
-    with user and password authentication. Descriptions can be found at the
+    with user and password authentication. Docs can be found at the
     [Snowflake Profile](
     https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile) page.
+
+    Args:
+        user:
+        password:
+        authenticator:
     """
 
     user: str
@@ -49,8 +66,12 @@ class SnowflakeUserPasswordTargetConfigs(SnowflakeTargetConfigs, extra=Extra.all
 class SnowflakeKeyPairTargetConfigs(SnowflakeTargetConfigs, extra=Extra.allow):
     """
     Target configs contain credentials and settings, specific to Snowflake,
-    with key pair authentication. Descriptions can be found at the [Snowflake Profile](
+    with key pair authentication. Docs can be found at the [Snowflake Profile](
     https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile) page.
+
+    Args:
+        private_key_path:
+        private_key_passphrase:
     """
 
     private_key_path: Union[Path, str]
@@ -60,8 +81,11 @@ class SnowflakeKeyPairTargetConfigs(SnowflakeTargetConfigs, extra=Extra.allow):
 class SnowflakeSsoTargetConfigs(SnowflakeTargetConfigs, extra=Extra.allow):
     """
     Target configs contain credentials and settings, specific to Snowflake,
-    with SSO authentication. Descriptions can be found at the [Snowflake Profile](
+    with SSO authentication. Docs can be found at the [Snowflake Profile](
     https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile) page.
+
+    Args:
+        authenticator:
     """
 
     authenticator: str = "externalbrowser"

@@ -17,6 +17,13 @@ class TargetConfigs(BaseModel, extra=Extra.allow):
     To find valid keys, head to the [Available adapters](
     https://docs.getdbt.com/docs/available-adapters) page and
     click the desired adapter's "Profile Setup" hyperlink.
+
+    Args:
+        type: The name of the database warehouse
+        schema: The schema that dbt will build objects into;
+            in BigQuery, a schema is actually a dataset.
+        threads: The number of threads representing the max number
+            of paths through the graph dbt may work on at once.
     """
 
     type: str
@@ -29,8 +36,22 @@ class GlobalConfigs(BaseModel, extra=Extra.allow):
     Global configs control things like the visual output
     of logs, the manner in which dbt parses your project,
     and what to do when dbt finds a version mismatch
-    or a failing model. Valid keys can be found [here](
+    or a failing model. Docs can be found [here](
     https://docs.getdbt.com/reference/global-configs).
+
+    Args:
+        send_anonymous_usage_stats:
+        use_colors:
+        partial_parse:
+        printer_width:
+        write_json:
+        warn_error:
+        log_format:
+        debug:
+        version_check:
+        fail_fast:
+        use_experimental_parser:
+        static_parser:
     """
 
     send_anonymous_usage_stats: Optional[bool] = None
