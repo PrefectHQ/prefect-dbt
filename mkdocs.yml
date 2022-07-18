@@ -45,7 +45,7 @@ nav:
       - Utils: cloud/utils.md
     - CLI:
       - Credentials: cli/credentials.md
-      - CLI: cli/commands.md
+      - Commands: cli/commands.md
       - Configs:
-        - Base: cli/configs/base
-        - Snowflake: cli/configs/snowflake
+        - Base: cli/configs/base.md
+        - Snowflake: cli/configs/snowflake.md
