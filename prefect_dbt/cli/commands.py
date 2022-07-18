@@ -27,20 +27,21 @@ async def trigger_dbt_cli_command(
     will first generate a profiles.yml file in the profiles_dir directory. Then run the dbt
     CLI shell command.
 
-    command: The dbt command to be executed.
-    profiles_dir: The directory to search for the profiles.yml file. Setting this
-        appends the `--profiles-dir` option to the command provided. If this is not set,
-        will try using the DBT_PROFILES_DIR environment variable, but if that's also not
-        set, will use the default directory `$HOME/.dbt/`.
-    project_dir: The directory to search for the dbt_project.yml file.
-        Default is the current working directory and its parents.
-    overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
-        should be overwritten with a new profile.
-    dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
-        Note! This is optional and will raise an error if profiles.yml already exists
-        under profile_dir and overwrite_profiles is set to False.
-    **shell_run_command_kwargs: Additional keyword arguments to pass to
-        [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
+    Args:
+        command: The dbt command to be executed.
+        profiles_dir: The directory to search for the profiles.yml file. Setting this
+            appends the `--profiles-dir` option to the command provided. If this is not set,
+            will try using the DBT_PROFILES_DIR environment variable, but if that's also not
+            set, will use the default directory `$HOME/.dbt/`.
+        project_dir: The directory to search for the dbt_project.yml file.
+            Default is the current working directory and its parents.
+        overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
+            should be overwritten with a new profile.
+        dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
+            Note! This is optional and will raise an error if profiles.yml already exists
+            under profile_dir and overwrite_profiles is set to False.
+        **shell_run_command_kwargs: Additional keyword arguments to pass to
+            [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
 
     Returns:
         If return_all (default is False) is passed to shell_run_command_kwargs,
