@@ -4,7 +4,7 @@ from prefect_dbt.cli.configs.base import TargetConfigs
 def test_target_configs_get_configs():
     target_configs = TargetConfigs(
         type="snowflake",
-        schema_="schema_input",
+        schema="schema_input",
         threads=5,
         extras={"extra_input": 1, "null_input": None},
     )

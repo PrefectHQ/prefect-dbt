@@ -3,6 +3,7 @@
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
+from pydantic import Field
 
 
 class DbtConfigs(Block):
@@ -13,8 +14,6 @@ class DbtConfigs(Block):
         extras: Extra target configs' keywords, not yet added
             to prefect-dbt, but available in dbt.
     """
-
-    _is_anonymous = True
 
     extras: Optional[Dict[str, Any]] = None
 
@@ -42,15 +41,14 @@ class TargetConfigs(DbtConfigs):
 
     Args:
         type: The name of the database warehouse
-        schema_: The schema that dbt will build objects into;
+        schema: The schema that dbt will build objects into;
             in BigQuery, a schema is actually a dataset.
         threads: The number of threads representing the max number
             of paths through the graph dbt may work on at once.
     """
 
     type: str
-    # cannot name this schema, even with Field alias; will handle in get_configs
-    schema_: str
+    schema_: str = Field(alias="schema")
     threads: int = 4
 
 

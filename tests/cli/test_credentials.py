@@ -6,7 +6,7 @@ from prefect_dbt.cli.credentials import DbtCliProfile, GlobalConfigs, TargetConf
 
 @pytest.mark.parametrize("configs_type", ["dict", "model"])
 def test_dbt_cli_profile_init(configs_type):
-    target_configs = dict(type="snowflake", schema_="schema")
+    target_configs = dict(type="snowflake", schema="schema")
     global_configs = dict(use_colors=False)
     if configs_type == "model":
         target_configs = TargetConfigs.parse_obj(target_configs)
@@ -28,7 +28,7 @@ def test_dbt_cli_profile_init_validation_failed():
 
 
 def test_dbt_cli_profile_get_profile():
-    target_configs = dict(type="snowflake", schema_="analysis")
+    target_configs = dict(type="snowflake", schema="analysis")
     global_configs = dict(use_colors=False)
     dbt_cli_profile = DbtCliProfile(
         name="test_name",

@@ -42,7 +42,7 @@ class DbtCliProfile(Block):
         )
         target_configs = SnowflakeTargetConfigs(
             type="snowflake",
-            schema_="schema",
+            schema="schema",
             threads=4,
             credentials=snowflake_credentials
         )
@@ -68,7 +68,7 @@ class DbtCliProfile(Block):
         )
         target_configs = TargetConfigs(
             type="redshift",
-            schema_="schema",
+            schema="schema",
             threads=4,
             extras=target_configs_extras
         )
