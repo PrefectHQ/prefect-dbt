@@ -26,7 +26,7 @@ class DbtConfigs(Block):
         for key, val in self.dict().items():
             if val is not None:
                 if key in ["extras", "credentials"]:
-                    configs_json.update({k.rstrip("_"): v for k, v in val.items()})
+                    configs_json.update({k.rstrip("_"): v for k, v in val.items() if v})
                 else:
                     configs_json[key.rstrip("_")] = val
         return configs_json
