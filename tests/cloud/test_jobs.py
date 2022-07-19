@@ -93,9 +93,7 @@ class TestTriggerDbtCloudJobRun:
                 ),
             )
 
-        flow_state = await test_trigger_with_custom_options()
-        task_state = flow_state.result()
-        result = task_state.result()
+        result = await test_trigger_with_custom_options()
         assert result == {"id": 10000, "project_id": 12345}
 
     async def test_trigger_nonexistent_job(self, respx_mock, dbt_cloud_credentials):
@@ -117,8 +115,7 @@ class TestTriggerDbtCloudJobRun:
             )
 
         with pytest.raises(DbtCloudJobRunTriggerFailed, match="Not found!"):
-            flow_state = await test_trigger_nonexistent_job()
-            flow_state.result()
+            await test_trigger_nonexistent_job()
 
 
 class TestTriggerDbtCloudJobRunAndWaitForCompletion:
@@ -141,10 +138,10 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": ["manifest.json"]}))
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+        result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
             dbt_cloud_credentials=dbt_cloud_credentials, job_id=1
         )
-        assert flow_state.result() == {
+        assert result == {
             "id": 10000,
             "status": 10,
             "artifact_paths": ["manifest.json"],
@@ -175,12 +172,12 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": ["manifest.json"]}))
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+        result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
             dbt_cloud_credentials=dbt_cloud_credentials,
             job_id=1,
             poll_frequency_seconds=1,
         )
-        assert flow_state.result() == {
+        assert result == {
             "id": 10000,
             "status": 10,
             "artifact_paths": ["manifest.json"],
@@ -207,13 +204,12 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             ]
         )
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
-            dbt_cloud_credentials=dbt_cloud_credentials,
-            job_id=1,
-            poll_frequency_seconds=1,
-        )
         with pytest.raises(DbtCloudJobRunFailed):
-            flow_state.result()
+            await trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                job_id=1,
+                poll_frequency_seconds=1,
+            )
 
     @pytest.mark.respx(assert_all_called=True)
     async def test_run_cancelled_with_wait(self, respx_mock, dbt_cloud_credentials):
@@ -236,13 +232,12 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             ]
         )
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
-            dbt_cloud_credentials=dbt_cloud_credentials,
-            job_id=1,
-            poll_frequency_seconds=1,
-        )
         with pytest.raises(DbtCloudJobRunCancelled):
-            flow_state.result()
+            await trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                job_id=1,
+                poll_frequency_seconds=1,
+            )
 
     @pytest.mark.respx(assert_all_called=True)
     async def test_run_timed_out(self, respx_mock, dbt_cloud_credentials):
@@ -266,14 +261,13 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             ]
         )
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
-            dbt_cloud_credentials=dbt_cloud_credentials,
-            job_id=1,
-            poll_frequency_seconds=1,
-            max_wait_seconds=3,
-        )
         with pytest.raises(DbtCloudJobRunTimedOut):
-            flow_state.result()
+            await trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                job_id=1,
+                poll_frequency_seconds=1,
+                max_wait_seconds=3,
+            )
 
     @pytest.mark.respx(assert_all_called=True)
     async def test_run_success_failed_artifacts(
@@ -300,10 +294,10 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             )
         )
 
-        flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+        result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
             dbt_cloud_credentials=dbt_cloud_credentials, job_id=1
         )
-        assert flow_state.result() == {"id": 10000, "status": 10}
+        assert result == {"id": 10000, "status": 10}
 
 
 @pytest.fixture
@@ -325,11 +319,11 @@ def real_dbt_cloud_account_id():
 async def test_run_real_dbt_cloud_job(
     real_dbt_cloud_job_id, real_dbt_cloud_api_key, real_dbt_cloud_account_id
 ):
-    flow_state = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+    result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=DbtCloudCredentials(
             api_key=real_dbt_cloud_api_key, account_id=real_dbt_cloud_account_id
         ),
         job_id=real_dbt_cloud_job_id,
         poll_frequency_seconds=1,
     )
-    assert flow_state.result().get("status") == 10
+    assert result.get("status") == 10

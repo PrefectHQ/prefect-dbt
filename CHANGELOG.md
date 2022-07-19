@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `call_dbt_cloud_administrative_api_endpoint` task - [#25](https://github.com/PrefectHQ/prefect-dbt/pull/25)
 
 ### Changed
+- Updated tests to be compatible with core Prefect library (v2.0b9) and bumped required version - [#28](https://github.com/PrefectHQ/prefect-dbt/pull/28)
 
 ### Deprecated
 
