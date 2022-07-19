@@ -1,8 +1,7 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 
@@ -94,31 +93,22 @@ class DbtCliProfile(Block):
     global_configs: Optional[GlobalConfigs] = None
 
     def block_initialization(self):
-        self.target_configs = self._parse_configs(self.target_configs)
-        self.global_configs = self._parse_configs(self.global_configs)
+        self.target_configs_json = self.target_configs.get_configs()
 
-    @staticmethod
-    def _parse_configs(configs: BaseModel) -> Dict[str, Any]:
-        """
-        Helper function to parse configs when passed either as
-        dict or pydantic model.
-        """
-        if configs is None:
-            return {}
-        elif isinstance(configs, BaseModel):
-            return {
-                k.rstrip("_"): v for k, v in configs.dict().items() if v is not None
-            }
+        if self.global_configs is not None:
+            self.global_configs_json = self.global_configs.get_configs()
+        else:
+            self.global_configs_json = {}
 
     def get_profile(self):
         """
         Returns the class's profile.
         """
         profile = {
-            "config": self.global_configs or {},
+            "config": self.global_configs_json,
             self.name: {
                 "target": self.target,
-                "outputs": {self.target: self.target_configs},
+                "outputs": {self.target: self.target_configs_json},
             },
         }
         return profile

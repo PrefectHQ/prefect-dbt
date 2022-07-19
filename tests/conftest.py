@@ -1,5 +1,6 @@
 import pytest
 
+from prefect_dbt.cli.configs.base import GlobalConfigs, TargetConfigs
 from prefect_dbt.cli.credentials import DbtCliProfile
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 
@@ -11,7 +12,7 @@ def dbt_cloud_credentials():
 
 @pytest.fixture
 def dbt_cli_profile():
-    target_configs = dict(
+    target_configs = TargetConfigs(
         type="snowflake",
         account="account",
         user="user",
@@ -24,7 +25,7 @@ def dbt_cli_profile():
         client_session_keep_alive=False,
         query_tag="query_tag",
     )
-    global_configs = dict(
+    global_configs = GlobalConfigs(
         send_anonymous_usage_stats=False,
         use_colors=True,
         partial_parse=False,
@@ -48,7 +49,7 @@ def dbt_cli_profile():
 
 @pytest.fixture
 def dbt_cli_profile_bare():
-    target_configs = dict(
+    target_configs = TargetConfigs(
         type="custom",
         schema="schema",
         account="fake",

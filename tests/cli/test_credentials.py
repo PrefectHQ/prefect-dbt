@@ -20,12 +20,12 @@ def test_dbt_cli_profile_init(configs_type):
     )
     assert dbt_cli_profile.name == "test_name"
     assert dbt_cli_profile.target == "dev"
-    assert dbt_cli_profile.target_configs == {
+    assert dbt_cli_profile.target_configs_json == {
         "type": "snowflake",
         "schema": "schema",
         "threads": 4,
     }
-    assert dbt_cli_profile.global_configs == {"use_colors": False}
+    assert dbt_cli_profile.global_configs_json == {"use_colors": False}
 
 
 def test_dbt_cli_profile_init_validation_failed():

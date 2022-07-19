@@ -1,11 +1,39 @@
 """Module containing models for base configs"""
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Extra, Field
+from prefect.blocks.core import Block
+from pydantic import Field
 
 
-class TargetConfigs(BaseModel, extra=Extra.allow):
+class DbtConfigs(Block):
+    """
+    Abstract class for other dbt Configs.
+
+    Args:
+        extras: Extra target configs' keywords, not yet added
+            to prefect-dbt, but available in dbt.
+    """
+
+    _is_anonymous = True
+
+    extras: Optional[Dict[str, Any]] = None
+
+    def get_configs(self):
+        """
+        Helper function to parse configs.
+        """
+        configs_json = {}
+        for key, val in self.dict().items():
+            if val is not None:
+                if key in ["extras", "credentials"]:
+                    configs_json.update(**val)
+                else:
+                    configs_json[key.rstrip("_")] = val
+        return configs_json
+
+
+class TargetConfigs(DbtConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
@@ -31,7 +59,7 @@ class TargetConfigs(BaseModel, extra=Extra.allow):
     threads: int = 4
 
 
-class GlobalConfigs(BaseModel, extra=Extra.allow):
+class GlobalConfigs(DbtConfigs):
     """
     Global configs control things like the visual output
     of logs, the manner in which dbt parses your project,
@@ -66,3 +94,12 @@ class GlobalConfigs(BaseModel, extra=Extra.allow):
     fail_fast: Optional[bool] = None
     use_experimental_parser: Optional[bool] = None
     static_parser: Optional[bool] = None
+
+
+class MissingExtrasRequireError(ImportError):
+    def __init__(self, service, *args, **kwargs):
+        msg = (
+            f"To use {service.title()}TargetConfigs, "
+            f"execute `pip install 'prefect-dbt[{service.lower()}]'`"
+        )
+        super().__init__(msg, *args, **kwargs)
