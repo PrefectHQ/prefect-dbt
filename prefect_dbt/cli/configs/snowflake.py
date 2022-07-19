@@ -16,7 +16,9 @@ class SnowflakeTargetConfigs(TargetConfigs):
     page.
 
     Args:
-        credentials: The credentials to use to authenticate.
+        credentials: The credentials to use to authenticate; if there are
+            overlapping keys between credentials and TargetConfigs,
+            e.g. schema, credentials takes precedence.
     """
 
     credentials: SnowflakeCredentials

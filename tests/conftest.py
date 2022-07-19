@@ -20,7 +20,7 @@ def dbt_cli_profile():
         role="role",
         database="database",
         warehouse="warehouse",
-        schema="schema",
+        schema_="schema",
         threads=4,
         client_session_keep_alive=False,
         query_tag="query_tag",
@@ -51,7 +51,7 @@ def dbt_cli_profile():
 def dbt_cli_profile_bare():
     target_configs = TargetConfigs(
         type="custom",
-        schema="schema",
+        schema_="schema",
         account="fake",
     )
     return DbtCliProfile(

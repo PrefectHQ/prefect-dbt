@@ -6,7 +6,7 @@ from prefect_dbt.cli.credentials import DbtCliProfile, GlobalConfigs, TargetConf
 
 @pytest.mark.parametrize("configs_type", ["dict", "model"])
 def test_dbt_cli_profile_init(configs_type):
-    target_configs = dict(type="snowflake", schema="schema")
+    target_configs = dict(type="snowflake", schema_="schema")
     global_configs = dict(use_colors=False)
     if configs_type == "model":
         target_configs = TargetConfigs.parse_obj(target_configs)
@@ -20,12 +20,6 @@ def test_dbt_cli_profile_init(configs_type):
     )
     assert dbt_cli_profile.name == "test_name"
     assert dbt_cli_profile.target == "dev"
-    assert dbt_cli_profile.target_configs_json == {
-        "type": "snowflake",
-        "schema": "schema",
-        "threads": 4,
-    }
-    assert dbt_cli_profile.global_configs_json == {"use_colors": False}
 
 
 def test_dbt_cli_profile_init_validation_failed():
@@ -34,7 +28,7 @@ def test_dbt_cli_profile_init_validation_failed():
 
 
 def test_dbt_cli_profile_get_profile():
-    target_configs = dict(type="snowflake", schema="analysis")
+    target_configs = dict(type="snowflake", schema_="analysis")
     global_configs = dict(use_colors=False)
     dbt_cli_profile = DbtCliProfile(
         name="test_name",
@@ -44,6 +38,7 @@ def test_dbt_cli_profile_get_profile():
     )
     actual = dbt_cli_profile.get_profile()
     expected_target_configs = target_configs.copy()
+    expected_target_configs["schema"] = expected_target_configs.pop("schema_")
     expected_target_configs["threads"] = 4
     expected = {
         "config": global_configs,

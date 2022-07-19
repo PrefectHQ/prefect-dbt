@@ -66,24 +66,24 @@ async def trigger_dbt_cli_command(
         from prefect import flow
         from prefect_dbt.cli.credentials import DbtCliProfile
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
-        from prefect_dbt.cli.configs.snowflake import SnowflakeUserPasswordTargetConfigs
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+        from prefect_snowflake.credentials import SnowflakeCredentials
 
         @flow
         def trigger_dbt_cli_command_flow():
-            target_configs = SnowflakeUserPasswordTargetConfigs(
-                type="snowflake",
-                account="account",
-
+            snowflake_credentials = SnowflakeCredentials(
                 user="user",
                 password="password",
-
+                account="account",
                 role="role",
                 database="database",
                 warehouse="warehouse",
-                schema="schema",
+            )
+            target_configs = SnowflakeTargetConfigs(
+                type="snowflake",
+                schema_="schema",
                 threads=4,
-                client_session_keep_alive=False,
-                query_tag="query_tag",
+                credentials=snowflake_credentials
             )
             dbt_cli_profile = DbtCliProfile(
                 name="jaffle_shop",

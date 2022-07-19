@@ -3,7 +3,6 @@
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import Field
 
 
 class DbtConfigs(Block):
@@ -27,7 +26,7 @@ class DbtConfigs(Block):
         for key, val in self.dict().items():
             if val is not None:
                 if key in ["extras", "credentials"]:
-                    configs_json.update(**val)
+                    configs_json.update({k.rstrip("_"): v for k, v in val.items()})
                 else:
                     configs_json[key.rstrip("_")] = val
         return configs_json
@@ -37,25 +36,21 @@ class TargetConfigs(DbtConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
-    This is the base dbt TargetConfigs model;
-    ideally use the TargetConfigs containing authentication keywords, e.g.
-    `prefect_dbt.cli.snowflake.SnowflakeUserPasswordTargetConfigs`,
-    but if the desired TargetConfigs is missing, use this class with
-    extra keywords, or help contribute a pull request.
     To find valid keys, head to the [Available adapters](
     https://docs.getdbt.com/docs/available-adapters) page and
     click the desired adapter's "Profile Setup" hyperlink.
 
     Args:
         type: The name of the database warehouse
-        schema: The schema that dbt will build objects into;
+        schema_: The schema that dbt will build objects into;
             in BigQuery, a schema is actually a dataset.
         threads: The number of threads representing the max number
             of paths through the graph dbt may work on at once.
     """
 
     type: str
-    schema_: str = Field(alias="schema")
+    # cannot name this schema, even with Field alias; will handle in get_configs
+    schema_: str
     threads: int = 4
 
 
@@ -100,6 +95,6 @@ class MissingExtrasRequireError(ImportError):
     def __init__(self, service, *args, **kwargs):
         msg = (
             f"To use {service.title()}TargetConfigs, "
-            f"execute `pip install 'prefect-dbt[{service.lower()}]'`"
+            f'execute `pip install "prefect-dbt[{service.lower()}]"`'
         )
         super().__init__(msg, *args, **kwargs)

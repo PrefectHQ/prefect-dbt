@@ -40,9 +40,7 @@ class TestTriggerDbtCloudJobRun:
                 job_id=1,
             )
 
-        flow_state = await test_flow()
-        task_state = flow_state.result()
-        result = task_state.result()
+        result = await test_flow()
         assert result == {"id": 10000, "project_id": 12345}
 
         request_body = json.loads(respx_mock.calls.last.request.content.decode())

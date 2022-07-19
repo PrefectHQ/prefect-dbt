@@ -26,53 +26,61 @@ class DbtCliProfile(Block):
             https://docs.getdbt.com/reference/global-configs).
 
     Examples:
-        Get a dbt Snowflake profile from DbtCliProfile:
+        Get a dbt Snowflake profile from DbtCliProfile by using SnowflakeTargetConfigs:
         ```python
         from prefect_dbt.cli import DbtCliProfile
-        from prefect_dbt.cli.configs import GlobalConfigs
-        from prefect_dbt.cli.configs.snowflake import (
-            SnowflakeUserPasswordTargetConfigs
-        )
+        from prefect_dbt.cli.configs import GlobalConfigs, SnowflakeTargetConfigs
+        from prefect_snowflake.credentials import SnowflakeCredentials
 
-        target_configs = SnowflakeUserPasswordTargetConfigs(
-            type="snowflake",
-            account="account",
-
+        snowflake_credentials = SnowflakeCredentials(
             user="user",
             password="password",
-
+            account="account",
             role="role",
             database="database",
             warehouse="warehouse",
-            schema="schema",
-            threads=4,
-            client_session_keep_alive=False,
-            query_tag="query_tag",
         )
-        global_configs = GlobalConfigs(
-            send_anonymous_usage_stats=False,
-            use_colors=True,
-            partial_parse=False,
-            printer_width=88,
-            write_json=True,
-            warn_error=False,
-            log_format=True,
-            debug=True,
-            version_check=True,
-            fail_fast=True,
-            use_experimental_parser=True,
-            static_parser=False
+        target_configs = SnowflakeTargetConfigs(
+            type="snowflake",
+            schema_="schema",
+            threads=4,
+            credentials=snowflake_credentials
         )
         dbt_cli_profile = DbtCliProfile(
             name="jaffle_shop",
             target="dev",
             target_configs=target_configs,
-            global_configs=global_configs,
         )
         profile = dbt_cli_profile.get_profile()
         ```
 
-    Load saved dbt CLI profile:
+        Get a dbt Redshift profile from DbtCliProfile by using generic TargetConfigs:
+        ```python
+        from prefect_dbt.cli import DbtCliProfile
+        from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
+
+        target_configs_extras = dict(
+            host="hostname.region.redshift.amazonaws.com",
+            user="username",
+            password="password1",
+            port=5439,
+            dbname="analytics",
+        )
+        target_configs = TargetConfigs(
+            type="redshift",
+            schema_="schema",
+            threads=4,
+            extras=target_configs_extras
+        )
+        dbt_cli_profile = DbtCliProfile(
+            name="jaffle_shop",
+            target="dev",
+            target_configs=target_configs,
+        )
+        profile = dbt_cli_profile.get_profile()
+        ```
+
+        Load saved dbt CLI profile:
         ```python
         from prefect_dbt.cli import DbtCliProfile
         profile = DbtCliProfile.load("my-dbt-credentials").get_profile()
@@ -92,23 +100,15 @@ class DbtCliProfile(Block):
     target_configs: TargetConfigs
     global_configs: Optional[GlobalConfigs] = None
 
-    def block_initialization(self):
-        self.target_configs_json = self.target_configs.get_configs()
-
-        if self.global_configs is not None:
-            self.global_configs_json = self.global_configs.get_configs()
-        else:
-            self.global_configs_json = {}
-
     def get_profile(self):
         """
         Returns the class's profile.
         """
         profile = {
-            "config": self.global_configs_json,
+            "config": self.global_configs.get_configs() if self.global_configs else {},
             self.name: {
                 "target": self.target,
-                "outputs": {self.target: self.target_configs_json},
+                "outputs": {self.target: self.target_configs.get_configs()},
             },
         }
         return profile
