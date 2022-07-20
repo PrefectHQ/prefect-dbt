@@ -11,6 +11,12 @@ with open("requirements-dev.txt") as dev_requires_file:
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
+extras_require = {"cli": ["dbt_core>=1.1.1"], "snowflake": ["prefect-snowflake>=0.1.1"]}
+extras_require["all_extras"] = sorted(
+    {lib for key in extras_require.values() for lib in key}
+)
+extras_require["dev"] = dev_requires + extras_require["all_extras"]
+
 setup(
     name="prefect-dbt",
     description="Prefect integration for working with dbt",
@@ -26,9 +32,12 @@ setup(
     packages=find_packages(exclude=("tests", "docs")),
     python_requires=">=3.7",
     install_requires=install_requires,
-    extras_require={"dev": dev_requires},
+    extras_require=extras_require,
     entry_points={
-        "prefect.collections": ["DbtCloudCredentials = prefect_dbt.cloud.credentials"]
+        "prefect.collections": [
+            "DbtCloudCredentials = prefect_dbt.cloud.credentials",
+            "DbtCliProfile = prefect_dbt.cli.credentials",
+        ]
     },
     classifiers=[
         "Natural Language :: English",

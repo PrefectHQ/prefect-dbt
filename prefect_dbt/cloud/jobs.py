@@ -268,30 +268,27 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     """  # noqa
     logger = get_run_logger()
 
-    trigger_job_run_future = await trigger_dbt_cloud_job_run(
+    triggered_run_data = await trigger_dbt_cloud_job_run(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         options=trigger_job_run_options,
     )
-    triggered_run_data = await trigger_job_run_future.result()
     run_id = triggered_run_data["id"]
 
     seconds_waited_for_run_completion = 0
     while seconds_waited_for_run_completion <= max_wait_seconds:
-        get_run_future = await get_dbt_cloud_run_info(
+        run_data = await get_dbt_cloud_run_info(
             dbt_cloud_credentials=dbt_cloud_credentials,
             run_id=run_id,
-            wait_for=[trigger_job_run_future],
         )
-        run_data = await get_run_future.result()
         run_status_code = run_data.get("status")
 
         if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
             try:
-                list_run_artifacts_state = await list_dbt_cloud_run_artifacts(
+                list_run_artifacts = await list_dbt_cloud_run_artifacts(
                     dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
                 )
-                run_data["artifact_paths"] = await list_run_artifacts_state.result()
+                run_data["artifact_paths"] = list_run_artifacts
                 return run_data
             except DbtCloudListRunArtifactsFailed as ex:
                 logger.warning(
