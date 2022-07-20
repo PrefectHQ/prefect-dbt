@@ -43,4 +43,9 @@ nav:
       - Clients: cloud/clients.md
       - Models: cloud/models.md
       - Utils: cloud/utils.md
-
+    - CLI:
+      - Credentials: cli/credentials.md
+      - Commands: cli/commands.md
+      - Configs:
+        - Base: cli/configs/base.md
+        - Snowflake: cli/configs/snowflake.md
