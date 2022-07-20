@@ -1,12 +1,13 @@
 """Module containing models for base configs"""
 
+import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
 from pydantic import Field
 
 
-class DbtConfigs(Block):
+class DbtConfigs(Block, abc.ABC):
     """
     Abstract class for other dbt Configs.
 
