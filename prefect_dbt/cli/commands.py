@@ -17,7 +17,7 @@ async def trigger_dbt_cli_command(
     profiles_dir: Optional[Union[Path, str]] = None,
     project_dir: Optional[Union[Path, str]] = None,
     overwrite_profiles: bool = False,
-    dbt_cli_profile: DbtCliProfile = None,
+    dbt_cli_profile: Optional[DbtCliProfile] = None,
     **shell_run_command_kwargs: Dict[str, Any],
 ) -> Union[List, str]:
     """

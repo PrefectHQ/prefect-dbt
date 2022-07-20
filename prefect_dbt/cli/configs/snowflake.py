@@ -1,5 +1,5 @@
 """Module containing models for Snowflake configs"""
-from typing import Any, Dict
+from typing import Any, Dict, Literal, Optional
 
 from pydantic import Field
 
@@ -25,8 +25,8 @@ class SnowflakeTargetConfigs(TargetConfigs):
             e.g. schema, an error will be raised.
     """
 
-    type: str = "snowflake"
-    schema_: str = Field(default=None, alias="schema")
+    type: Literal["snowflake"] = "snowflake"
+    schema_: Optional[str] = Field(default=None, alias="schema")
     credentials: SnowflakeCredentials
 
     def get_configs(self) -> Dict[str, Any]:

@@ -27,6 +27,7 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for key, value in dict_.items():
+            # key needs to be rstripped because schema alias doesn't get used
             key = key.rstrip("_")
             if value is not None:
                 if key in ["extras", "credentials"]:
@@ -39,7 +40,6 @@ class DbtConfigs(Block, abc.ABC):
                         )
                     if isinstance(value, (SecretStr, SecretBytes)):
                         value = value.get_secret_value()
-                    # key needs to be rstripped because schema alias doesn't get used
                     configs_json[key] = value
         return configs_json
 
@@ -83,18 +83,26 @@ class GlobalConfigs(DbtConfigs):
     https://docs.getdbt.com/reference/global-configs).
 
     Args:
-        send_anonymous_usage_stats:
-        use_colors:
-        partial_parse:
-        printer_width:
-        write_json:
-        warn_error:
-        log_format:
-        debug:
-        version_check:
-        fail_fast:
-        use_experimental_parser:
-        static_parser:
+        send_anonymous_usage_stats: Whether usage stats are sent to dbt.
+        use_colors: Colorize the output it prints in your terminal.
+        partial_parse: When partial parsing is enabled, dbt will use an
+            stored internal manifest to determine which files have been changed
+            (if any) since it last parsed the project.
+        printer_width: Length of characters before starting a new line.
+        write_json: Determines whether dbt writes JSON artifacts to
+            the target/ directory.
+        warn_error: Whether to convert dbt warnings into errors.
+        log_format: The LOG_FORMAT config specifies how dbt's logs should
+            be formatted. If the value of this config is json, dbt will
+            output fully structured logs in JSON format.
+        debug: Whether to redirect dbt's debug logs to standard out.
+        version_check: Whether to raise an error if a project's version
+            is used with an incompatible dbt version.
+        fail_fast: Make dbt exit immediately if a single resource fails to build.
+        use_experimental_parser: Opt into the latest experimental version
+            of the static parser.
+        static_parser: Whether to use the [static parser](
+            https://docs.getdbt.com/reference/parsing#static-parser).
     """
 
     send_anonymous_usage_stats: Optional[bool] = None

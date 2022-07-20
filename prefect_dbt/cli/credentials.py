@@ -103,7 +103,7 @@ class DbtCliProfile(Block):
         Returns the dbt profile, likely used for writing to profiles.yml.
 
         Returns:
-            A JSON compatible with the expected format of profiles.yml.
+            A JSON compatible dictionary with the expected format of profiles.yml.
         """
         profile = {
             "config": self.global_configs.get_configs() if self.global_configs else {},
