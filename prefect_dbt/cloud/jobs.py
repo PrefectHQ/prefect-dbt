@@ -92,7 +92,7 @@ async def trigger_dbt_cloud_job_run(
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import trigger_job_run
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run
 
 
         @flow
@@ -110,7 +110,7 @@ async def trigger_dbt_cloud_job_run(
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import trigger_job_run
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run
         from prefect_dbt.cloud.models import TriggerJobRunOptions
 
 
@@ -118,7 +118,7 @@ async def trigger_dbt_cloud_job_run(
         def trigger_job_run_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            trigger_job_run(
+            trigger_dbt_cloud_job_run(
                 dbt_cloud_credentials=credentials,
                 job_id=1,
                 options=TriggerJobRunOptions(
