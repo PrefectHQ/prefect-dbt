@@ -32,7 +32,7 @@ def test_trigger_dbt_cli_command_not_dbt():
         return trigger_dbt_cli_command("ls")
 
     with pytest.raises(ValueError, match="Command is not a valid dbt sub-command"):
-        test_flow().result().result()
+        test_flow()
 
 
 def test_trigger_dbt_cli_command(profiles_dir, dbt_cli_profile_bare):
@@ -42,7 +42,7 @@ def test_trigger_dbt_cli_command(profiles_dir, dbt_cli_profile_bare):
             "dbt ls", profiles_dir=profiles_dir, dbt_cli_profile=dbt_cli_profile_bare
         )
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {"command": f"dbt ls --profiles-dir {profiles_dir}"}
 
 
@@ -62,7 +62,7 @@ def test_trigger_dbt_cli_command_run_twice_overwrite(
         )
         return run_two
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {"command": f"dbt ls --profiles-dir {profiles_dir}"}
     with open(profiles_dir / "profiles.yml", "r") as f:
         actual = yaml.safe_load(f)
@@ -99,7 +99,7 @@ def test_trigger_dbt_cli_command_run_twice_exists(
         return run_two
 
     with pytest.raises(ValueError, match="Since overwrite_profiles is False"):
-        test_flow().result().result()
+        test_flow()
 
 
 def test_trigger_dbt_cli_command_missing_profile(profiles_dir):
@@ -113,7 +113,7 @@ def test_trigger_dbt_cli_command_missing_profile(profiles_dir):
     with pytest.raises(
         ValueError, match="Provide `dbt_cli_profile` keyword for writing profiles"
     ):
-        test_flow().result().result()
+        test_flow()
 
 
 def test_trigger_dbt_cli_command_find_home(dbt_cli_profile_bare):
@@ -129,7 +129,7 @@ def test_trigger_dbt_cli_command_find_home(dbt_cli_profile_bare):
             "dbt ls", dbt_cli_profile=dbt_cli_profile, overwrite_profiles=False
         )
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {"command": f"dbt ls --profiles-dir {home_dbt_dir}"}
 
 
@@ -139,7 +139,7 @@ def test_trigger_dbt_cli_command_find_env(profiles_dir, dbt_cli_profile_bare):
         return trigger_dbt_cli_command("dbt ls", dbt_cli_profile=dbt_cli_profile_bare)
 
     os.environ["DBT_PROFILES_DIR"] = str(profiles_dir)
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {"command": f"dbt ls --profiles-dir {profiles_dir}"}
 
 
@@ -153,7 +153,7 @@ def test_trigger_dbt_cli_command_project_dir(profiles_dir, dbt_cli_profile_bare)
             dbt_cli_profile=dbt_cli_profile_bare,
         )
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {
         "command": f"dbt ls --profiles-dir {profiles_dir} --project-dir project"
     }
@@ -169,7 +169,7 @@ def test_trigger_dbt_cli_command_shell_kwargs(profiles_dir, dbt_cli_profile_bare
             dbt_cli_profile=dbt_cli_profile_bare,
         )
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result == {
         "command": f"dbt ls --profiles-dir {profiles_dir}",
         "return_all": True,

@@ -27,20 +27,21 @@ async def trigger_dbt_cli_command(
     will first generate a profiles.yml file in the profiles_dir directory. Then run the dbt
     CLI shell command.
 
-    command: The dbt command to be executed.
-    profiles_dir: The directory to search for the profiles.yml file. Setting this
-        appends the `--profiles-dir` option to the command provided. If this is not set,
-        will try using the DBT_PROFILES_DIR environment variable, but if that's also not
-        set, will use the default directory `$HOME/.dbt/`.
-    project_dir: The directory to search for the dbt_project.yml file.
-        Default is the current working directory and its parents.
-    overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
-        should be overwritten with a new profile.
-    dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
-        Note! This is optional and will raise an error if profiles.yml already exists
-        under profile_dir and overwrite_profiles is set to False.
-    **shell_run_command_kwargs: Additional keyword arguments to pass to
-        [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
+    Args:
+        command: The dbt command to be executed.
+        profiles_dir: The directory to search for the profiles.yml file. Setting this
+            appends the `--profiles-dir` option to the command provided. If this is not set,
+            will try using the DBT_PROFILES_DIR environment variable, but if that's also not
+            set, will use the default directory `$HOME/.dbt/`.
+        project_dir: The directory to search for the dbt_project.yml file.
+            Default is the current working directory and its parents.
+        overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
+            should be overwritten with a new profile.
+        dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
+            Note! This is optional and will raise an error if profiles.yml already exists
+            under profile_dir and overwrite_profiles is set to False.
+        **shell_run_command_kwargs: Additional keyword arguments to pass to
+            [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
 
     Returns:
         If return_all (default is False) is passed to shell_run_command_kwargs,
@@ -63,25 +64,26 @@ async def trigger_dbt_cli_command(
         Execute `dbt debug` without a pre-populated profiles.yml.
         ```python
         from prefect import flow
-        from prefect_dbt.cli.credentials import DbtCliProfile, TargetConfigs
+        from prefect_dbt.cli.credentials import DbtCliProfile
         from prefect_dbt.cli.commands import trigger_dbt_cli_command
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+        from prefect_snowflake.credentials import SnowflakeCredentials
 
         @flow
         def trigger_dbt_cli_command_flow():
-            target_configs = TargetConfigs(
-                type="snowflake",
-                account="account",
-
+            snowflake_credentials = SnowflakeCredentials(
                 user="user",
                 password="password",
-
+                account="account",
                 role="role",
                 database="database",
                 warehouse="warehouse",
+            )
+            target_configs = SnowflakeTargetConfigs(
+                type="snowflake",
                 schema="schema",
                 threads=4,
-                client_session_keep_alive=False,
-                query_tag="query_tag",
+                credentials=snowflake_credentials
             )
             dbt_cli_profile = DbtCliProfile(
                 name="jaffle_shop",
