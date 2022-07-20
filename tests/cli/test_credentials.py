@@ -38,7 +38,6 @@ def test_dbt_cli_profile_get_profile():
     )
     actual = dbt_cli_profile.get_profile()
     expected_target_configs = target_configs.copy()
-    expected_target_configs["schema"] = expected_target_configs.pop("schema_")
     expected_target_configs["threads"] = 4
     expected = {
         "config": global_configs,

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `TargetConfigs` and `GlobalConfigs` moved to `cli/configs/base.py` and converted into a `Block` - [#27](https://github.com/PrefectHQ/prefect-dbt/pull/27)
+- Updated tests to be compatible with core Prefect library (v2.0b9) and bumped required version - [#28](https://github.com/PrefectHQ/prefect-dbt/pull/28)
 
 ### Deprecated
 
