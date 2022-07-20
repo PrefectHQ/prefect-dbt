@@ -1,5 +1,10 @@
 """Module containing models for Snowflake configs"""
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Field
 
