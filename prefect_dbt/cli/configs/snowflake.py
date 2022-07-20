@@ -22,3 +22,8 @@ class SnowflakeTargetConfigs(TargetConfigs):
     """
 
     credentials: SnowflakeCredentials
+
+    def get_configs(self):
+        configs_json = super().get_configs()
+        configs_json.pop("connect_params")
+        return configs_json
