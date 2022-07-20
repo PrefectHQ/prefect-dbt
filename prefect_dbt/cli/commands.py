@@ -78,11 +78,9 @@ async def trigger_dbt_cli_command(
                 role="role",
                 database="database",
                 warehouse="warehouse",
+                schema="schema",
             )
             target_configs = SnowflakeTargetConfigs(
-                type="snowflake",
-                schema="schema",
-                threads=4,
                 credentials=snowflake_credentials
             )
             dbt_cli_profile = DbtCliProfile(
