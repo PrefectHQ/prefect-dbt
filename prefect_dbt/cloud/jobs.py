@@ -69,7 +69,7 @@ class DbtCloudJobRunStatus(Enum):
     retries=3,
     retry_delay_seconds=10,
 )
-async def trigger_dbt_cloud_job_run(
+async def trigger_job_run(
     dbt_cloud_credentials: DbtCloudCredentials,
     job_id: int,
     options: Optional[TriggerJobRunOptions] = None,
