@@ -4,7 +4,7 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import Field
+from pydantic import Field, SecretBytes, SecretStr
 
 
 class DbtConfigs(Block, abc.ABC):
@@ -13,23 +13,44 @@ class DbtConfigs(Block, abc.ABC):
 
     Args:
         extras: Extra target configs' keywords, not yet added
-            to prefect-dbt, but available in dbt.
+            to prefect-dbt, but available in dbt; if there are
+            duplicate keys between extras and TargetConfigs,
+            an error will be raised.
     """
 
     extras: Optional[Dict[str, Any]] = None
 
-    def get_configs(self):
+    def _populate_configs_json(
+        self, configs_json: Dict[str, Any], dict_: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
-        Helper function to parse configs.
+        Recursively populate configs_json.
         """
-        configs_json = {}
-        for key, val in self.dict().items():
-            if val is not None:
+        for key, value in dict_.items():
+            key = key.rstrip("_")
+            if value is not None:
                 if key in ["extras", "credentials"]:
-                    configs_json.update({k.rstrip("_"): v for k, v in val.items() if v})
+                    configs_json = self._populate_configs_json(configs_json, value)
                 else:
-                    configs_json[key.rstrip("_")] = val
+                    if key in configs_json.keys():
+                        raise ValueError(
+                            f"The keyword, {key}, has already been provided in "
+                            f"TargetConfigs; remove duplicated keywords to continue"
+                        )
+                    if isinstance(value, (SecretStr, SecretBytes)):
+                        value = value.get_secret_value()
+                    # key needs to be rstripped because schema alias doesn't get used
+                    configs_json[key] = value
         return configs_json
+
+    def get_configs(self) -> Dict[str, Any]:
+        """
+        Returns the dbt configs, likely used eventually for writing to profiles.yml.
+
+        Returns:
+            A configs JSON.
+        """
+        return self._populate_configs_json({}, self.dict())
 
 
 class TargetConfigs(DbtConfigs):

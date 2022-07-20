@@ -1,5 +1,5 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
 
@@ -33,6 +33,7 @@ class DbtCliProfile(Block):
         from prefect_snowflake.credentials import SnowflakeCredentials
 
         snowflake_credentials = SnowflakeCredentials(
+            schema="schema",
             user="user",
             password="password",
             account="account",
@@ -41,9 +42,6 @@ class DbtCliProfile(Block):
             warehouse="warehouse",
         )
         target_configs = SnowflakeTargetConfigs(
-            type="snowflake",
-            schema="schema",
-            threads=4,
             credentials=snowflake_credentials
         )
         dbt_cli_profile = DbtCliProfile(
@@ -100,9 +98,12 @@ class DbtCliProfile(Block):
     target_configs: TargetConfigs
     global_configs: Optional[GlobalConfigs] = None
 
-    def get_profile(self):
+    def get_profile(self) -> Dict[str, Any]:
         """
-        Returns the class's profile.
+        Returns the dbt profile, likely used for writing to profiles.yml.
+
+        Returns:
+            A JSON compatible with the expected format of profiles.yml.
         """
         profile = {
             "config": self.global_configs.get_configs() if self.global_configs else {},
