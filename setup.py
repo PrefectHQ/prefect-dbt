@@ -11,7 +11,10 @@ with open("requirements-dev.txt") as dev_requires_file:
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-extras_require = {"cli": ["dbt_core>=1.1.1"], "snowflake": ["prefect-snowflake>=0.1.1"]}
+extras_require = {
+    "cli": ["dbt_core>=1.1.1"],
+    "snowflake": ["prefect-snowflake>=0.1.1"],
+}
 extras_require["all_extras"] = sorted(
     {lib for key in extras_require.values() for lib in key}
 )

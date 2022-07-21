@@ -29,7 +29,7 @@ class DbtCliProfile(Block):
         Get a dbt Snowflake profile from DbtCliProfile by using SnowflakeTargetConfigs:
         ```python
         from prefect_dbt.cli import DbtCliProfile
-        from prefect_dbt.cli.configs import GlobalConfigs, SnowflakeTargetConfigs
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
         from prefect_snowflake.credentials import SnowflakeCredentials
 
         snowflake_credentials = SnowflakeCredentials(
