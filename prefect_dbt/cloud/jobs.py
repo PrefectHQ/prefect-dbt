@@ -75,7 +75,7 @@ async def trigger_dbt_cloud_job_run(
     options: Optional[TriggerJobRunOptions] = None,
 ) -> Dict:
     """
-    A task to trigger a dbt Cloud job run.
+    A task to trigger a dbt Cloud job run with optional overrides.
 
     Args:
         dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
@@ -84,7 +84,7 @@ async def trigger_dbt_cloud_job_run(
             for the triggered job run.
 
     Returns:
-        The run data returned from the dbt Cloud administrative API.
+        The run data returned from the dbt Cloud administrative API. See API docs here: https://docs.getdbt.com/dbt-cloud/api-v2#tag/Jobs/operation/triggerRun
 
     Example:
         Trigger a dbt Cloud job run:
@@ -189,7 +189,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             run completion.
 
     Returns:
-        The run data returned by the dbt Cloud administrative API.
+        The run data returned by the dbt Cloud administrative API. See API docs here: https://docs.getdbt.com/dbt-cloud/api-v2#tag/Jobs/operation/triggerRun
 
     Examples:
         Trigger a dbt Cloud job and wait for completion as a stand alone flow:
