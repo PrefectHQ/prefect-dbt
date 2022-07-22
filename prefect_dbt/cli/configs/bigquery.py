@@ -1,4 +1,4 @@
-"""Module containing models for GCP configs"""
+"""Module containing models for BigQuery configs"""
 from typing import Any, Dict, Optional
 
 try:
