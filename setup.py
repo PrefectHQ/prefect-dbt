@@ -44,6 +44,7 @@ setup(
             "DbtCliProfile = prefect_dbt.cli.credentials",
             "TargetConfigs = prefect_dbt.cli.configs.base",
             "GlobalConfigs = prefect_dbt.cli.configs.base",
+            "SnowflakeTargetConfigs = prefect_dbt.cli.configs.snowflake",
             "BigQueryTargetConfigs = prefect_dbt.cli.configs.bigquery",
         ]
     },
