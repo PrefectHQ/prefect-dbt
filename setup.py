@@ -42,6 +42,9 @@ setup(
         "prefect.collections": [
             "DbtCloudCredentials = prefect_dbt.cloud.credentials",
             "DbtCliProfile = prefect_dbt.cli.credentials",
+            "TargetConfigs = prefect_dbt.cli.configs.base",
+            "GlobalConfigs = prefect_dbt.cli.configs.base",
+            "BigQueryTargetConfigs = prefect_dbt.cli.configs.bigquery",
         ]
     },
     classifiers=[
