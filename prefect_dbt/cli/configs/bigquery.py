@@ -43,11 +43,12 @@ class BigQueryTargetConfigs(TargetConfigs):
 
         Instantiate BigQueryTargetConfigs with service account info.
         ```python
+        import json
         from prefect_dbt.cli.configs import BigQueryTargetConfigs
         from prefect_gcp.credentials import GcpCredentials
 
         credentials = GcpCredentials(
-            service_account_info={
+            service_account_info=json.dumps({
                 "type": "service_account",
                 "project_id": "project_id",
                 "private_key_id": "private_key_id",
@@ -58,7 +59,7 @@ class BigQueryTargetConfigs(TargetConfigs):
                 "token_uri": "token_uri",
                 "auth_provider_x509_cert_url": "auth_provider_x509_cert_url",
                 "client_x509_cert_url": "client_x509_cert_url"
-            }
+            })
         )
         target_configs = BigQueryTargetConfigs(
             schema="schema",
