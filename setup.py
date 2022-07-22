@@ -46,6 +46,7 @@ setup(
             "GlobalConfigs = prefect_dbt.cli.configs.base",
             "SnowflakeTargetConfigs = prefect_dbt.cli.configs.snowflake",
             "BigQueryTargetConfigs = prefect_dbt.cli.configs.bigquery",
+            "PostgresTargetConfigs = prefect_dbt.cli.configs.postgres",
         ]
     },
     classifiers=[
