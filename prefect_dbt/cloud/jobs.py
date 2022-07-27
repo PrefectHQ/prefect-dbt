@@ -96,13 +96,13 @@ async def trigger_dbt_cloud_job_run(
 
 
         @flow
-        def trigger_job_run_flow():
+        def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            trigger_job_run(dbt_cloud_credentials=credentials, job_id=1)
+            trigger_dbt_cloud_job_run(dbt_cloud_credentials=credentials, job_id=1)
 
 
-        trigger_job_run_flow()
+        trigger_dbt_cloud_job_run_flow()
         ```
 
         Trigger a dbt Cloud job run with overrides:
@@ -138,7 +138,7 @@ async def trigger_dbt_cloud_job_run(
             )
 
 
-        trigger_job_run_flow()
+        trigger_dbt_cloud_job_run()
         ```
     """  # noqa
     logger = get_run_logger()
