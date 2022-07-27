@@ -11,7 +11,9 @@ class DbtCloudCredentials(Block):
 
     Args:
         api_key (SecretStr): API key to authenticate with the dbt Cloud
-            administrative API.
+            administrative API. Refer to the [Authentication docs](
+            https://docs.getdbt.com/dbt-cloud/api-v2#section/Authentication)
+            for retrieving the API key.
         account_id (int): ID of dbt Cloud account with which to interact.
         domain (Optional[str]): Domain at which the dbt Cloud API is hosted.
 
@@ -31,22 +33,22 @@ class DbtCloudCredentials(Block):
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import trigger_job_run
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run
 
 
         @flow
-        def trigger_job_run_flow():
+        def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials.load("my-dbt-credentials")
 
-            trigger_job_run(dbt_cloud_credentials=credentials, job_id=1)
+            trigger_dbt_cloud_job_run(dbt_cloud_credentials=credentials, job_id=1)
 
 
-        trigger_job_run_flow()
+        trigger_dbt_cloud_job_run_flow()
         ```
     """
 
     _block_type_name = "dbt Cloud Credentials"
-    _logo_url = "https://asset.brandfetch.io/idofJOT4bu/idxrwTdDC-.svg"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
     _code_example = """/
     ```python
         from prefect_dbt.cloud import DbtCloudCredentials
