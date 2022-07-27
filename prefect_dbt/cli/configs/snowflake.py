@@ -30,6 +30,9 @@ class SnowflakeTargetConfigs(TargetConfigs):
             e.g. schema, an error will be raised.
     """
 
+    _block_type_name = "dbt CLI Snowflake Target Configs"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+
     type: Literal["snowflake"] = "snowflake"
     schema_: Optional[str] = Field(default=None, alias="schema")
     credentials: SnowflakeCredentials

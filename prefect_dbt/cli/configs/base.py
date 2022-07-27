@@ -69,6 +69,9 @@ class TargetConfigs(DbtConfigs):
             of paths through the graph dbt may work on at once.
     """
 
+    _block_type_name = "dbt CLI Target Configs"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+
     type: str
     schema_: str = Field(alias="schema")
     threads: int = 4
@@ -104,6 +107,9 @@ class GlobalConfigs(DbtConfigs):
         static_parser: Whether to use the [static parser](
             https://docs.getdbt.com/reference/parsing#static-parser).
     """
+
+    _block_type_name = "dbt CLI Global Configs"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
 
     send_anonymous_usage_stats: Optional[bool] = None
     use_colors: Optional[bool] = None
