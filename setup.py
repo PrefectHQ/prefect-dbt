@@ -11,7 +11,12 @@ with open("requirements-dev.txt") as dev_requires_file:
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-extras_require = {"cli": ["dbt_core>=1.1.1"], "snowflake": ["prefect-snowflake>=0.1.1"]}
+extras_require = {
+    "cli": ["dbt_core>=1.1.1"],
+    "snowflake": ["prefect-snowflake>=0.1.1"],
+    "bigquery": ["prefect-gcp>=0.1.2"],
+    "postgres": ["prefect-sqlalchemy>=0.1.1"],
+}
 extras_require["all_extras"] = sorted(
     {lib for key in extras_require.values() for lib in key}
 )
@@ -37,6 +42,11 @@ setup(
         "prefect.collections": [
             "DbtCloudCredentials = prefect_dbt.cloud.credentials",
             "DbtCliProfile = prefect_dbt.cli.credentials",
+            "TargetConfigs = prefect_dbt.cli.configs.base",
+            "GlobalConfigs = prefect_dbt.cli.configs.base",
+            "SnowflakeTargetConfigs = prefect_dbt.cli.configs.snowflake",
+            "BigQueryTargetConfigs = prefect_dbt.cli.configs.bigquery",
+            "PostgresTargetConfigs = prefect_dbt.cli.configs.postgres",
         ]
     },
     classifiers=[

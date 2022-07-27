@@ -189,14 +189,14 @@ async def get_dbt_cloud_run_artifact(
         def get_artifact_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            get_run_artifact_future = get_dbt_cloud_run_artifact(
+            get_run_artifact_result = get_dbt_cloud_run_artifact(
                 dbt_cloud_credentials=credentials,
                 run_id=42,
                 path="manifest.json"
             )
 
             with open("manifest.json", "w") as file:
-                json.dump(get_run_artifact_future.result(), file)
+                json.dump(get_run_artifact_result, file)
 
         get_artifact_flow()
         ```

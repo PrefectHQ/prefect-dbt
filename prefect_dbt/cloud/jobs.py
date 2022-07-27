@@ -92,17 +92,17 @@ async def trigger_dbt_cloud_job_run(
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import trigger_job_run
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run
 
 
         @flow
-        def trigger_job_run_flow():
+        def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            trigger_job_run(dbt_cloud_credentials=credentials, job_id=1)
+            trigger_dbt_cloud_job_run(dbt_cloud_credentials=credentials, job_id=1)
 
 
-        trigger_job_run_flow()
+        trigger_dbt_cloud_job_run_flow()
         ```
 
         Trigger a dbt Cloud job run with overrides:
@@ -110,15 +110,15 @@ async def trigger_dbt_cloud_job_run(
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import trigger_job_run
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run
         from prefect_dbt.cloud.models import TriggerJobRunOptions
 
 
         @flow
-        def trigger_job_run_flow():
+        def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            trigger_job_run(
+            trigger_dbt_cloud_job_run(
                 dbt_cloud_credentials=credentials,
                 job_id=1,
                 options=TriggerJobRunOptions(
@@ -138,7 +138,7 @@ async def trigger_dbt_cloud_job_run(
             )
 
 
-        trigger_job_run_flow()
+        trigger_dbt_cloud_job_run()
         ```
     """  # noqa
     logger = get_run_logger()
@@ -268,27 +268,29 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     """  # noqa
     logger = get_run_logger()
 
-    triggered_run_data = await trigger_dbt_cloud_job_run(
+    triggered_run_data_future = await trigger_dbt_cloud_job_run.submit(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         options=trigger_job_run_options,
     )
+    triggered_run_data = await triggered_run_data_future.result()
     run_id = triggered_run_data["id"]
 
     seconds_waited_for_run_completion = 0
     while seconds_waited_for_run_completion <= max_wait_seconds:
-        run_data = await get_dbt_cloud_run_info(
+        run_data_future = await get_dbt_cloud_run_info.submit(
             dbt_cloud_credentials=dbt_cloud_credentials,
             run_id=run_id,
         )
+        run_data = await run_data_future.result()
         run_status_code = run_data.get("status")
 
         if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
             try:
-                list_run_artifacts = await list_dbt_cloud_run_artifacts(
+                list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
                     dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
                 )
-                run_data["artifact_paths"] = list_run_artifacts
+                run_data["artifact_paths"] = await list_run_artifacts_future.result()
                 return run_data
             except DbtCloudListRunArtifactsFailed as ex:
                 logger.warning(
