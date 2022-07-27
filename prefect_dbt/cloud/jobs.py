@@ -115,7 +115,7 @@ async def trigger_dbt_cloud_job_run(
 
 
         @flow
-        def trigger_job_run_flow():
+        def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
             trigger_dbt_cloud_job_run(
