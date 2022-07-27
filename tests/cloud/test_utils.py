@@ -1,7 +1,10 @@
 import pytest
-from httpx import HTTPStatusError, Response
+from httpx import Response
 
-from prefect_dbt.cloud.utils import call_dbt_cloud_administrative_api_endpoint
+from prefect_dbt.cloud.utils import (
+    DbtCloudAdministrativeApiCallFailed,
+    call_dbt_cloud_administrative_api_endpoint,
+)
 
 
 class TestCallDbtCloudAdministrativeApiEndpoint:
@@ -58,9 +61,9 @@ class TestCallDbtCloudAdministrativeApiEndpoint:
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/projects/",
             headers={"Authorization": "Bearer my_api_key"},
-        ).mock(return_value=Response(500))
+        ).mock(return_value=Response(500, json={}))
 
-        with pytest.raises(HTTPStatusError):
+        with pytest.raises(DbtCloudAdministrativeApiCallFailed):
             await call_dbt_cloud_administrative_api_endpoint.fn(
                 dbt_cloud_credentials=dbt_cloud_credentials,
                 path="/projects/",
