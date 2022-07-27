@@ -71,6 +71,12 @@ class TargetConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _code_example = """/
+    ```python
+        from prefect_dbt.cli.configs import TargetConfigs
+        
+        dbt_cli_target_configs = TargetConfigs.load("BLOCK_NAME")
+    ```"""  # noqa
 
     type: str
     schema_: str = Field(alias="schema")
@@ -110,6 +116,12 @@ class GlobalConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Global Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _code_example = """/
+    ```python
+        from prefect_dbt.cli.configs import GlobalConfigs
+        
+        dbt_cli_global_configs = GlobalConfigs.load("BLOCK_NAME")
+    ```"""  # noqa
 
     send_anonymous_usage_stats: Optional[bool] = None
     use_colors: Optional[bool] = None

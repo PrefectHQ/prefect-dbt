@@ -90,8 +90,9 @@ class DbtCliProfile(Block):
     _code_example = """/
     ```python
         from prefect_dbt.cli import DbtCliProfile
+
         dbt_cli_profile = DbtCliProfile.load("BLOCK_NAME")
-    ```"""
+    ```"""  # noqa
 
     name: str
     target: str
