@@ -53,8 +53,7 @@ class PostgresTargetConfigs(TargetConfigs):
         
         dbt_cli_target_configs = PostgresTargetConfigs.load("BLOCK_NAME")
     ```"""  # noqa
-    _description = "dbt CLI target configs containing credentials and
-    settings specific to Postgres."
+    _description = "dbt CLI target configs containing credentials and settings specific to Postgres."  # noqa
 
     type: Literal["postgres"] = "postgres"
     credentials: DatabaseCredentials
