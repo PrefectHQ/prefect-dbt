@@ -11,7 +11,9 @@ class DbtCloudCredentials(Block):
 
     Args:
         api_key (SecretStr): API key to authenticate with the dbt Cloud
-            administrative API. How to access API key: https://docs.getdbt.com/dbt-cloud/api-v2#section/Authentication
+            administrative API. Refer to the [Authentication docs](
+            https://docs.getdbt.com/dbt-cloud/api-v2#section/Authentication)
+            for retrieving the API key.
         account_id (int): ID of dbt Cloud account with which to interact.
         domain (Optional[str]): Domain at which the dbt Cloud API is hosted.
 
