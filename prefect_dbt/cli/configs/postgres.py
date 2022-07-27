@@ -45,6 +45,15 @@ class PostgresTargetConfigs(TargetConfigs):
         ```
     """
 
+    _block_type_name = "dbt CLI Postgres Target Configs"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _code_example = """/
+    ```python
+        from prefect_dbt.cli.configs import PostgresTargetConfigs
+        
+        dbt_cli_target_configs = PostgresTargetConfigs.load("BLOCK_NAME")
+    ```"""  # noqa
+
     type: Literal["postgres"] = "postgres"
     credentials: DatabaseCredentials
 

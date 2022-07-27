@@ -69,6 +69,15 @@ class BigQueryTargetConfigs(TargetConfigs):
         ```
     """
 
+    _block_type_name = "dbt CLI BigQuery Target Configs"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _code_example = """/
+    ```python
+        from prefect_dbt.cli.configs import BigQueryTargetConfigs
+        
+        dbt_cli_target_configs = BigQueryTargetConfigs.load("BLOCK_NAME")
+    ```"""  # noqa
+
     type: Literal["gcp"] = "gcp"
     project: Optional[str] = None
     credentials: GcpCredentials
