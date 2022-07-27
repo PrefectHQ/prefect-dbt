@@ -24,6 +24,29 @@ def extract_user_message(ex: HTTPStatusError) -> Optional[str]:
     return status.get("user_message")
 
 
+def extract_developer_message(ex: HTTPStatusError) -> Optional[str]:
+    """
+    Extracts developer message from a error response from the dbt Cloud
+    administrative API.
+
+    Args:
+        ex: An HTTPStatusError raised by httpx
+
+    Returns:
+        developer_message from dbt Cloud administrative API response or None if a
+        developer_message cannot be extracted
+    """
+    response_payload = ex.response.json()
+    status = response_payload.get("status", {})
+    return status.get("developer_message")
+
+
+class DbtCloudAdministrativeApiCallFailed(Exception):
+    """Raised when a call to dbt Cloud administrative API fails."""
+
+    pass
+
+
 @task(
     name="Call dbt Cloud administrative API endpoint",
     description="Calls a dbt Cloud administrative API endpoint",
@@ -66,12 +89,14 @@ async def call_dbt_cloud_administrative_api_endpoint(
         def get_projects_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            future = call_dbt_cloud_administrative_api_endpoint(
+            result = call_dbt_cloud_administrative_api_endpoint(
                 dbt_cloud_credentials=credentials,
                 path="/projects/",
                 http_method="GET",
             )
-            return future.result()["data"]
+            return result["data"]
+
+        get_projects_flow()
         ```
 
         Create a new job:
@@ -86,16 +111,17 @@ async def call_dbt_cloud_administrative_api_endpoint(
         def create_job_flow():
             credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
 
-            future = call_dbt_cloud_administrative_api_endpoint(
+            result = call_dbt_cloud_administrative_api_endpoint(
                 dbt_cloud_credentials=credentials,
                 path="/jobs/",
                 http_method="POST",
                 json={
+                    "id": None,
                     "account_id": 123456789,
                     "project_id": 100,
                     "environment_id": 10,
                     "name": "Nightly run",
-                    "dbt_version": "0.17.1",
+                    "dbt_version": None,
                     "triggers": {"github_webhook": True, "schedule": True},
                     "execute_steps": ["dbt run", "dbt test", "dbt source snapshot-freshness"],
                     "settings": {"threads": 4, "target_name": "prod"},
@@ -106,13 +132,19 @@ async def call_dbt_cloud_administrative_api_endpoint(
                     },
                 },
             )
-            return future.result()["data"]
+            return result["data"]
+
+        create_job_flow()
         ```
     """  # noqa
-    async with dbt_cloud_credentials.get_administrative_client() as client:
-        response = await client.call_endpoint(
-            http_method=http_method, path=path, params=params, json=json
-        )
+    try:
+
+        async with dbt_cloud_credentials.get_administrative_client() as client:
+            response = await client.call_endpoint(
+                http_method=http_method, path=path, params=params, json=json
+            )
+    except HTTPStatusError as ex:
+        raise DbtCloudAdministrativeApiCallFailed(extract_developer_message(ex)) from ex
     try:
         return response.json()
     except JSONDecodeError:
