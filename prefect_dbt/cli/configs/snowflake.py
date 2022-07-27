@@ -28,6 +28,26 @@ class SnowflakeTargetConfigs(TargetConfigs):
         credentials: The credentials to use to authenticate; if there are
             duplicate keys between credentials and TargetConfigs,
             e.g. schema, an error will be raised.
+
+    Examples:
+        Instantiate SnowflakeTargetConfigs.
+        ```python
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+        from prefect_snowflake.credentials import SnowflakeCredentials
+
+        credentials = SnowflakeCredentials(
+            schema="schema",
+            user="user",
+            password="password",
+            account="account",
+            role="role",
+            database="database",
+            warehouse="warehouse",
+        )
+        target_configs = SnowflakeTargetConfigs(
+            credentials=credentials
+        )
+        ```
     """
 
     _block_type_name = "dbt CLI Snowflake Target Configs"
@@ -44,6 +64,12 @@ class SnowflakeTargetConfigs(TargetConfigs):
     credentials: SnowflakeCredentials
 
     def get_configs(self) -> Dict[str, Any]:
+        """
+        Returns the dbt configs specific to Snowflake profile.
+
+        Returns:
+            A configs JSON.
+        """
         configs_json = super().get_configs()
         configs_json.pop("connect_params")
         if "schema" not in configs_json:
