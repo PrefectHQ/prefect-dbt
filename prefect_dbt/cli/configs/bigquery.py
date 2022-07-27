@@ -77,6 +77,8 @@ class BigQueryTargetConfigs(TargetConfigs):
         
         dbt_cli_target_configs = BigQueryTargetConfigs.load("BLOCK_NAME")
     ```"""  # noqa
+    _description = "dbt CLI target configs containing credentials and
+    settings, specific to BigQuery."
 
     type: Literal["gcp"] = "gcp"
     project: Optional[str] = None
