@@ -28,6 +28,13 @@ class PostgresTargetConfigs(TargetConfigs):
             e.g. schema, an error will be raised.
 
     Examples:
+        Load stored PostgresTargetConfigs:
+        ```python
+        from prefect_dbt.cli.configs import PostgresTargetConfigs
+
+        postgres_target_configs = PostgresTargetConfigs.load("BLOCK_NAME")
+        ```
+
         Instantiate PostgresTargetConfigs with DatabaseCredentials.
         ```python
         from prefect_dbt.cli.configs import PostgresTargetConfigs
@@ -47,12 +54,6 @@ class PostgresTargetConfigs(TargetConfigs):
 
     _block_type_name = "dbt CLI Postgres Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
-    _code_example = """/
-    ```python
-        from prefect_dbt.cli.configs import PostgresTargetConfigs
-        
-        dbt_cli_target_configs = PostgresTargetConfigs.load("BLOCK_NAME")
-    ```"""  # noqa
     _description = "dbt CLI target configs containing credentials and settings specific to Postgres."  # noqa
 
     type: Literal["postgres"] = "postgres"
