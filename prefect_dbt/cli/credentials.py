@@ -29,7 +29,7 @@ class DbtCliProfile(Block):
         Load stored dbt CLI profile:
         ```python
         from prefect_dbt.cli import DbtCliProfile
-        dbt_cli_profile = DbtCliProfile.load("MY_BLOCK").get_profile()
+        dbt_cli_profile = DbtCliProfile.load("BLOCK_NAME").get_profile()
         ```
 
         Get a dbt Snowflake profile from DbtCliProfile by using SnowflakeTargetConfigs:
