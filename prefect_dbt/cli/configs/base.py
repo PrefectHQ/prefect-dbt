@@ -53,7 +53,7 @@ class DbtConfigs(Block, abc.ABC):
         return self._populate_configs_json({}, self.dict())
 
 
-class TargetConfigs(Block):
+class TargetConfigs(DbtConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
