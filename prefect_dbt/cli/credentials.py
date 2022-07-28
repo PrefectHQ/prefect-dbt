@@ -26,6 +26,12 @@ class DbtCliProfile(Block):
             https://docs.getdbt.com/reference/global-configs).
 
     Examples:
+        Load stored dbt CLI profile:
+        ```python
+        from prefect_dbt.cli import DbtCliProfile
+        dbt_cli_profile = DbtCliProfile.load("MY_BLOCK").get_profile()
+        ```
+
         Get a dbt Snowflake profile from DbtCliProfile by using SnowflakeTargetConfigs:
         ```python
         from prefect_dbt.cli import DbtCliProfile
@@ -77,22 +83,10 @@ class DbtCliProfile(Block):
         )
         profile = dbt_cli_profile.get_profile()
         ```
-
-        Load saved dbt CLI profile:
-        ```python
-        from prefect_dbt.cli import DbtCliProfile
-        profile = DbtCliProfile.load("my-dbt-credentials").get_profile()
-        ```
     """
 
     _block_type_name = "dbt CLI Profile"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
-    _code_example = """/
-    ```python
-        from prefect_dbt.cli import DbtCliProfile
-
-        dbt_cli_profile = DbtCliProfile.load("BLOCK_NAME")
-    ```"""  # noqa
 
     name: str
     target: str
