@@ -34,7 +34,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
         ```python
         from prefect_dbt.cli.configs import SnowflakeTargetConfigs
 
-        dbt_cli_snowflake_target_configs = SnowflakeTargetConfigs.load("BLOCK_NAME")
+        snowflake_target_configs = SnowflakeTargetConfigs.load("BLOCK_NAME")
         ```
 
         Instantiate SnowflakeTargetConfigs.
