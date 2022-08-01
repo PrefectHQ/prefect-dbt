@@ -18,6 +18,13 @@ class DbtCloudCredentials(Block):
         domain (Optional[str]): Domain at which the dbt Cloud API is hosted.
 
     Examples:
+        Load stored dbt Cloud credentials:
+        ```python
+        from prefect_dbt.cloud import DbtCloudCredentials
+
+        dbt_cloud_credentials = DbtCloudCredentials.load("BLOCK_NAME")
+        ```
+
         Use DbtCloudCredentials instance to trigger a job run:
         ```python
         from prefect_dbt.cloud import DbtCloudCredentials
@@ -39,9 +46,7 @@ class DbtCloudCredentials(Block):
         @flow
         def trigger_dbt_cloud_job_run_flow():
             credentials = DbtCloudCredentials.load("my-dbt-credentials")
-
             trigger_dbt_cloud_job_run(dbt_cloud_credentials=credentials, job_id=1)
-
 
         trigger_dbt_cloud_job_run_flow()
         ```
@@ -49,12 +54,6 @@ class DbtCloudCredentials(Block):
 
     _block_type_name = "dbt Cloud Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
-    _code_example = """/
-    ```python
-        from prefect_dbt.cloud import DbtCloudCredentials
-
-        dbt_cloud_credentials = DbtCloudCredentials.load("BLOCK_NAME")
-    ```"""
 
     api_key: SecretStr
     account_id: int
