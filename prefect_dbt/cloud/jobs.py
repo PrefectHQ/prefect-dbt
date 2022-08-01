@@ -291,14 +291,13 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
                     dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
                 )
                 run_data["artifact_paths"] = await list_run_artifacts_future.result()
-                return run_data
             except DbtCloudListRunArtifactsFailed as ex:
                 logger.warning(
                     "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
                     run_id,
                     ex,
                 )
-
+            logger.info("dbt Cloud job run with ID %s completed successfully!", run_id)
             return run_data
         elif run_status_code == DbtCloudJobRunStatus.FAILED.value:
             raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
@@ -306,7 +305,6 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             raise DbtCloudJobRunCancelled(
                 f"Triggered job run with ID {run_id} was cancelled."
             )
-
         logger.info(
             "dbt Cloud job run with ID %i has status %s. Waiting for %i seconds.",
             run_id,
