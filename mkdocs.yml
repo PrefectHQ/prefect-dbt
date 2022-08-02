@@ -16,11 +16,6 @@ theme:
     code: Source Code Pro
 extra_css:
     - stylesheets/extra.css
-theme:
-  name: material
-  palette:
-    primary: blue
-    accent: blue
 markdown_extensions:
     - admonition
     - attr_list
