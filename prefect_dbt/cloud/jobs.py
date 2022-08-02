@@ -165,7 +165,7 @@ async def trigger_dbt_cloud_job_run(
 
 
 @flow(
-    name="Trigger dbt Cloud job run and wait for completions",
+    name="Trigger dbt Cloud job run and wait for completion",
     description="Triggers a dbt Cloud job run and waits for the"
     "triggered run to complete.",
 )
@@ -281,6 +281,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         run_data_future = await get_dbt_cloud_run_info.submit(
             dbt_cloud_credentials=dbt_cloud_credentials,
             run_id=run_id,
+            wait_for=[triggered_run_data_future],
         )
         run_data = await run_data_future.result()
         run_status_code = run_data.get("status")
@@ -288,17 +289,18 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         if run_status_code == DbtCloudJobRunStatus.SUCCESS.value:
             try:
                 list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
-                    dbt_cloud_credentials=dbt_cloud_credentials, run_id=run_id
+                    dbt_cloud_credentials=dbt_cloud_credentials,
+                    run_id=run_id,
+                    wait_for=[run_data_future],
                 )
                 run_data["artifact_paths"] = await list_run_artifacts_future.result()
-                return run_data
             except DbtCloudListRunArtifactsFailed as ex:
                 logger.warning(
                     "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
                     run_id,
                     ex,
                 )
-
+            logger.info("dbt Cloud job run with ID %s completed successfully!", run_id)
             return run_data
         elif run_status_code == DbtCloudJobRunStatus.FAILED.value:
             raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
@@ -306,7 +308,6 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             raise DbtCloudJobRunCancelled(
                 f"Triggered job run with ID {run_id} was cancelled."
             )
-
         logger.info(
             "dbt Cloud job run with ID %i has status %s. Waiting for %i seconds.",
             run_id,
