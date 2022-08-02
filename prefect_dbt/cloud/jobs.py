@@ -86,7 +86,7 @@ async def trigger_dbt_cloud_job_run(
     Returns:
         The run data returned from the dbt Cloud administrative API.
 
-    Example:
+    Examples:
         Trigger a dbt Cloud job run:
         ```python
         from prefect import flow
