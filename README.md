@@ -22,22 +22,37 @@ Install `prefect-dbt` with `pip`:
 pip install prefect-dbt
 ```
 
-### Write and run a flow
-
+### Trigger a dbt Cloud job and wait for completion
 ```python
 from prefect import flow
-from prefect_dbt.tasks import (
-    goodbye_prefect_dbt,
-    hello_prefect_dbt,
-)
 
+from prefect_dbt.cloud import DbtCloudCredentials
+from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
 
 @flow
-def example_flow():
-    hello_prefect_dbt()
-    goodbye_prefect_dbt()
+def my_flow():
+    run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
+        dbt_cloud_credentials=DbtCloudCredentials(
+            api_key="my_api_key",
+            account_id=123456789
+        ),
+        job_id=1
+    )
 
-example_flow()
+my_flow()
+```
+
+### Execute a dbt CLI command
+```python
+from prefect import flow
+from prefect_dbt.cli.commands import trigger_dbt_cli_command
+
+@flow
+def trigger_dbt_cli_command_flow():
+    result = trigger_dbt_cli_command("dbt debug")
+    return result
+
+trigger_dbt_cli_command_flow()
 ```
 
 ## Resources
@@ -45,6 +60,8 @@ example_flow()
 If you encounter any bugs while using `prefect-dbt`, feel free to open an issue in the [prefect-dbt](https://github.com/PrefectHQ/prefect-dbt) repository.
 
 If you have any questions or issues while using `prefect-dbt`, you can find help in either the [Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
+
+If you need help getting started with or using dbt, please consult the [dbt documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation).
 
 ## Development
 
