@@ -31,7 +31,6 @@ from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_comple
 
 @flow
 def my_flow():
-    ...
     run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=DbtCloudCredentials(
             api_key="my_api_key",
@@ -39,7 +38,6 @@ def my_flow():
         ),
         job_id=1
     )
-    ...
 
 my_flow()
 ```
