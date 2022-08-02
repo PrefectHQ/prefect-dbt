@@ -30,6 +30,13 @@ class SnowflakeTargetConfigs(TargetConfigs):
             e.g. schema, an error will be raised.
 
     Examples:
+        Load stored SnowflakeTargetConfigs:
+        ```python
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+
+        snowflake_target_configs = SnowflakeTargetConfigs.load("BLOCK_NAME")
+        ```
+
         Instantiate SnowflakeTargetConfigs.
         ```python
         from prefect_dbt.cli.configs import SnowflakeTargetConfigs
@@ -52,12 +59,6 @@ class SnowflakeTargetConfigs(TargetConfigs):
 
     _block_type_name = "dbt CLI Snowflake Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
-    _code_example = """/
-    ```python
-        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
-        
-        dbt_cli_snowflake_target_configs = SnowflakeTargetConfigs.load("BLOCK_NAME")
-    ```"""  # noqa
 
     type: Literal["snowflake"] = "snowflake"
     schema_: Optional[str] = Field(default=None, alias="schema")
