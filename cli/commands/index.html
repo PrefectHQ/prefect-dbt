@@ -714,22 +714,25 @@ under profile_dir and overwrite_profiles is set to False.</p></td>
   <table>
     <thead>
       <tr>
-        <th>Type</th>
+<th>Name</th>        <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
         <tr>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>, str]</code>
+<td><code>last_line_cli_output</code></td>          <td>
+                <code>str</code>
           </td>
-          <td><p>If return_all (default is False) is passed to shell_run_command_kwargs,</p></td>
+          <td><p>The last line of the CLI output will be returned
+if <code>return_all</code> in <code>shell_run_command_kwargs</code> is False. This is the default
+behavior.</p></td>
         </tr>
         <tr>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>, str]</code>
+<td><code>full_cli_output</code></td>          <td>
+                <code><span title="typing.List">List</span>[str]</code>
           </td>
-          <td><p>returns all lines as a list; else the last line as a string.</p></td>
+          <td><p>Full CLI output will be returned if <code>return_all</code>
+in <code>shell_run_command_kwargs</code> is True.</p></td>
         </tr>
     </tbody>
   </table>
@@ -923,7 +926,10 @@ under profile_dir and overwrite_profiles is set to False.</p></td>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">trigger_dbt_cli_command</span><span class="p">(</span>
     <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">profiles_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -931,7 +937,7 @@ under profile_dir and overwrite_profiles is set to False.</p></td>
     <span class="n">overwrite_profiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">dbt_cli_profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DbtCliProfile</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">shell_run_command_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Task for running dbt commands.</span>
 
@@ -956,8 +962,11 @@ under profile_dir and overwrite_profiles is set to False.</p></td>
 <span class="sd">            [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        If return_all (default is False) is passed to shell_run_command_kwargs,</span>
-<span class="sd">        returns all lines as a list; else the last line as a string.</span>
+<span class="sd">        last_line_cli_output (str): The last line of the CLI output will be returned</span>
+<span class="sd">            if `return_all` in `shell_run_command_kwargs` is False. This is the default</span>
+<span class="sd">            behavior.</span>
+<span class="sd">        full_cli_output (List[str]): Full CLI output will be returned if `return_all`</span>
+<span class="sd">            in `shell_run_command_kwargs` is True.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        Execute `dbt debug` with a pre-populated profiles.yml.</span>

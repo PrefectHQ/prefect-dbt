@@ -708,7 +708,7 @@
 <span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">trigger_dbt_cloud_job_run_and_wait_for_completion</span>
 
 <span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">run_dbt_job_flow</span><span class="p">():</span>
     <span class="n">run_result</span> <span class="o">=</span> <span class="n">trigger_dbt_cloud_job_run_and_wait_for_completion</span><span class="p">(</span>
         <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">DbtCloudCredentials</span><span class="p">(</span>
             <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span>
@@ -717,16 +717,16 @@
         <span class="n">job_id</span><span class="o">=</span><span class="mi">1</span>
     <span class="p">)</span>
 
-<span class="n">my_flow</span><span class="p">()</span>
+<span class="n">run_dbt_job_flow</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="execute-a-dbt-cli-command">Execute a dbt CLI command</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 <span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
 
 <span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">result</span> <span class="c1"># Returns the last line the in CLI output</span>
 
 <span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
 </code></pre></div>
