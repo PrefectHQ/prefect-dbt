@@ -30,7 +30,7 @@ from prefect_dbt.cloud import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
 
 @flow
-def my_flow():
+def run_dbt_job_flow():
     run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=DbtCloudCredentials(
             api_key="my_api_key",
@@ -39,7 +39,7 @@ def my_flow():
         job_id=1
     )
 
-my_flow()
+run_dbt_job_flow()
 ```
 
 ### Execute a dbt CLI command
@@ -48,9 +48,9 @@ from prefect import flow
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
 
 @flow
-def trigger_dbt_cli_command_flow():
+def trigger_dbt_cli_command_flow() -> str:
     result = trigger_dbt_cli_command("dbt debug")
-    return result
+    return result # Returns the last line the in CLI output
 
 trigger_dbt_cli_command_flow()
 ```
