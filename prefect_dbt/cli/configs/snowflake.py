@@ -72,7 +72,6 @@ class SnowflakeTargetConfigs(TargetConfigs):
             A configs JSON.
         """
         configs_json = super().get_configs()
-        configs_json.pop("connect_params")
         if "schema" not in configs_json:
             raise ValueError(
                 "The keyword, schema, must be provided in either "
