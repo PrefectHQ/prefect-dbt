@@ -19,7 +19,7 @@ async def trigger_dbt_cli_command(
     overwrite_profiles: bool = False,
     dbt_cli_profile: Optional[DbtCliProfile] = None,
     **shell_run_command_kwargs: Dict[str, Any],
-) -> Union[List, str]:
+) -> Union[List[str], str]:
     """
     Task for running dbt commands.
 
@@ -44,8 +44,11 @@ async def trigger_dbt_cli_command(
             [shell_run_command](https://prefecthq.github.io/prefect-shell/commands/#prefect_shell.commands.shell_run_command).
 
     Returns:
-        If return_all (default is False) is passed to shell_run_command_kwargs,
-        returns all lines as a list; else the last line as a string.
+        last_line_cli_output (str): The last line of the CLI output will be returned
+            if `return_all` in `shell_run_command_kwargs` is False. This is the default
+            behavior.
+        full_cli_output (List[str]): Full CLI output will be returned if `return_all`
+            in `shell_run_command_kwargs` is True.
 
     Examples:
         Execute `dbt debug` with a pre-populated profiles.yml.
