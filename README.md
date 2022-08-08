@@ -42,7 +42,7 @@ def run_dbt_job_flow():
 run_dbt_job_flow()
 ```
 
-### Execute a dbt CLI command
+### Execute a dbt CLI command with a pre-populated profiles.yml
 ```python
 from prefect import flow
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
@@ -51,6 +51,44 @@ from prefect_dbt.cli.commands import trigger_dbt_cli_command
 def trigger_dbt_cli_command_flow() -> str:
     result = trigger_dbt_cli_command("dbt debug")
     return result # Returns the last line the in CLI output
+
+trigger_dbt_cli_command_flow()
+```
+
+### Execute a dbt CLI command without a pre-populated profiles.yml
+
+```python
+from prefect import flow
+from prefect_dbt.cli.credentials import DbtCliProfile
+from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+from prefect_snowflake.credentials import SnowflakeCredentials
+
+@flow
+def trigger_dbt_cli_command_flow():
+    snowflake_credentials = SnowflakeCredentials(
+        user="user",
+        password="password",
+        account="account",
+        role="role",
+        database="database",
+        warehouse="warehouse",
+        schema="schema",
+    )
+    target_configs = SnowflakeTargetConfigs(
+        credentials=snowflake_credentials
+    )
+    dbt_cli_profile = DbtCliProfile(
+        name="jaffle_shop",
+        target="dev",
+        target_configs=target_configs,
+    )
+    result = trigger_dbt_cli_command(
+        "dbt debug",
+        overwrite_profiles=True,
+        dbt_cli_profile=dbt_cli_profile
+    )
+    return result
 
 trigger_dbt_cli_command_flow()
 ```
