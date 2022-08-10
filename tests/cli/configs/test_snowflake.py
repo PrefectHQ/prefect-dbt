@@ -1,21 +1,22 @@
 import pytest
-from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.credentials import SnowflakeConnector
 from pydantic import SecretBytes, SecretStr
 
 from prefect_dbt.cli.configs import SnowflakeTargetConfigs
 
 
-@pytest.mark.parametrize("schema_in_target_configs", [True, False])
-def test_snowflake_target_configs_get_configs(schema_in_target_configs):
-    configs_kwargs = dict()
-    credentials_kwargs = dict(account="account", user="user", password="password")
-    if schema_in_target_configs:
-        configs_kwargs["schema"] = "schema"
-    else:
-        credentials_kwargs["schema"] = "schema"
+def test_snowflake_target_configs_get_configs():
+    connector_kwargs = dict(
+        account="account",
+        user="user",
+        password="password",
+        schema="schema",
+        database="database",
+        warehouse="warehouse",
+    )
 
-    snowflake_credentials = SnowflakeCredentials(**credentials_kwargs)
-    configs_kwargs["credentials"] = snowflake_credentials
+    snowflake_connector = SnowflakeConnector(**connector_kwargs)
+    configs_kwargs = {"credentials": snowflake_connector}
 
     configs = SnowflakeTargetConfigs(**configs_kwargs)
     actual = configs.get_configs()
@@ -25,6 +26,8 @@ def test_snowflake_target_configs_get_configs(schema_in_target_configs):
         password="password",
         type="snowflake",
         schema="schema",
+        database="database",
+        warehouse="warehouse",
         threads=4,
     )
     for k, v in actual.items():
@@ -36,18 +39,13 @@ def test_snowflake_target_configs_get_configs(schema_in_target_configs):
 
 
 def test_snowflake_target_configs_get_configs_missing_schema():
-    snowflake_credentials = SnowflakeCredentials(
-        account="account", user="user", password="password"
+    snowflake_connector = SnowflakeConnector(
+        account="account",
+        user="user",
+        password="password",
+        database="database",
+        warehouse="warehouse",
     )
-    configs = SnowflakeTargetConfigs(credentials=snowflake_credentials)
-    with pytest.raises(ValueError, match="The keyword, schema"):
-        configs.get_configs()
-
-
-def test_snowflake_target_configs_get_configs_duplicate_schema():
-    snowflake_credentials = SnowflakeCredentials(
-        account="account", user="user", password="password", schema="schema"
-    )
-    configs = SnowflakeTargetConfigs(credentials=snowflake_credentials, schema="schema")
+    configs = SnowflakeTargetConfigs(credentials=snowflake_connector)
     with pytest.raises(ValueError, match="The keyword, schema"):
         configs.get_configs()

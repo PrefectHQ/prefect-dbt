@@ -11,7 +11,7 @@ from pydantic import Field
 from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
 
 try:
-    from prefect_snowflake.credentials import SnowflakeCredentials
+    from prefect_snowflake.credentials import SnowflakeConnector
 except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Snowflake") from e
 
@@ -40,9 +40,9 @@ class SnowflakeTargetConfigs(TargetConfigs):
         Instantiate SnowflakeTargetConfigs.
         ```python
         from prefect_dbt.cli.configs import SnowflakeTargetConfigs
-        from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.credentials import SnowflakeConnector
 
-        credentials = SnowflakeCredentials(
+        connector = SnowflakeConnector(
             schema="schema",
             user="user",
             password="password",
@@ -52,7 +52,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
             warehouse="warehouse",
         )
         target_configs = SnowflakeTargetConfigs(
-            credentials=credentials
+            credentials=connector
         )
         ```
     """
@@ -62,7 +62,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
 
     type: Literal["snowflake"] = "snowflake"
     schema_: Optional[str] = Field(default=None, alias="schema")
-    credentials: SnowflakeCredentials
+    credentials: SnowflakeConnector
 
     def get_configs(self) -> Dict[str, Any]:
         """
@@ -75,6 +75,6 @@ class SnowflakeTargetConfigs(TargetConfigs):
         if "schema" not in configs_json:
             raise ValueError(
                 "The keyword, schema, must be provided in either "
-                "SnowflakeCredentials or SnowflakeTargetConfigs"
+                "SnowflakeConnector or SnowflakeTargetConfigs"
             )
         return configs_json
