@@ -19,7 +19,7 @@ def test_gcp_target_configs_get_configs(project_in_target_configs):
     configs = BigQueryTargetConfigs(**configs_kwargs)
     actual = configs.get_configs()
     expected = {
-        "type": "gcp",
+        "type": "bigquery",
         "schema": "schema",
         "threads": 4,
         "project": "project",
