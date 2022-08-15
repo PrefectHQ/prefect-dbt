@@ -55,6 +55,47 @@ def trigger_dbt_cli_command_flow() -> str:
 trigger_dbt_cli_command_flow()
 ```
 
+### Execute a dbt CLI command without a pre-populated profiles.yml
+```python
+from prefect import flow
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector
+
+from prefect_dbt.cli.credentials import DbtCliProfile
+from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+
+@flow
+def trigger_dbt_cli_command_flow():
+    connector = SnowflakeConnector(
+        schema="public",
+        database="database",
+        warehouse="warehouse",
+        credentials=SnowflakeCredentials(
+            user="user",
+            password="password",
+            account="account.region.aws",
+            role="role",
+        ),
+    )
+    target_configs = SnowflakeTargetConfigs(
+        credentials=connector
+    )
+    dbt_cli_profile = DbtCliProfile(
+        name="jaffle_shop",
+        target="dev",
+        target_configs=target_configs,
+    )
+    result = trigger_dbt_cli_command(
+        "dbt debug",
+        overwrite_profiles=True,
+        dbt_cli_profile=dbt_cli_profile
+    )
+    return result
+
+trigger_dbt_cli_command_flow()
+```
+
 ## Resources
 
 If you encounter any bugs while using `prefect-dbt`, feel free to open an issue in the [prefect-dbt](https://github.com/PrefectHQ/prefect-dbt) repository.

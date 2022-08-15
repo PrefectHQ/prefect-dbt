@@ -1,18 +1,21 @@
-import pytest
-from prefect_snowflake.credentials import SnowflakeConnector
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector
 from pydantic import SecretBytes, SecretStr
 
 from prefect_dbt.cli.configs import SnowflakeTargetConfigs
 
 
 def test_snowflake_target_configs_get_configs():
-    connector_kwargs = dict(
+    credentials = SnowflakeCredentials(
         account="account",
         user="user",
         password="password",
+    )
+    connector_kwargs = dict(
         schema="schema",
         database="database",
         warehouse="warehouse",
+        credentials=credentials,
     )
 
     snowflake_connector = SnowflakeConnector(**connector_kwargs)
@@ -28,6 +31,7 @@ def test_snowflake_target_configs_get_configs():
         schema="schema",
         database="database",
         warehouse="warehouse",
+        authenticator="snowflake",
         threads=4,
     )
     for k, v in actual.items():
@@ -36,16 +40,3 @@ def test_snowflake_target_configs_get_configs():
         )
         expected_v = expected[k]
         assert actual_v == expected_v
-
-
-def test_snowflake_target_configs_get_configs_missing_schema():
-    snowflake_connector = SnowflakeConnector(
-        account="account",
-        user="user",
-        password="password",
-        database="database",
-        warehouse="warehouse",
-    )
-    configs = SnowflakeTargetConfigs(credentials=snowflake_connector)
-    with pytest.raises(ValueError, match="The keyword, schema"):
-        configs.get_configs()
