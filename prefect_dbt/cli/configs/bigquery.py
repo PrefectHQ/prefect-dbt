@@ -80,7 +80,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings, specific to BigQuery."  # noqa
 
-    type: Literal["gcp"] = "gcp"
+    type: Literal["bigquery"] = "bigquery"
     project: Optional[str] = None
     credentials: GcpCredentials
 
