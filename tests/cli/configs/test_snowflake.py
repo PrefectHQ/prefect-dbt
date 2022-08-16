@@ -19,7 +19,7 @@ def test_snowflake_target_configs_get_configs():
     )
 
     snowflake_connector = SnowflakeConnector(**connector_kwargs)
-    configs_kwargs = {"credentials": snowflake_connector}
+    configs_kwargs = {"connector": snowflake_connector}
 
     configs = SnowflakeTargetConfigs(**configs_kwargs)
     actual = configs.get_configs()
