@@ -20,6 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.0
+
+Released on August 16th, 2022.
+
+### Changed
+
+- Updates to `SnowflakeTargetConfigs` to accomodate breaking changes in `prefect-snowflake` - [#46](https://github.com/PrefectHQ/prefect-dbt/pull/46)
+
 ## 0.1.0
 
 Released on August 2nd, 2022.
