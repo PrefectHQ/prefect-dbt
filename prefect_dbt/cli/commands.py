@@ -74,17 +74,20 @@ async def trigger_dbt_cli_command(
 
         @flow
         def trigger_dbt_cli_command_flow():
-            snowflake_credentials = SnowflakeCredentials(
+            credentials = SnowflakeCredentials(
                 user="user",
                 password="password",
-                account="account",
+                account="account.region.aws",
                 role="role",
+            )
+            connector = SnowflakeConnector(
+                schema="public",
                 database="database",
                 warehouse="warehouse",
-                schema="schema",
+                credentials=credentials,
             )
             target_configs = SnowflakeTargetConfigs(
-                credentials=snowflake_credentials
+                connector=connector
             )
             dbt_cli_profile = DbtCliProfile(
                 name="jaffle_shop",

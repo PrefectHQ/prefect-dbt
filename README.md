@@ -79,7 +79,7 @@ def trigger_dbt_cli_command_flow():
         ),
     )
     target_configs = SnowflakeTargetConfigs(
-        credentials=connector
+        connector=connector
     )
     dbt_cli_profile = DbtCliProfile(
         name="jaffle_shop",

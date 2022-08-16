@@ -30,7 +30,7 @@ class DbtConfigs(Block, abc.ABC):
             # key needs to be rstripped because schema alias doesn't get used
             key = key.rstrip("_")
             if value is not None:
-                if key in ["extras", "credentials"]:
+                if key in ["extras", "credentials", "connector"]:
                     configs_json = self._populate_configs_json(configs_json, value)
                 else:
                     if key in configs_json.keys():

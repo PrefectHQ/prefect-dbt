@@ -56,7 +56,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
             credentials=credentials,
         )
         target_configs = SnowflakeTargetConfigs(
-            credentials=connector
+            connector=connector
         )
         ```
     """
@@ -66,7 +66,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
 
     type: Literal["snowflake"] = "snowflake"
     schema_: Optional[str] = Field(default=None, alias="schema")
-    credentials: SnowflakeConnector
+    connector: SnowflakeConnector
 
     def get_configs(self) -> Dict[str, Any]:
         """
