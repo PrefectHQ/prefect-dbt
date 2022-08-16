@@ -687,18 +687,22 @@ e.g. schema, an error will be raised.</p></td>
 <p>Instantiate SnowflakeTargetConfigs.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
 <span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 
 <span class="n">credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="p">(</span>
-    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span>
     <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
     <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
-    <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account&quot;</span><span class="p">,</span>
+    <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account.region.aws&quot;</span><span class="p">,</span>
     <span class="n">role</span><span class="o">=</span><span class="s2">&quot;role&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
+    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;public&quot;</span><span class="p">,</span>
     <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
     <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
+    <span class="n">credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span>
-    <span class="n">credentials</span><span class="o">=</span><span class="n">credentials</span>
+    <span class="n">connector</span><span class="o">=</span><span class="n">connector</span>
 <span class="p">)</span>
 </code></pre></div></p>
 
@@ -765,9 +769,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SnowflakeTargetConfigs</span><span class="p">(</span><span class="n">TargetConfigs</span><span class="p">):</span>
+<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SnowflakeTargetConfigs</span><span class="p">(</span><span class="n">TargetConfigs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Target configs contain credentials and</span>
 <span class="sd">    settings, specific to Snowflake.</span>
@@ -792,18 +794,22 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">        ```python</span>
 <span class="sd">        from prefect_dbt.cli.configs import SnowflakeTargetConfigs</span>
 <span class="sd">        from prefect_snowflake.credentials import SnowflakeCredentials</span>
+<span class="sd">        from prefect_snowflake.database import SnowflakeConnector</span>
 
 <span class="sd">        credentials = SnowflakeCredentials(</span>
-<span class="sd">            schema=&quot;schema&quot;,</span>
 <span class="sd">            user=&quot;user&quot;,</span>
 <span class="sd">            password=&quot;password&quot;,</span>
-<span class="sd">            account=&quot;account&quot;,</span>
+<span class="sd">            account=&quot;account.region.aws&quot;,</span>
 <span class="sd">            role=&quot;role&quot;,</span>
+<span class="sd">        )</span>
+<span class="sd">        connector = SnowflakeConnector(</span>
+<span class="sd">            schema=&quot;public&quot;,</span>
 <span class="sd">            database=&quot;database&quot;,</span>
 <span class="sd">            warehouse=&quot;warehouse&quot;,</span>
+<span class="sd">            credentials=credentials,</span>
 <span class="sd">        )</span>
 <span class="sd">        target_configs = SnowflakeTargetConfigs(</span>
-<span class="sd">            credentials=credentials</span>
+<span class="sd">            connector=connector</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -813,7 +819,7 @@ e.g. schema, an error will be raised.</p></td>
 
     <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;snowflake&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;snowflake&quot;</span>
     <span class="n">schema_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
-    <span class="n">credentials</span><span class="p">:</span> <span class="n">SnowflakeCredentials</span>
+    <span class="n">connector</span><span class="p">:</span> <span class="n">SnowflakeConnector</span>
 
     <span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -823,12 +829,6 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">            A configs JSON.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">configs_json</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_configs</span><span class="p">()</span>
-        <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;connect_params&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;schema&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The keyword, schema, must be provided in either &quot;</span>
-                <span class="s2">&quot;SnowflakeCredentials or SnowflakeTargetConfigs&quot;</span>
-            <span class="p">)</span>
         <span class="k">return</span> <span class="n">configs_json</span>
 </code></pre></div></td></tr></table></div>
         </details>
@@ -879,11 +879,7 @@ e.g. schema, an error will be raised.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cli/configs/snowflake.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -891,9 +887,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the dbt configs specific to Snowflake profile.</span>
 
@@ -901,12 +895,6 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">        A configs JSON.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">configs_json</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_configs</span><span class="p">()</span>
-    <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;connect_params&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;schema&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;The keyword, schema, must be provided in either &quot;</span>
-            <span class="s2">&quot;SnowflakeCredentials or SnowflakeTargetConfigs&quot;</span>
-        <span class="p">)</span>
     <span class="k">return</span> <span class="n">configs_json</span>
 </code></pre></div></td></tr></table></div>
       </details>

@@ -287,6 +287,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#execute-a-dbt-cli-command-without-a-pre-populated-profilesyml" class="md-nav__link">
+    Execute a dbt CLI command without a pre-populated profiles.yml
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -652,6 +659,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#execute-a-dbt-cli-command-without-a-pre-populated-profilesyml" class="md-nav__link">
+    Execute a dbt CLI command without a pre-populated profiles.yml
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -727,6 +741,45 @@
 <span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span> <span class="c1"># Returns the last line the in CLI output</span>
+
+<span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="execute-a-dbt-cli-command-without-a-pre-populated-profilesyml">Execute a dbt CLI command without a pre-populated profiles.yml</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.credentials</span> <span class="kn">import</span> <span class="n">DbtCliProfile</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">():</span>
+    <span class="n">connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
+        <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;public&quot;</span><span class="p">,</span>
+        <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
+        <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
+        <span class="n">credentials</span><span class="o">=</span><span class="n">SnowflakeCredentials</span><span class="p">(</span>
+            <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
+            <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account.region.aws&quot;</span><span class="p">,</span>
+            <span class="n">role</span><span class="o">=</span><span class="s2">&quot;role&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span>
+        <span class="n">connector</span><span class="o">=</span><span class="n">connector</span>
+    <span class="p">)</span>
+    <span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jaffle_shop&quot;</span><span class="p">,</span>
+        <span class="n">target</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
+        <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span>
+        <span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span>
+        <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
 
 <span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
 </code></pre></div>
