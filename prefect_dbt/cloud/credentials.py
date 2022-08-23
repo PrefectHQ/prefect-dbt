@@ -9,7 +9,7 @@ class DbtCloudCredentials(Block):
     """
     Credentials block for credential use across dbt Cloud tasks and flows.
 
-    Args:
+    Attributes:
         api_key (SecretStr): API key to authenticate with the dbt Cloud
             administrative API. Refer to the [Authentication docs](
             https://docs.getdbt.com/dbt-cloud/api-v2#section/Authentication)

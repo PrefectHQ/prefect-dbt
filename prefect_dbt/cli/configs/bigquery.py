@@ -22,7 +22,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile)
     page.
 
-    Args:
+    Attributes:
         credentials: The credentials to use to authenticate; if there are
             duplicate keys between credentials and TargetConfigs,
             e.g. schema, an error will be raised.

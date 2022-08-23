@@ -1,8 +1,10 @@
 """Module containing tasks and flows for interacting with dbt Cloud job runs"""
-from typing import Dict, List, Optional, Union
+import asyncio
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from httpx import HTTPStatusError
-from prefect import task
+from prefect import flow, get_run_logger, task
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.utils import extract_user_message
@@ -24,6 +26,46 @@ class DbtCloudGetRunArtifactFailed(Exception):
     """Raised when unable to get a dbt Cloud run artifact"""
 
     pass
+
+
+class DbtCloudJobRunFailed(Exception):
+    """Raised when a triggered job run fails"""
+
+    pass
+
+
+class DbtCloudJobRunCancelled(Exception):
+    """Raised when a triggered job run is cancelled"""
+
+    pass
+
+
+class DbtCloudJobRunTimedOut(Exception):
+    """
+    Raised when a triggered job run does not complete in the configured max
+    wait seconds
+    """
+
+    pass
+
+
+class DbtCloudJobRunStatus(Enum):
+    """dbt Cloud Job statuses."""
+
+    QUEUED = 1
+    STARTING = 2
+    RUNNING = 3
+    SUCCESS = 10
+    FAILED = 20
+    CANCELLED = 30
+
+    @classmethod
+    def is_terminal_status_code(cls, status_code: Any) -> bool:
+        """
+        Returns True if a status code is terminal for a job run.
+        Returns False otherwise.
+        """
+        return status_code in [cls.SUCCESS.value, cls.FAILED.value, cls.CANCELLED.value]
 
 
 @task(
@@ -216,3 +258,63 @@ async def get_dbt_cloud_run_artifact(
         artifact_contents = response.text
 
     return artifact_contents
+
+
+@flow
+async def wait_for_dbt_cloud_job_run(
+    run_id: int,
+    dbt_cloud_credentials: DbtCloudCredentials,
+    max_wait_seconds: int = 900,
+    poll_frequency_seconds: int = 10,
+) -> Tuple[DbtCloudJobRunStatus, Dict]:
+    """
+    Wait for the given dbt Cloud job run to finish running.
+
+    Args:
+        run_id: The ID of the run to wait for.
+        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
+        max_wait_seconds: Maximum number of seconds to wait for job to complete
+        poll_frequency_seconds: Number of seconds to wait in between checks for
+            run completion.
+
+    Raises:
+        DbtCloudJobRunTimedOut: When the elapsed wait time exceeds `max_wait_seconds`.
+
+    Returns:
+        run_status: An enum representing the final dbt Cloud job run status
+        run_data: A dictionary containing information about the run after completion.
+
+
+    Example:
+
+
+    """
+    logger = get_run_logger()
+    seconds_waited_for_run_completion = 0
+    wait_for = []
+    while seconds_waited_for_run_completion <= max_wait_seconds:
+        run_data_future = await get_dbt_cloud_run_info.submit(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            run_id=run_id,
+            wait_for=wait_for,
+        )
+        run_data = await run_data_future.result()
+        run_status_code = run_data.get("status")
+
+        if DbtCloudJobRunStatus.is_terminal_status_code(run_status_code):
+            return DbtCloudJobRunStatus(run_status_code), run_data
+
+        wait_for = [run_data_future]
+        logger.info(
+            "dbt Cloud job run with ID %i has status %s. Waiting for %i seconds.",
+            run_id,
+            DbtCloudJobRunStatus(run_status_code).name,
+            poll_frequency_seconds,
+        )
+        await asyncio.sleep(poll_frequency_seconds)
+        seconds_waited_for_run_completion += poll_frequency_seconds
+
+    raise DbtCloudJobRunTimedOut(
+        f"Max wait time of {max_wait_seconds} seconds exceeded while waiting "
+        "for job run with ID {run_id}"
+    )
