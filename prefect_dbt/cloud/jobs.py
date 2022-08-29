@@ -138,6 +138,31 @@ def get_run_id(obj: Dict):
 
     Args:
         obj: The JSON body from the trigger job run response.
+
+    Example:
+        ```python
+        from prefect import flow
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run, get_run_id
+
+
+        @flow
+        def trigger_run_and_get_id():
+            dbt_cloud_credentials=DbtCloudCredentials(
+                    api_key="my_api_key",
+                    account_id=123456789
+                )
+
+            triggered_run_data = trigger_dbt_cloud_job_run(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                job_id=job_id,
+                options=trigger_job_run_options,
+            )
+            run_id = get_run_id.submit(triggered_run_data)
+            return run_id
+
+        trigger_run_and_get_id()
+        ```
     """
     id = obj.get("id")
     if id is None:
@@ -297,5 +322,5 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     else:
         raise RuntimeError(
             f"Triggered job run with ID: {run_id_future.result()} ended with unexpected"
-            f"status {final_run_status.value}."
+            "status {final_run_status.value}."
         )

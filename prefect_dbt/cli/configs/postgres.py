@@ -53,7 +53,7 @@ class PostgresTargetConfigs(TargetConfigs):
     """
 
     _block_type_name = "dbt CLI Postgres Target Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings specific to Postgres."  # noqa
 
     type: Literal["postgres"] = "postgres"

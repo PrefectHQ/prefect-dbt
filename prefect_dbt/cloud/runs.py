@@ -260,7 +260,10 @@ async def get_dbt_cloud_run_artifact(
     return artifact_contents
 
 
-@flow
+@flow(
+    name="Wait for dbt Cloud job run",
+    description="Waits for a dbt Cloud job run to finish running.",
+)
 async def wait_for_dbt_cloud_job_run(
     run_id: int,
     dbt_cloud_credentials: DbtCloudCredentials,
@@ -268,7 +271,7 @@ async def wait_for_dbt_cloud_job_run(
     poll_frequency_seconds: int = 10,
 ) -> Tuple[DbtCloudJobRunStatus, Dict]:
     """
-    Wait for the given dbt Cloud job run to finish running.
+    Waits for the given dbt Cloud job run to finish running.
 
     Args:
         run_id: The ID of the run to wait for.
