@@ -10,7 +10,7 @@ class DbtCliProfile(Block):
     """
     Profile for use across dbt CLI tasks and flows.
 
-    Args:
+    Attributes:
         name (str): Profile name used for populating profiles.yml.
         target (str): The default target your dbt project will use.
         target_configs (TargetConfigs): Target configs contain credentials and
@@ -86,7 +86,7 @@ class DbtCliProfile(Block):
     """
 
     _block_type_name = "dbt CLI Profile"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
 
     name: str
     target: str

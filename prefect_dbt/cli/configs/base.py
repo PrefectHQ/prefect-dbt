@@ -11,7 +11,7 @@ class DbtConfigs(Block, abc.ABC):
     """
     Abstract class for other dbt Configs.
 
-    Args:
+    Attributes:
         extras: Extra target configs' keywords, not yet added
             to prefect-dbt, but available in dbt; if there are
             duplicate keys between extras and TargetConfigs,
@@ -61,7 +61,7 @@ class TargetConfigs(DbtConfigs):
     https://docs.getdbt.com/docs/available-adapters) page and
     click the desired adapter's "Profile Setup" hyperlink.
 
-    Args:
+    Attributes:
         type: The name of the database warehouse
         schema: The schema that dbt will build objects into;
             in BigQuery, a schema is actually a dataset.
@@ -78,7 +78,7 @@ class TargetConfigs(DbtConfigs):
     """
 
     _block_type_name = "dbt CLI Target Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
 
     type: str
     schema_: str = Field(alias="schema")
@@ -93,7 +93,7 @@ class GlobalConfigs(DbtConfigs):
     or a failing model. Docs can be found [here](
     https://docs.getdbt.com/reference/global-configs).
 
-    Args:
+    Attributes:
         send_anonymous_usage_stats: Whether usage stats are sent to dbt.
         use_colors: Colorize the output it prints in your terminal.
         partial_parse: When partial parsing is enabled, dbt will use an
@@ -125,7 +125,7 @@ class GlobalConfigs(DbtConfigs):
     """
 
     _block_type_name = "dbt CLI Global Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
 
     send_anonymous_usage_stats: Optional[bool] = None
     use_colors: Optional[bool] = None
