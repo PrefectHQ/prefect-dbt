@@ -27,6 +27,9 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for key, value in dict_.items():
+            if key.startswith("_"):
+                continue
+
             # key needs to be rstripped because schema alias doesn't get used
             key = key.rstrip("_")
             if value is not None:
