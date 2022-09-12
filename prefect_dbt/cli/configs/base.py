@@ -26,8 +26,10 @@ class DbtConfigs(Block, abc.ABC):
         """
         Recursively populate configs_json.
         """
+        invalid_keys = Block().dict().keys()
+
         for key, value in dict_.items():
-            if key.startswith("_"):
+            if key in invalid_keys or key.startswith("_"):
                 continue
 
             # key needs to be rstripped because schema alias doesn't get used
@@ -44,6 +46,7 @@ class DbtConfigs(Block, abc.ABC):
                     if isinstance(value, (SecretStr, SecretBytes)):
                         value = value.get_secret_value()
                     configs_json[key] = value
+        print(configs_json)
         return configs_json
 
     def get_configs(self) -> Dict[str, Any]:
