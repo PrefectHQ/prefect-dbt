@@ -22,7 +22,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile)
     page.
 
-    Args:
+    Attributes:
         credentials: The credentials to use to authenticate; if there are
             duplicate keys between credentials and TargetConfigs,
             e.g. schema, an error will be raised.
@@ -77,7 +77,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     """
 
     _block_type_name = "dbt CLI BigQuery Target Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings, specific to BigQuery."  # noqa
 
     type: Literal["bigquery"] = "bigquery"
