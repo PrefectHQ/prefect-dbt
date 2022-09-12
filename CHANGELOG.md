@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixes `TargetConfigs.load("BLOCK_NAME").get_configs()` by ignoring private attributes - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
+- Fixes `TargetConfigs.load("BLOCK_NAME").get_configs()` by ignoring private attributes and base `Block` fields - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
 
 ### Security
 
