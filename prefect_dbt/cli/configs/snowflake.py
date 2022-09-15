@@ -27,7 +27,7 @@ class SnowflakeTargetConfigs(CredentialsTargetConfigs):
     https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile)
     page.
 
-    Args:
+    Attributes:
         credentials: The credentials to use to authenticate; if there are
             duplicate keys between credentials and TargetConfigs,
             e.g. schema, an error will be raised.
@@ -65,7 +65,7 @@ class SnowflakeTargetConfigs(CredentialsTargetConfigs):
     """
 
     _block_type_name = "dbt CLI Snowflake Target Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _nested_fields = ("connector",) + CredentialsTargetConfigs._nested_fields
 
     type: Literal["snowflake"] = "snowflake"

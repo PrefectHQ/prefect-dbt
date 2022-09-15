@@ -9,12 +9,12 @@ from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import (
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
-    DbtCloudJobRunTimedOut,
     DbtCloudJobRunTriggerFailed,
     trigger_dbt_cloud_job_run,
     trigger_dbt_cloud_job_run_and_wait_for_completion,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
+from prefect_dbt.cloud.runs import DbtCloudJobRunTimedOut
 
 
 @pytest.fixture
