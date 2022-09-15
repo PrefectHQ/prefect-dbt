@@ -6,7 +6,10 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from prefect_dbt.cli.configs.base import (
+    CredentialsTargetConfigs,
+    MissingExtrasRequireError,
+)
 
 try:
     from prefect_gcp.credentials import GcpCredentials
@@ -14,7 +17,7 @@ except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("BigQuery") from e
 
 
-class BigQueryTargetConfigs(TargetConfigs):
+class BigQueryTargetConfigs(CredentialsTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to BigQuery.
@@ -79,6 +82,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     _block_type_name = "dbt CLI BigQuery Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings, specific to BigQuery."  # noqa
+    _include_fields = ("project",) + CredentialsTargetConfigs._include_fields
 
     type: Literal["bigquery"] = "bigquery"
     project: Optional[str] = None

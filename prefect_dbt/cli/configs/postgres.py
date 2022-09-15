@@ -6,7 +6,10 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from prefect_dbt.cli.configs.base import (
+    CredentialsTargetConfigs,
+    MissingExtrasRequireError,
+)
 
 try:
     from prefect_sqlalchemy.credentials import DatabaseCredentials
@@ -14,7 +17,7 @@ except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Postgres") from e
 
 
-class PostgresTargetConfigs(TargetConfigs):
+class PostgresTargetConfigs(CredentialsTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to Postgres.

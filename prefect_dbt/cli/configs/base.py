@@ -1,7 +1,7 @@
 """Module containing models for base configs"""
 
 import abc
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from prefect.blocks.core import Block
 from pydantic import Field, SecretBytes, SecretStr
@@ -20,22 +20,27 @@ class DbtConfigs(Block, abc.ABC):
 
     extras: Optional[Dict[str, Any]] = None
 
+    _include_fields: Optional[Tuple[str]] = None
+    _exclude_fields: Optional[Tuple[str]] = None
+    _nested_fields: Tuple[str] = ("extras",)
+
     def _populate_configs_json(
         self, configs_json: Dict[str, Any], dict_: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Recursively populate configs_json.
         """
-        invalid_keys = Block().dict().keys()
-
         for key, value in dict_.items():
-            if key in invalid_keys or key.startswith("_"):
+            # must use exclude fields here because of nesting;
+            # e.g. `CredentialsTargetConfigs` contains `Credentials`
+            # and `block_type_slug` is inside Credentials
+            if key.startswith("_") or key in self._exclude_fields:
                 continue
 
             # key needs to be rstripped because schema alias doesn't get used
             key = key.rstrip("_")
             if value is not None:
-                if key in ["extras", "credentials", "connector"]:
+                if key in self._nested_fields:
                     configs_json = self._populate_configs_json(configs_json, value)
                 else:
                     if key in configs_json.keys():
@@ -46,7 +51,6 @@ class DbtConfigs(Block, abc.ABC):
                     if isinstance(value, (SecretStr, SecretBytes)):
                         value = value.get_secret_value()
                     configs_json[key] = value
-        print(configs_json)
         return configs_json
 
     def get_configs(self) -> Dict[str, Any]:
@@ -56,7 +60,13 @@ class DbtConfigs(Block, abc.ABC):
         Returns:
             A configs JSON.
         """
-        return self._populate_configs_json({}, self.dict())
+        include = None
+        if self._include_fields:
+            include = set(self._include_fields + self._nested_fields)
+
+        # cannot use exclude here; see note in _populate_configs_json
+        subset_dict = self.dict(include=include)
+        return self._populate_configs_json({}, subset_dict)
 
 
 class TargetConfigs(DbtConfigs):
@@ -85,10 +95,23 @@ class TargetConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    # cannot use include because we don't know all the possible config keys
+    _exclude_fields = ("block_type_slug",)
 
     type: str
     schema_: str = Field(alias="schema")
     threads: int = 4
+
+
+class CredentialsTargetConfigs(TargetConfigs, abc.ABC):
+    """
+    Abstract class for target configs that use credentials.
+    """
+
+    _include_fields = ("type", "schema_", "threads") + (
+        TargetConfigs._include_fields or ()
+    )
+    _nested_fields = ("credentials",) + (TargetConfigs._nested_fields or ())
 
 
 class GlobalConfigs(DbtConfigs):
@@ -132,6 +155,20 @@ class GlobalConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Global Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
+    _include_fields = (
+        "send_anonymous_usage_stats",
+        "use_colors",
+        "partial_parse",
+        "printer_width",
+        "write_json",
+        "warn_error",
+        "log_format",
+        "debug",
+        "version_check",
+        "fail_fast",
+        "use_experimental_parser",
+        "static_parser",
+    )
 
     send_anonymous_usage_stats: Optional[bool] = None
     use_colors: Optional[bool] = None
