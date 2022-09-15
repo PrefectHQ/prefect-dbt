@@ -52,7 +52,7 @@ def dbt_cli_profile_bare():
     target_configs = TargetConfigs(
         type="custom",
         schema="schema",
-        account="fake",
+        extras={"account": "fake"},
     )
     return DbtCliProfile(
         name="prefecto",

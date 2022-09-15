@@ -21,7 +21,7 @@ class DbtConfigs(Block, abc.ABC):
     extras: Optional[Dict[str, Any]] = None
 
     _include_fields: Optional[Tuple[str]] = None
-    _exclude_fields: Optional[Tuple[str]] = None
+    _exclude_fields: Tuple[str] = ("block_type_slug",)
     _nested_fields: Tuple[str] = ("extras",)
 
     def _populate_configs_json(
@@ -31,9 +31,10 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for key, value in dict_.items():
-            if self._include_fields and key not in self._include_fields:
-                continue
-            elif self._exclude_fields and key in self._exclude_fields:
+            # must use exclude fields here because of nesting;
+            # e.g. `CredentialsTargetConfigs` contains `Credentials`
+            # and `block_type_slug` is inside the Credentials
+            if key.startswith("_") or key in self._exclude_fields:
                 continue
 
             # key needs to be rstripped because schema alias doesn't get used
@@ -59,7 +60,13 @@ class DbtConfigs(Block, abc.ABC):
         Returns:
             A configs JSON.
         """
-        return self._populate_configs_json({}, self.dict())
+        include = None
+        if self._include_fields:
+            include = set(self._include_fields + self._nested_fields)
+
+        # cannot use exclude here; see note in _populate_configs_json
+        subset_dict = self.dict(include=include)
+        return self._populate_configs_json({}, subset_dict)
 
 
 class TargetConfigs(DbtConfigs):
@@ -88,8 +95,9 @@ class TargetConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250"  # noqa
-    # cannot use include because we don't know all the possible config keys
-    _exclude_fields = ("block_type_slug",)
+    _include_fields = ("type", "schema_", "threads") + (
+        DbtConfigs._include_fields or ()
+    )
 
     type: str
     schema_: str = Field(alias="schema")
@@ -101,9 +109,6 @@ class CredentialsTargetConfigs(TargetConfigs, abc.ABC):
     Abstract class for target configs that use credentials.
     """
 
-    _include_fields = ("type", "schema_", "threads") + (
-        TargetConfigs._include_fields or ()
-    )
     _nested_fields = ("credentials",) + (TargetConfigs._nested_fields or ())
 
 
