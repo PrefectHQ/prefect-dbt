@@ -31,10 +31,9 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for key, value in dict_.items():
-            # must use exclude fields here because of nesting;
-            # e.g. `CredentialsTargetConfigs` contains `Credentials`
-            # and `block_type_slug` is inside Credentials
-            if key.startswith("_") or key in self._exclude_fields:
+            if self._include_fields and key not in self._include_fields:
+                continue
+            elif self._exclude_fields and key in self._exclude_fields:
                 continue
 
             # key needs to be rstripped because schema alias doesn't get used
@@ -60,13 +59,7 @@ class DbtConfigs(Block, abc.ABC):
         Returns:
             A configs JSON.
         """
-        include = None
-        if self._include_fields:
-            include = set(self._include_fields + self._nested_fields)
-
-        # cannot use exclude here; see note in _populate_configs_json
-        subset_dict = self.dict(include=include)
-        return self._populate_configs_json({}, subset_dict)
+        return self._populate_configs_json({}, self.dict())
 
 
 class TargetConfigs(DbtConfigs):
