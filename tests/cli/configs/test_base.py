@@ -1,12 +1,6 @@
 import pytest
-from pydantic import ValidationError
 
-from prefect_dbt.cli.configs.base import DbtConfigs, TargetConfigs
-
-
-def test_dbt_configs_forbid_extra():
-    with pytest.raises(ValidationError, match="extra fields not"):
-        DbtConfigs(some_field="not going to happen")
+from prefect_dbt.cli.configs.base import TargetConfigs
 
 
 def test_target_configs_get_configs():
