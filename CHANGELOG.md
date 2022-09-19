@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.1
 
+Released on September 19th, 2022.
+
 ### Changed
 
 - `TargetConfigs` now forbids unexpected fields; utilize the `extras` field instead - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
