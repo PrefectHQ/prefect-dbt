@@ -4,10 +4,10 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel, Extra, Field, SecretBytes, SecretStr
+from pydantic import BaseModel, Field, SecretBytes, SecretStr
 
 
-class DbtConfigs(Block, abc.ABC, extra=Extra.forbid):
+class DbtConfigs(Block, abc.ABC):
     """
     Abstract class for other dbt Configs.
 
