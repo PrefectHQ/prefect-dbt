@@ -14,16 +14,18 @@ def dbt_cloud_credentials():
 def dbt_cli_profile():
     target_configs = TargetConfigs(
         type="snowflake",
-        account="account",
-        user="user",
-        password="password",
-        role="role",
-        database="database",
-        warehouse="warehouse",
         schema="schema",
         threads=4,
-        client_session_keep_alive=False,
-        query_tag="query_tag",
+        extras=dict(
+            account="account",
+            user="user",
+            password="password",
+            role="role",
+            database="database",
+            warehouse="warehouse",
+            client_session_keep_alive=False,
+            query_tag="query_tag",
+        ),
     )
     global_configs = GlobalConfigs(
         send_anonymous_usage_stats=False,
@@ -50,9 +52,7 @@ def dbt_cli_profile():
 @pytest.fixture
 def dbt_cli_profile_bare():
     target_configs = TargetConfigs(
-        type="custom",
-        schema="schema",
-        account="fake",
+        type="custom", schema="schema", extras={"account": "fake"}
     )
     return DbtCliProfile(
         name="prefecto",
