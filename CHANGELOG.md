@@ -30,7 +30,7 @@ Released on September 19th, 2022.
 
 ### Fixed
 
-- Fixes `TargetConfigs.load("BLOCK_NAME").get_configs()` by passing only `TargetConfigs.__fields__` - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
+- Fixes `.get_configs()` method on a `TargetConfigs` instance by passing only `TargetConfigs.__fields__` - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
 
 ## 0.2.0
 
