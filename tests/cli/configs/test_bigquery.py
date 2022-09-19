@@ -29,6 +29,23 @@ def test_gcp_target_configs_get_configs(project_in_target_configs):
     assert actual == expected
 
 
+def test_gcp_target_configs_get_configs_service_account_info():
+    gcp_credentials = GcpCredentials(service_account_info='{"my": "secrets"}')
+    configs = BigQueryTargetConfigs(
+        credentials=gcp_credentials, project="my_project", schema="my_schema"
+    )
+    actual = configs.get_configs()
+    expected = {
+        "type": "bigquery",
+        "schema": "my_schema",
+        "threads": 4,
+        "project": "my_project",
+        "method": "service-account-json",
+        "keyfile_json": {"my": "secrets"},
+    }
+    assert actual == expected
+
+
 def test_gcp_target_configs_get_configs_missing_schema():
     gcp_credentials = GcpCredentials(service_account_file="service_account_file")
     configs = BigQueryTargetConfigs(credentials=gcp_credentials, schema="schema")

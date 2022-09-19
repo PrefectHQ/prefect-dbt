@@ -4,10 +4,10 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr
+from pydantic import BaseModel, Extra, Field, SecretBytes, SecretStr
 
 
-class DbtConfigs(Block, abc.ABC):
+class DbtConfigs(Block, abc.ABC, extra=Extra.forbid):
     """
     Abstract class for other dbt Configs.
 
@@ -21,26 +21,44 @@ class DbtConfigs(Block, abc.ABC):
     extras: Optional[Dict[str, Any]] = None
 
     def _populate_configs_json(
-        self, configs_json: Dict[str, Any], dict_: Dict[str, Any]
+        self,
+        configs_json: Dict[str, Any],
+        fields: Dict[str, Any],
+        model: BaseModel = None,
     ) -> Dict[str, Any]:
         """
         Recursively populate configs_json.
         """
-        for key, value in dict_.items():
-            # key needs to be rstripped because schema alias doesn't get used
-            key = key.rstrip("_")
-            if value is not None:
-                if key in ["extras", "credentials", "connector"]:
-                    configs_json = self._populate_configs_json(configs_json, value)
-                else:
-                    if key in configs_json.keys():
-                        raise ValueError(
-                            f"The keyword, {key}, has already been provided in "
-                            f"TargetConfigs; remove duplicated keywords to continue"
-                        )
-                    if isinstance(value, (SecretStr, SecretBytes)):
-                        value = value.get_secret_value()
-                    configs_json[key] = value
+        for field_name, field in fields.items():
+            if model is not None:
+                # get actual value from model
+                field_value = getattr(model, field_name)
+                # override the name with alias so dbt parser can recognize the keyword;
+                # e.g. schema_ -> schema, returns the original name if no alias is set
+                field_name = field.alias
+            else:
+                field_value = field
+
+            if field_value is None:
+                # do not add to configs json if no value or default is set
+                continue
+
+            if isinstance(field_value, BaseModel):
+                configs_json = self._populate_configs_json(
+                    configs_json, field_value.__fields__, model=field_value
+                )
+            elif field_name == "extras":
+                configs_json = self._populate_configs_json(configs_json, field_value)
+            else:
+                if field_name in configs_json.keys():
+                    raise ValueError(
+                        f"The keyword, {field_name}, has already been provided in "
+                        f"TargetConfigs; remove duplicated keywords to continue"
+                    )
+                if isinstance(field_value, (SecretStr, SecretBytes)):
+                    field_value = field_value.get_secret_value()
+                configs_json[field_name] = field_value
+
         return configs_json
 
     def get_configs(self) -> Dict[str, Any]:
@@ -50,7 +68,7 @@ class DbtConfigs(Block, abc.ABC):
         Returns:
             A configs JSON.
         """
-        return self._populate_configs_json({}, self.dict())
+        return self._populate_configs_json({}, self.__fields__, model=self)
 
 
 class TargetConfigs(DbtConfigs):

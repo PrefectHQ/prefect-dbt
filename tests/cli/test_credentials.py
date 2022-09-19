@@ -24,7 +24,9 @@ def test_dbt_cli_profile_init(configs_type):
 
 def test_dbt_cli_profile_init_validation_failed():
     with pytest.raises(ValidationError, match="2 validation errors for DbtCliProfile"):
-        DbtCliProfile(name="test_name", target="dev", target_configs={"field": "abc"})
+        DbtCliProfile(
+            name="test_name", target="dev", target_configs={"extras": {"field": "abc"}}
+        )
 
 
 def test_dbt_cli_profile_get_profile():

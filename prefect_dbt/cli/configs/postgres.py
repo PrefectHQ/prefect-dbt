@@ -79,7 +79,7 @@ class PostgresTargetConfigs(TargetConfigs):
         for invalid_key in invalid_keys + list(rename_keys):
             configs_json.pop(invalid_key, None)
 
-        rendered_url = configs_json.pop("rendered_url")
+        rendered_url = self.credentials.rendered_url
         for key in rename_keys:
             renamed_key = rename_keys[key]
             configs_json[renamed_key] = getattr(rendered_url, key)
