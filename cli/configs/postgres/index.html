@@ -653,27 +653,24 @@ settings, specific to Postgres.
 To find valid keys, head to the <a href="https://docs.getdbt.com/reference/warehouse-profiles/postgres-profile">Postgres Profile</a>
 page.</p>
 
-  <p><strong>Parameters:</strong></p>
+  <p><strong>Attributes:</strong></p>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Default</th>
       </tr>
     </thead>
     <tbody>
         <tr>
           <td><code>credentials</code></td>
           <td>
+                <code><span title="prefect_sqlalchemy.credentials.DatabaseCredentials">DatabaseCredentials</span></code>
           </td>
           <td><p>The credentials to use to authenticate; if there are
 duplicate keys between credentials and TargetConfigs,
 e.g. schema, an error will be raised.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
     </tbody>
   </table>
@@ -779,7 +776,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">    https://docs.getdbt.com/reference/warehouse-profiles/postgres-profile)</span>
 <span class="sd">    page.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        credentials: The credentials to use to authenticate; if there are</span>
 <span class="sd">            duplicate keys between credentials and TargetConfigs,</span>
 <span class="sd">            e.g. schema, an error will be raised.</span>
@@ -810,7 +807,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_block_type_name</span> <span class="o">=</span> <span class="s2">&quot;dbt CLI Postgres Target Configs&quot;</span>
-    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
     <span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;dbt CLI target configs containing credentials and settings specific to Postgres.&quot;</span>  <span class="c1"># noqa</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;postgres&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;postgres&quot;</span>
@@ -836,7 +833,7 @@ e.g. schema, an error will be raised.</p></td>
         <span class="k">for</span> <span class="n">invalid_key</span> <span class="ow">in</span> <span class="n">invalid_keys</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">rename_keys</span><span class="p">):</span>
             <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">invalid_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="n">rendered_url</span> <span class="o">=</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;rendered_url&quot;</span><span class="p">)</span>
+        <span class="n">rendered_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">rendered_url</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rename_keys</span><span class="p">:</span>
             <span class="n">renamed_key</span> <span class="o">=</span> <span class="n">rename_keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">configs_json</span><span class="p">[</span><span class="n">renamed_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">rendered_url</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
@@ -934,7 +931,7 @@ e.g. schema, an error will be raised.</p></td>
     <span class="k">for</span> <span class="n">invalid_key</span> <span class="ow">in</span> <span class="n">invalid_keys</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">rename_keys</span><span class="p">):</span>
         <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">invalid_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="n">rendered_url</span> <span class="o">=</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;rendered_url&quot;</span><span class="p">)</span>
+    <span class="n">rendered_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">rendered_url</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rename_keys</span><span class="p">:</span>
         <span class="n">renamed_key</span> <span class="o">=</span> <span class="n">rename_keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">configs_json</span><span class="p">[</span><span class="n">renamed_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">rendered_url</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>

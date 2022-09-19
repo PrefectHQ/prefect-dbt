@@ -678,28 +678,25 @@
   
       <p>Abstract class for other dbt Configs.</p>
 
-  <p><strong>Parameters:</strong></p>
+  <p><strong>Attributes:</strong></p>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Default</th>
       </tr>
     </thead>
     <tbody>
         <tr>
           <td><code>extras</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
           </td>
           <td><p>Extra target configs' keywords, not yet added
 to prefect-dbt, but available in dbt; if there are
 duplicate keys between extras and TargetConfigs,
 an error will be raised.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
     </tbody>
   </table>
@@ -750,11 +747,29 @@ an error will be raised.</p></td>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
-<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtConfigs</span><span class="p">(</span><span class="n">Block</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtConfigs</span><span class="p">(</span><span class="n">Block</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract class for other dbt Configs.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        extras: Extra target configs&#39; keywords, not yet added</span>
 <span class="sd">            to prefect-dbt, but available in dbt; if there are</span>
 <span class="sd">            duplicate keys between extras and TargetConfigs,</span>
@@ -764,26 +779,44 @@ an error will be raised.</p></td>
     <span class="n">extras</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_populate_configs_json</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">configs_json</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">configs_json</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">BaseModel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recursively populate configs_json.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># key needs to be rstripped because schema alias doesn&#39;t get used</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;extras&quot;</span><span class="p">,</span> <span class="s2">&quot;credentials&quot;</span><span class="p">,</span> <span class="s2">&quot;connector&quot;</span><span class="p">]:</span>
-                    <span class="n">configs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">(</span><span class="n">configs_json</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;The keyword, </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">, has already been provided in &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;TargetConfigs; remove duplicated keywords to continue&quot;</span>
-                        <span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">SecretStr</span><span class="p">,</span> <span class="n">SecretBytes</span><span class="p">)):</span>
-                        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
-                    <span class="n">configs_json</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># get actual value from model</span>
+                <span class="n">field_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+                <span class="c1"># override the name with alias so dbt parser can recognize the keyword;</span>
+                <span class="c1"># e.g. schema_ -&gt; schema, returns the original name if no alias is set</span>
+                <span class="n">field_name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">alias</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">field_value</span> <span class="o">=</span> <span class="n">field</span>
+
+            <span class="k">if</span> <span class="n">field_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># do not add to configs json if no value or default is set</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
+                <span class="n">configs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">(</span>
+                    <span class="n">configs_json</span><span class="p">,</span> <span class="n">field_value</span><span class="o">.</span><span class="n">__fields__</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">field_value</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;extras&quot;</span><span class="p">:</span>
+                <span class="n">configs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">(</span><span class="n">configs_json</span><span class="p">,</span> <span class="n">field_value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;The keyword, </span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">, has already been provided in &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;TargetConfigs; remove duplicated keywords to continue&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="p">(</span><span class="n">SecretStr</span><span class="p">,</span> <span class="n">SecretBytes</span><span class="p">)):</span>
+                    <span class="n">field_value</span> <span class="o">=</span> <span class="n">field_value</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
+                <span class="n">configs_json</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_value</span>
+
         <span class="k">return</span> <span class="n">configs_json</span>
 
     <span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -793,7 +826,7 @@ an error will be raised.</p></td>
 <span class="sd">        Returns:</span>
 <span class="sd">            A configs JSON.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">({},</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">({},</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fields__</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -843,21 +876,21 @@ an error will be raised.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cli/configs/base.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the dbt configs, likely used eventually for writing to profiles.yml.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A configs JSON.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">({},</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">({},</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fields__</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -891,131 +924,106 @@ of logs, the manner in which dbt parses your project,
 and what to do when dbt finds a version mismatch
 or a failing model. Docs can be found <a href="https://docs.getdbt.com/reference/global-configs">here</a>.</p>
 
-  <p><strong>Parameters:</strong></p>
+  <p><strong>Attributes:</strong></p>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Default</th>
       </tr>
     </thead>
     <tbody>
         <tr>
           <td><code>send_anonymous_usage_stats</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether usage stats are sent to dbt.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>use_colors</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Colorize the output it prints in your terminal.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>partial_parse</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>When partial parsing is enabled, dbt will use an
 stored internal manifest to determine which files have been changed
 (if any) since it last parsed the project.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>printer_width</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[int]</code>
           </td>
           <td><p>Length of characters before starting a new line.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>write_json</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Determines whether dbt writes JSON artifacts to
 the target/ directory.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>warn_error</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether to convert dbt warnings into errors.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>log_format</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>The LOG_FORMAT config specifies how dbt's logs should
 be formatted. If the value of this config is json, dbt will
 output fully structured logs in JSON format.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>debug</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether to redirect dbt's debug logs to standard out.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>version_check</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether to raise an error if a project's version
 is used with an incompatible dbt version.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>fail_fast</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Make dbt exit immediately if a single resource fails to build.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>use_experimental_parser</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Opt into the latest experimental version
 of the static parser.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>static_parser</code></td>
           <td>
+                <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether to use the <a href="https://docs.getdbt.com/reference/parsing#static-parser">static parser</a>.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
     </tbody>
   </table>
@@ -1030,25 +1038,7 @@ of the static parser.</p></td>
 
         <details class="quote">
           <summary>Source code in <code>prefect_dbt/cli/configs/base.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
@@ -1083,7 +1073,25 @@ of the static parser.</p></td>
 <span class="normal">138</span>
 <span class="normal">139</span>
 <span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GlobalConfigs</span><span class="p">(</span><span class="n">DbtConfigs</span><span class="p">):</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GlobalConfigs</span><span class="p">(</span><span class="n">DbtConfigs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Global configs control things like the visual output</span>
 <span class="sd">    of logs, the manner in which dbt parses your project,</span>
@@ -1091,7 +1099,7 @@ of the static parser.</p></td>
 <span class="sd">    or a failing model. Docs can be found [here](</span>
 <span class="sd">    https://docs.getdbt.com/reference/global-configs).</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        send_anonymous_usage_stats: Whether usage stats are sent to dbt.</span>
 <span class="sd">        use_colors: Colorize the output it prints in your terminal.</span>
 <span class="sd">        partial_parse: When partial parsing is enabled, dbt will use an</span>
@@ -1123,7 +1131,7 @@ of the static parser.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_block_type_name</span> <span class="o">=</span> <span class="s2">&quot;dbt CLI Global Configs&quot;</span>
-    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
 
     <span class="n">send_anonymous_usage_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">use_colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1179,45 +1187,38 @@ settings, specific to the warehouse you're connecting to.
 To find valid keys, head to the <a href="https://docs.getdbt.com/docs/available-adapters">Available adapters</a> page and
 click the desired adapter's "Profile Setup" hyperlink.</p>
 
-  <p><strong>Parameters:</strong></p>
+  <p><strong>Attributes:</strong></p>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Default</th>
       </tr>
     </thead>
     <tbody>
         <tr>
           <td><code>type</code></td>
           <td>
+                <code>str</code>
           </td>
           <td><p>The name of the database warehouse</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>schema</code></td>
           <td>
+                <code>str</code>
           </td>
           <td><p>The schema that dbt will build objects into;
 in BigQuery, a schema is actually a dataset.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
         <tr>
           <td><code>threads</code></td>
           <td>
+                <code>int</code>
           </td>
           <td><p>The number of threads representing the max number
 of paths through the graph dbt may work on at once.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
     </tbody>
   </table>
@@ -1232,36 +1233,36 @@ of paths through the graph dbt may work on at once.</p></td>
 
         <details class="quote">
           <summary>Source code in <code>prefect_dbt/cli/configs/base.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TargetConfigs</span><span class="p">(</span><span class="n">DbtConfigs</span><span class="p">):</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TargetConfigs</span><span class="p">(</span><span class="n">DbtConfigs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Target configs contain credentials and</span>
 <span class="sd">    settings, specific to the warehouse you&#39;re connecting to.</span>
@@ -1269,7 +1270,7 @@ of paths through the graph dbt may work on at once.</p></td>
 <span class="sd">    https://docs.getdbt.com/docs/available-adapters) page and</span>
 <span class="sd">    click the desired adapter&#39;s &quot;Profile Setup&quot; hyperlink.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        type: The name of the database warehouse</span>
 <span class="sd">        schema: The schema that dbt will build objects into;</span>
 <span class="sd">            in BigQuery, a schema is actually a dataset.</span>
@@ -1286,7 +1287,7 @@ of paths through the graph dbt may work on at once.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_block_type_name</span> <span class="o">=</span> <span class="s2">&quot;dbt CLI Target Configs&quot;</span>
-    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">schema_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>

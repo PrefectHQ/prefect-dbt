@@ -653,14 +653,13 @@ settings, specific to Snowflake.
 To find valid keys, head to the <a href="https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile">Snowflake Profile</a>
 page.</p>
 
-  <p><strong>Parameters:</strong></p>
+  <p><strong>Attributes:</strong></p>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Default</th>
       </tr>
     </thead>
     <tbody>
@@ -671,9 +670,6 @@ page.</p>
           <td><p>The credentials to use to authenticate; if there are
 duplicate keys between credentials and TargetConfigs,
 e.g. schema, an error will be raised.</p></td>
-          <td>
-              <em>required</em>
-          </td>
         </tr>
     </tbody>
   </table>
@@ -777,7 +773,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">    https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile)</span>
 <span class="sd">    page.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        credentials: The credentials to use to authenticate; if there are</span>
 <span class="sd">            duplicate keys between credentials and TargetConfigs,</span>
 <span class="sd">            e.g. schema, an error will be raised.</span>
@@ -815,7 +811,7 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_block_type_name</span> <span class="o">=</span> <span class="s2">&quot;dbt CLI Snowflake Target Configs&quot;</span>
-    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/8cb73be51575a659667f6471a24153f5/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;snowflake&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;snowflake&quot;</span>
     <span class="n">schema_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
