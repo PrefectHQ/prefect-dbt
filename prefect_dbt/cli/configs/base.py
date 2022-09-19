@@ -47,7 +47,7 @@ class DbtConfigs(Block, abc.ABC, extra=Extra.forbid):
                 configs_json = self._populate_configs_json(
                     configs_json, field_value.__fields__, model=field_value
                 )
-            elif isinstance(field_value, dict):
+            elif field_name == "extras":
                 configs_json = self._populate_configs_json(configs_json, field_value)
             else:
                 if field_name in configs_json.keys():
