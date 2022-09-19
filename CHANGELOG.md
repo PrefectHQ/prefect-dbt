@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `TargetConfigs` now allows unexpected fields again because block attributes were not being saved - [#60](https://github.com/PrefectHQ/prefect-dbt/pull/60)
+- `TargetConfigs` now allows unexpected fields again because block attributes were not being saved - [#64](https://github.com/PrefectHQ/prefect-dbt/pull/64)
 
 
 ### Deprecated
