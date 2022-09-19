@@ -30,7 +30,7 @@ def test_gcp_target_configs_get_configs(project_in_target_configs):
 
 
 def test_gcp_target_configs_get_configs_service_account_info():
-    gcp_credentials = GcpCredentials(service_account_info={"my": "secrets"})
+    gcp_credentials = GcpCredentials(service_account_info='{"my": "secrets"}')
     configs = BigQueryTargetConfigs(
         credentials=gcp_credentials, project="my_project", schema="my_schema"
     )
