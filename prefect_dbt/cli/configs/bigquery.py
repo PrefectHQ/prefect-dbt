@@ -92,6 +92,8 @@ class BigQueryTargetConfigs(TargetConfigs):
             A configs JSON.
         """
         configs_json = super().get_configs()
+        configs_json.pop("infer_project", None)
+
         if "service_account_info" in configs_json:
             configs_json["method"] = "service-account-json"
             configs_json["keyfile_json"] = configs_json.pop("service_account_info")

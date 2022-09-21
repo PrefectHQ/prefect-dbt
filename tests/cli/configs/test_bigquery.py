@@ -1,17 +1,38 @@
+import json
+
 import pytest
 from prefect_gcp.credentials import GcpCredentials
 
 from prefect_dbt.cli.configs import BigQueryTargetConfigs
 
 
+@pytest.fixture()
+def service_account_file(tmp_path):
+    _service_account_file = tmp_path / "gcp.json"
+    with open(_service_account_file, "w") as f:
+        json.dump(
+            {
+                "client_email": "my_email",
+                "token_uri": "my_token_uri",
+                "private_key": "my_key",
+                "project_id": "my_project",
+            },
+            f,
+        )
+    return _service_account_file
+
+
 @pytest.mark.parametrize("project_in_target_configs", [True, False])
-def test_gcp_target_configs_get_configs(project_in_target_configs):
+def test_gcp_target_configs_get_configs(
+    service_account_file, project_in_target_configs
+):
     configs_kwargs = dict(schema="schema")
-    credentials_kwargs = dict(service_account_file="/path/to/file.json")
+    credentials_kwargs = dict(service_account_file=service_account_file)
+
     if project_in_target_configs:
-        configs_kwargs["project"] = "project"
+        configs_kwargs["project"] = "my_project"
     else:
-        credentials_kwargs["project"] = "project"
+        credentials_kwargs["project"] = "my_project"
 
     gcp_credentials = GcpCredentials(**credentials_kwargs)
     configs_kwargs["credentials"] = gcp_credentials
@@ -22,9 +43,9 @@ def test_gcp_target_configs_get_configs(project_in_target_configs):
         "type": "bigquery",
         "schema": "schema",
         "threads": 4,
-        "project": "project",
+        "project": "my_project",
         "method": "service-account",
-        "keyfile": "/path/to/file.json",
+        "keyfile": str(service_account_file),
     }
     assert actual == expected
 
@@ -46,16 +67,16 @@ def test_gcp_target_configs_get_configs_service_account_info():
     assert actual == expected
 
 
-def test_gcp_target_configs_get_configs_missing_schema():
-    gcp_credentials = GcpCredentials(service_account_file="service_account_file")
+def test_gcp_target_configs_get_configs_missing_schema(service_account_file):
+    gcp_credentials = GcpCredentials(service_account_file=service_account_file)
     configs = BigQueryTargetConfigs(credentials=gcp_credentials, schema="schema")
     with pytest.raises(ValueError, match="The keyword, project"):
         configs.get_configs()
 
 
-def test_gcp_target_configs_get_configs_duplicate_project():
+def test_gcp_target_configs_get_configs_duplicate_project(service_account_file):
     gcp_credentials = GcpCredentials(
-        service_account_file="service_account_file", project="project"
+        service_account_file=service_account_file, project="project"
     )
     configs = BigQueryTargetConfigs(
         credentials=gcp_credentials, schema="schema", project="project"
