@@ -144,7 +144,7 @@ def trigger_dbt_cli_commands_flow():
     return result
     
 
-trigger_dbt_cli_command_flow()
+trigger_dbt_cli_commands_flow()
 ```
 ## Resources
 
