@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Drops `infer_project` from GcpCredentials for `prefect-gcp>=0.1.5` - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
+
 ### Security
 
 ## 0.2.2
