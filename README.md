@@ -115,35 +115,13 @@ trigger_dbt_cli_command_flow()
 ### Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml
 ```python
 from prefect import flow
-from prefect_snowflake.credentials import SnowflakeCredentials
-from prefect_snowflake.database import SnowflakeConnector
 
 from prefect_dbt.cli.credentials import DbtCliProfile
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
-from prefect_dbt.cli.configs import SnowflakeTargetConfigs
 
 @flow
-def trigger_dbt_cli_command_flow():
-    connector = SnowflakeConnector(
-        schema="public",
-        database="database",
-        warehouse="warehouse",
-        credentials=SnowflakeCredentials(
-            user="user",
-            password="password",
-            account="account.region.aws",
-            role="role",
-        ),
-    )
-    target_configs = SnowflakeTargetConfigs(
-        connector=connector
-    )
-    
-    dbt_cli_profile = DbtCliProfile(
-        name="jaffle_shop",
-        target="dev",
-        target_configs=target_configs,
-    )
+def trigger_dbt_cli_commands_flow():
+    dbt_cli_profile = DbtCliProfile.load("MY_BLOCK_NAME")
     
     trigger_kwargs = dict(
         profiles_dir=".",
