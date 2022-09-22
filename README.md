@@ -45,17 +45,16 @@ from prefect import flow
 from prefect_dbt.cloud import DbtCloudCredentials
 from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
 
+
 @flow
-def run_dbt_job_flow():
+def run_dbt_cloud_job():
     run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
-        dbt_cloud_credentials=DbtCloudCredentials(
-            api_key="my_api_key",
-            account_id=123456789
-        ),
+        dbt_cloud_credentials=DbtCloudCredentials.load("dev"),
         job_id=1
     )
 
-run_dbt_job_flow()
+if __name__ == "__main__":
+    run_dbt_cloud_job()
 ```
 
 ### Execute a dbt CLI command
@@ -63,45 +62,27 @@ run_dbt_job_flow()
 from prefect import flow
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
 
-@flow
-def trigger_dbt_cli_command_flow() -> str:
-    result = trigger_dbt_cli_command("dbt debug")
-    return result # Returns the last line the in CLI output
 
-trigger_dbt_cli_command_flow()
+@flow
+def execute_dbt_command() -> str:
+    result = trigger_dbt_cli_command("dbt debug")
+    return result  # Returns the last line the in CLI output
+
+if __name__ == "__main__":
+    execute_dbt_command()
 ```
 
 ### Execute a dbt CLI command without a pre-populated profiles.yml
 ```python
 from prefect import flow
-from prefect_snowflake.credentials import SnowflakeCredentials
-from prefect_snowflake.database import SnowflakeConnector
 
 from prefect_dbt.cli.credentials import DbtCliProfile
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
-from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+
 
 @flow
-def trigger_dbt_cli_command_flow():
-    connector = SnowflakeConnector(
-        schema="public",
-        database="database",
-        warehouse="warehouse",
-        credentials=SnowflakeCredentials(
-            user="user",
-            password="password",
-            account="account.region.aws",
-            role="role",
-        ),
-    )
-    target_configs = SnowflakeTargetConfigs(
-        connector=connector
-    )
-    dbt_cli_profile = DbtCliProfile(
-        name="jaffle_shop",
-        target="dev",
-        target_configs=target_configs,
-    )
+def execute_dbt_command():
+    dbt_cli_profile = DbtCliProfile.load("dev")
     result = trigger_dbt_cli_command(
         "dbt debug",
         overwrite_profiles=True,
@@ -109,7 +90,8 @@ def trigger_dbt_cli_command_flow():
     )
     return result
 
-trigger_dbt_cli_command_flow()
+if __name__ == "__main__":
+    execute_dbt_command()
 ```
 
 ## Resources
