@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Improve docs to clarify that blocks are loaded and used in a flow rather than being created in a flow - [#69](https://github.com/PrefectHQ/prefect-dbt/pull/69)
+
 ### Added
 
 ### Changed
