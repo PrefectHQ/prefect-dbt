@@ -138,7 +138,6 @@ def trigger_dbt_cli_commands_flow():
     result = trigger_dbt_cli_command(
         "dbt debug",
         **trigger_kwargs
-       
     )
     
     return result
