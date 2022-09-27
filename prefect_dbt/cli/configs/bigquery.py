@@ -91,18 +91,27 @@ class BigQueryTargetConfigs(TargetConfigs):
         Returns:
             A configs JSON.
         """
-        if self.project is not None:
-            self.credentials.project = self.project
-            self.project = None
-
-        configs_json = super().get_configs()
+        # since GcpCredentials will always define a project
+        self_copy = self.copy()
+        if self_copy.project is not None:
+            self_copy.credentials.project = None
+        configs_json = self._populate_configs_json(
+            {}, self_copy.__fields__, model=self_copy
+        )
 
         if "service_account_info" in configs_json:
             configs_json["method"] = "service-account-json"
             configs_json["keyfile_json"] = configs_json.pop("service_account_info")
-        else:
+        elif "service_account_file" in configs_json:
             configs_json["method"] = "service-account"
             configs_json["keyfile"] = str(configs_json.pop("service_account_file"))
+        else:
+            # through gcloud application-default login
+            google_credentials = (
+                self_copy.credentials.get_credentials_from_service_account()
+            )
+            for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
+                configs_json[key] = getattr(google_credentials, key)
 
         if "project" not in configs_json:
             raise ValueError(
