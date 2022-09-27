@@ -91,8 +91,11 @@ class BigQueryTargetConfigs(TargetConfigs):
         Returns:
             A configs JSON.
         """
+        if self.project is not None:
+            self.credentials.project = self.project
+            self.project = None
+
         configs_json = super().get_configs()
-        configs_json.pop("infer_project", None)
 
         if "service_account_info" in configs_json:
             configs_json["method"] = "service-account-json"

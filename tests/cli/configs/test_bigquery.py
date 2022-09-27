@@ -7,7 +7,11 @@ from prefect_dbt.cli.configs import BigQueryTargetConfigs
 
 
 @pytest.fixture()
-def service_account_file(tmp_path):
+def service_account_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        "google.auth.crypt._cryptography_rsa.serialization.load_pem_private_key",
+        lambda *args, **kwargs: args[0],
+    )
     _service_account_file = tmp_path / "gcp.json"
     with open(_service_account_file, "w") as f:
         json.dump(
@@ -50,8 +54,23 @@ def test_gcp_target_configs_get_configs(
     assert actual == expected
 
 
-def test_gcp_target_configs_get_configs_service_account_info():
-    gcp_credentials = GcpCredentials(service_account_info='{"my": "secrets"}')
+@pytest.fixture()
+def service_account_info_dict(monkeypatch):
+    monkeypatch.setattr(
+        "google.auth.crypt._cryptography_rsa.serialization.load_pem_private_key",
+        lambda *args, **kwargs: args[0],
+    )
+    _service_account_info = {
+        "project_id": "my_project",
+        "token_uri": "my-token-uri",
+        "client_email": "my-client-email",
+        "private_key": "my-private-key",
+    }
+    return _service_account_info
+
+
+def test_gcp_target_configs_get_configs_service_account_info(service_account_info_dict):
+    gcp_credentials = GcpCredentials(service_account_info=service_account_info_dict)
     configs = BigQueryTargetConfigs(
         credentials=gcp_credentials, project="my_project", schema="my_schema"
     )
@@ -62,24 +81,6 @@ def test_gcp_target_configs_get_configs_service_account_info():
         "threads": 4,
         "project": "my_project",
         "method": "service-account-json",
-        "keyfile_json": {"my": "secrets"},
+        "keyfile_json": service_account_info_dict,
     }
     assert actual == expected
-
-
-def test_gcp_target_configs_get_configs_missing_schema(service_account_file):
-    gcp_credentials = GcpCredentials(service_account_file=service_account_file)
-    configs = BigQueryTargetConfigs(credentials=gcp_credentials, schema="schema")
-    with pytest.raises(ValueError, match="The keyword, project"):
-        configs.get_configs()
-
-
-def test_gcp_target_configs_get_configs_duplicate_project(service_account_file):
-    gcp_credentials = GcpCredentials(
-        service_account_file=service_account_file, project="project"
-    )
-    configs = BigQueryTargetConfigs(
-        credentials=gcp_credentials, schema="schema", project="project"
-    )
-    with pytest.raises(ValueError, match="The keyword, project"):
-        configs.get_configs()
