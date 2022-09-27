@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support [`Oauth Token-Based`](https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#oauth-token-based) in `BigQueryTargetConfigs` - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
+
 ### Changed
 
 ### Deprecated
