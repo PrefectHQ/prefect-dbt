@@ -94,6 +94,38 @@ if __name__ == "__main__":
     execute_dbt_command()
 ```
 
+### Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml
+```python
+from prefect import flow
+
+from prefect_dbt.cli.credentials import DbtCliProfile
+from prefect_dbt.cli.commands import trigger_dbt_cli_command
+
+@flow
+def trigger_dbt_cli_commands_flow():
+    dbt_cli_profile = DbtCliProfile.load("MY_BLOCK_NAME")
+    
+    trigger_kwargs = dict(
+        profiles_dir=".",
+        overwrite_profiles=True,
+        dbt_cli_profile=dbt_cli_profile,
+    )
+    
+    trigger_dbt_cli_command(
+        "dbt deps",
+        **trigger_kwargs
+    )
+    
+    result = trigger_dbt_cli_command(
+        "dbt debug",
+        **trigger_kwargs
+    )
+    
+    return result
+    
+
+trigger_dbt_cli_commands_flow()
+```
 ## Resources
 
 If you encounter any bugs while using `prefect-dbt`, feel free to open an issue in the [prefect-dbt](https://github.com/PrefectHQ/prefect-dbt) repository.
