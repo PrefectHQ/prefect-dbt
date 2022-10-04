@@ -322,5 +322,5 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     else:
         raise RuntimeError(
             f"Triggered job run with ID: {run_id} ended with unexpected"
-            "status {final_run_status.value}."
+            f"status {final_run_status.value}."
         )
