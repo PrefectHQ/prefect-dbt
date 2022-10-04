@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://prefecthq.github.io/prefect-dbt/cli/configs/bigquery/">
       
       <link rel="icon" href="../../../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.3.0">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.3.0">
     
     
       
@@ -811,7 +811,21 @@ e.g. schema, an error will be raised.</p></td>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BigQueryTargetConfigs</span><span class="p">(</span><span class="n">TargetConfigs</span><span class="p">):</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BigQueryTargetConfigs</span><span class="p">(</span><span class="n">TargetConfigs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Target configs contain credentials and</span>
 <span class="sd">    settings, specific to BigQuery.</span>
@@ -888,13 +902,27 @@ e.g. schema, an error will be raised.</p></td>
 <span class="sd">        Returns:</span>
 <span class="sd">            A configs JSON.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">configs_json</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_configs</span><span class="p">()</span>
+        <span class="c1"># since GcpCredentials will always define a project</span>
+        <span class="n">self_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">self_copy</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_copy</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">configs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">(</span>
+            <span class="p">{},</span> <span class="n">self_copy</span><span class="o">.</span><span class="n">__fields__</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">self_copy</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="s2">&quot;service_account_info&quot;</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
             <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;service-account-json&quot;</span>
             <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;keyfile_json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;service_account_info&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="s2">&quot;service_account_file&quot;</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
             <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;service-account&quot;</span>
             <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;keyfile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;service_account_file&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># through gcloud application-default login</span>
+            <span class="n">google_credentials</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">self_copy</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">get_credentials_from_service_account</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;refresh_token&quot;</span><span class="p">,</span> <span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;client_secret&quot;</span><span class="p">,</span> <span class="s2">&quot;token_uri&quot;</span><span class="p">):</span>
+                <span class="n">configs_json</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">google_credentials</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">&quot;project&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -971,20 +999,48 @@ e.g. schema, an error will be raised.</p></td>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the dbt configs specific to BigQuery profile.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A configs JSON.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">configs_json</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_configs</span><span class="p">()</span>
+    <span class="c1"># since GcpCredentials will always define a project</span>
+    <span class="n">self_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">self_copy</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">self_copy</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">configs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_configs_json</span><span class="p">(</span>
+        <span class="p">{},</span> <span class="n">self_copy</span><span class="o">.</span><span class="n">__fields__</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">self_copy</span>
+    <span class="p">)</span>
+
     <span class="k">if</span> <span class="s2">&quot;service_account_info&quot;</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
         <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;service-account-json&quot;</span>
         <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;keyfile_json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;service_account_info&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="s2">&quot;service_account_file&quot;</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
         <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;service-account&quot;</span>
         <span class="n">configs_json</span><span class="p">[</span><span class="s2">&quot;keyfile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">configs_json</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;service_account_file&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># through gcloud application-default login</span>
+        <span class="n">google_credentials</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">self_copy</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">get_credentials_from_service_account</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;refresh_token&quot;</span><span class="p">,</span> <span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;client_secret&quot;</span><span class="p">,</span> <span class="s2">&quot;token_uri&quot;</span><span class="p">):</span>
+            <span class="n">configs_json</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">google_credentials</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">&quot;project&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configs_json</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
