@@ -284,10 +284,12 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         job_id=job_id,
         options=trigger_job_run_options,
     )
-    run_id_future = get_run_id.submit(triggered_run_data_future)
+    run_id = (await triggered_run_data_future.result()).get("id")
+    if id is None:
+        raise RuntimeError("Unable to determine run ID for triggered job.")
 
     final_run_status, run_data = await wait_for_dbt_cloud_job_run(
-        run_id=run_id_future,
+        run_id=run_id,
         dbt_cloud_credentials=dbt_cloud_credentials,
         max_wait_seconds=max_wait_seconds,
         poll_frequency_seconds=poll_frequency_seconds,
@@ -297,30 +299,28 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         try:
             list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
                 dbt_cloud_credentials=dbt_cloud_credentials,
-                run_id=run_id_future,
+                run_id=run_id,
             )
             run_data["artifact_paths"] = await list_run_artifacts_future.result()
         except DbtCloudListRunArtifactsFailed as ex:
             logger.warning(
                 "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
-                run_id_future.result(),
+                run_id,
                 ex,
             )
         logger.info(
             "dbt Cloud job run with ID %s completed successfully!",
-            run_id_future.result(),
+            run_id,
         )
         return run_data
     elif final_run_status == DbtCloudJobRunStatus.CANCELLED:
         raise DbtCloudJobRunCancelled(
-            f"Triggered job run with ID {run_id_future.result()} was cancelled."
+            f"Triggered job run with ID {run_id} was cancelled."
         )
     elif final_run_status == DbtCloudJobRunStatus.FAILED:
-        raise DbtCloudJobRunFailed(
-            f"Triggered job run with ID: {run_id_future.result()} failed."
-        )
+        raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
     else:
         raise RuntimeError(
-            f"Triggered job run with ID: {run_id_future.result()} ended with unexpected"
+            f"Triggered job run with ID: {run_id} ended with unexpected"
             "status {final_run_status.value}."
         )
