@@ -46,6 +46,12 @@ Install `prefect-dbt` with `pip`:
 pip install prefect-dbt
 ```
 
+Some dbt CLI profiles require additional installation; for example Databricks:
+
+```bash
+pip install dbt-databricks
+```
+
 ### Trigger a dbt Cloud job and wait for completion
 ```python
 from prefect import flow
