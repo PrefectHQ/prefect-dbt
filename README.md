@@ -20,6 +20,14 @@
 
 `prefect-dbt` is a collection of Prefect integrations for working with dbt with your Prefect flows.
 
+Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
+
+```bash
+prefect block register -m prefect_dbt.credentials
+```
+
+Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
+
 ## Getting Started
 
 ### Python setup
@@ -157,6 +165,8 @@ If you encounter any bugs while using `prefect-dbt`, feel free to open an issue 
 If you have any questions or issues while using `prefect-dbt`, you can find help in either the [Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
 
 If you need help getting started with or using dbt, please consult the [dbt documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation).
+
+Feel free to ⭐️ or watch [`prefect-dbt`](https://github.com/PrefectHQ/prefect-dbt) for updates too!
 
 ## Development
 
