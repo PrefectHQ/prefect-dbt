@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support [`Oauth Token-Based`](https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#oauth-token-based) in `BigQueryTargetConfigs` - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
-
 ### Changed
 
 ### Deprecated
@@ -21,10 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## 0.2.3
+
+Released on October 4th, 2022.
+
+### Added
+
+- Support [`Oauth Token-Based`](https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#oauth-token-based) in `BigQueryTargetConfigs` - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
+
+### Fixed
+
 - `BigQueryTargetConfigs.project` now overrides `GcpCredential.project` rather than error - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
 - `trigger_dbt_cloud_job_run_and_wait_for_completion` no longer hangs when called from a synchronous flow = [#71](https://github.com/PrefectHQ/prefect-dbt/pull/71)
-
-### Security
 
 ## 0.2.2
 
