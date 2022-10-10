@@ -37,18 +37,22 @@ class DbtCliProfile(Block):
         from prefect_dbt.cli import DbtCliProfile
         from prefect_dbt.cli.configs import SnowflakeTargetConfigs
         from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.database import SnowflakeConnector
 
-        snowflake_credentials = SnowflakeCredentials(
-            schema="schema",
+        credentials = SnowflakeCredentials(
             user="user",
             password="password",
-            account="account",
+            account="account.region.aws",
             role="role",
+        )
+        connector = SnowflakeConnector(
+            schema="public",
             database="database",
             warehouse="warehouse",
+            credentials=credentials,
         )
         target_configs = SnowflakeTargetConfigs(
-            credentials=snowflake_credentials
+            connector=connector
         )
         dbt_cli_profile = DbtCliProfile(
             name="jaffle_shop",
