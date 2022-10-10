@@ -51,6 +51,9 @@ class DbtCliProfile(Block):
             warehouse="warehouse",
             credentials=credentials,
         )
+        target_configs = SnowflakeTargetConfigs(
+            connector=connector
+        )
         dbt_cli_profile = DbtCliProfile(
             name="jaffle_shop",
             target="dev",
