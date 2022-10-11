@@ -40,13 +40,7 @@ setup(
     extras_require=extras_require,
     entry_points={
         "prefect.collections": [
-            "DbtCloudCredentials = prefect_dbt.cloud.credentials",
-            "DbtCliProfile = prefect_dbt.cli.credentials",
-            "TargetConfigs = prefect_dbt.cli.configs.base",
-            "GlobalConfigs = prefect_dbt.cli.configs.base",
-            "SnowflakeTargetConfigs = prefect_dbt.cli.configs.snowflake",
-            "BigQueryTargetConfigs = prefect_dbt.cli.configs.bigquery",
-            "PostgresTargetConfigs = prefect_dbt.cli.configs.postgres",
+            "prefect_dbt = prefect_dbt",
         ]
     },
     classifiers=[
