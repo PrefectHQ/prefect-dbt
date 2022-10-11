@@ -20,14 +20,6 @@
 
 `prefect-dbt` is a collection of Prefect integrations for working with dbt with your Prefect flows.
 
-Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
-
-```bash
-prefect block register -m prefect_dbt.credentials
-```
-
-Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
-
 ## Getting Started
 
 ### Python setup
@@ -51,6 +43,21 @@ Some dbt CLI profiles require additional installation; for example Databricks:
 ```bash
 pip install dbt-databricks
 ```
+
+Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud.
+
+For dbt Cloud:
+```bash
+prefect block register -m prefect_dbt.cloud
+```
+
+For dbt CLI:
+```
+prefect block register -m prefect_dbt.cli
+prefect block register -m prefect_dbt.cli.configs
+```
+
+Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
 ### Trigger a dbt Cloud job and wait for completion
 ```python
