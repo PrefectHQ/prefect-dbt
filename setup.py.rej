@@ -1,0 +1,13 @@
+diff a/setup.py b/setup.py	(rejected hunks)
+@@ -27,6 +27,11 @@ setup(
+     python_requires=">=3.7",
+     install_requires=install_requires,
+     extras_require={"dev": dev_requires},
++    entry_points={
++        "prefect.collections": [
++            "prefect_dbt = prefect_dbt",
++        ]
++    },
+     classifiers=[
+         "Natural Language :: English",
+         "Intended Audience :: Developers",
