@@ -1,5 +1,4 @@
 from . import _version
-from .blocks import DbtBlock  # noqa
 
 from .cloud import DbtCloudCredentials  # noqa
 from .cli import DbtCliProfile, MissingExtrasRequireError  # noqa
