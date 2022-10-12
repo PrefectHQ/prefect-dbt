@@ -38,9 +38,9 @@ plugins:
           rendering:
             show_root_heading: True
             show_object_full_path: False
-            show_category_heading: False
+            show_category_heading: True
             show_signature: False
-            show_bases: False
+            show_bases: True
             heading_level: 1
       watch:
         - prefect_dbt/
