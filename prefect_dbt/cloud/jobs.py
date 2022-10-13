@@ -182,6 +182,9 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
+    retry_filtered_models_attempts: int = 3,
+    retry_status_filters: Tuple[str] = ("error", "fail"),
+    retry_downstream_nodes: bool = True,
 ) -> Dict:
     """
     Flow that triggers a job run and waits for the triggered run to complete.
@@ -194,6 +197,9 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         max_wait_seconds: Maximum number of seconds to wait for job to complete
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
+        retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.
+        retry_status_filters: A tuple of statuses to filter the models by.
+        retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
         DbtCloudJobRunCancelled: The triggered dbt Cloud job run was cancelled.
@@ -319,7 +325,29 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             f"Triggered job run with ID {run_id} was cancelled."
         )
     elif final_run_status == DbtCloudJobRunStatus.FAILED:
-        raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
+        while retry_filtered_models_attempts > 0:
+            logger.info(
+                f"Retrying job run with ID: {run_id} "
+                f"{retry_filtered_models_attempts} more times"
+            )
+            try:
+                retry_filtered_models_attempts -= 1
+                run_data = await (
+                    retry_dbt_cloud_job_run_subset_and_wait_for_completion.submit(
+                        dbt_cloud_credentials=dbt_cloud_credentials,
+                        run_id=run_id,
+                        trigger_job_run_options=trigger_job_run_options,
+                        max_wait_seconds=max_wait_seconds,
+                        poll_frequency_seconds=poll_frequency_seconds,
+                        retry_status_filters=retry_status_filters,
+                        retry_downstream_nodes=retry_downstream_nodes,
+                    )
+                )
+                return run_data
+            except Exception:
+                pass
+        else:
+            raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
     else:
         raise RuntimeError(
             f"Triggered job run with ID: {run_id} ended with unexpected"
@@ -328,35 +356,35 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
 
 
 @flow(
-    name="Rerun subset of dbt Cloud job run and wait for completion",
+    name="Retry subset of dbt Cloud job run and wait for completion",
     description=(
-        "Reruns a subset of dbt Cloud job run, filtered by select statuses, "
-        "and waits for the triggered rerun to complete."
+        "Retries a subset of dbt Cloud job run, filtered by select statuses, "
+        "and waits for the triggered retry to complete."
     ),
 )
-async def rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion(
+async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     dbt_cloud_credentials: DbtCloudCredentials,
     run_id: int,
-    status_filters: Tuple[str] = ("error", "fail"),
-    run_downstream_nodes: bool = True,
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
+    retry_status_filters: Tuple[str] = ("error", "fail"),
+    retry_downstream_nodes: bool = True,
 ) -> Dict:
     """
-    Flow that reruns a subset of dbt Cloud job run, filtered by select statuses,
-    and waits for the triggered rerun to complete.
+    Flow that retrys a subset of dbt Cloud job run, filtered by select statuses,
+    and waits for the triggered retry to complete.
 
     Args:
         dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
-        run_id: The ID of the job run to retry.
-        status_filters: A tuple of statuses to filter the models by.
-        run_downstream_nodes: Whether to also rerun nodes downstream of the filtered models.
         trigger_job_run_options: An optional TriggerJobRunOptions instance to
             specify overrides for the triggered job run.
         max_wait_seconds: Maximum number of seconds to wait for job to complete
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
+        run_id: The ID of the job run to retry.
+        retry_status_filters: A tuple of statuses to filter the models by.
+        retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
         ValueError: If `trigger_job_run_options.steps_override` is set by the user.
@@ -365,24 +393,24 @@ async def rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion(
         The run data returned by the dbt Cloud administrative API.
 
     Examples:
-        Rerun a subset of models in a dbt Cloud job run and wait for completion:
+        Retry a subset of models in a dbt Cloud job run and wait for completion:
         ```python
         from prefect import flow
 
         from prefect_dbt.cloud import DbtCloudCredentials
-        from prefect_dbt.cloud.jobs import rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion
+        from prefect_dbt.cloud.jobs import retry_dbt_cloud_job_run_subset_and_wait_for_completion
 
         @flow
-        def rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion_flow():
+        def retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow():
             credentials = DbtCloudCredentials.load("MY_BLOCK_NAME")
-            rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion(
+            retry_dbt_cloud_job_run_subset_and_wait_for_completion(
                 dbt_cloud_credentials=credentials,
                 run_id=88640123,
-                status_filters=("error", "fail", "warn"),
-                run_downstream_nodes=True,
+                retry_status_filters=("error", "fail", "warn"),
+                retry_downstream_nodes=True,
             )
 
-        rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion_flow()
+        retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow()
         ```
     """  # noqa
     if trigger_job_run_options.steps_override is not None:
@@ -391,7 +419,7 @@ async def rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion(
             "because this flow will automatically set it"
         )
 
-    run_artifact = get_dbt_cloud_run_artifact(
+    run_artifact = await get_dbt_cloud_run_artifact.submit(
         dbt_cloud_credentials=dbt_cloud_credentials,
         run_id=run_id,
         path="run_results.json",
@@ -400,30 +428,31 @@ async def rerun_subset_of_dbt_cloud_job_run_and_wait_for_completion(
     model_names = set()
     model_results = run_artifact.get("results", [])
     for model_result in model_results:
-        if model_result.get("status") in status_filters:
+        if model_result.get("status") in retry_status_filters:
             model_id = model_result["unique_id"]
             model_name = model_id.split(".")[-1]
             model_names.add(model_name)
 
-    graph_operator = "+ " if run_downstream_nodes else " "
-    rerun_command = f"dbt build --select {graph_operator.join(model_names)}"
-    if run_downstream_nodes:
+    graph_operator = "+ " if retry_downstream_nodes else " "
+    retry_command = f"dbt build --select {graph_operator.join(model_names)}"
+    if retry_downstream_nodes:
         # Convert: ...stg_customers+ stg_payments
         # To: ...stg_payments+ stg_orders+
-        rerun_command += graph_operator.rstrip()
+        retry_command += graph_operator.rstrip()
 
     if trigger_job_run_options is None:
         trigger_job_run_options_override = TriggerJobRunOptions(
-            steps_override=[rerun_command]
+            steps_override=[retry_command]
         )
     else:
         trigger_job_run_options_override = trigger_job_run_options.copy()
-        trigger_job_run_options_override.steps_override = [rerun_command]
+        trigger_job_run_options_override.steps_override = [retry_command]
 
     job_id = run_artifact["metadata"]["env"]["DBT_CLOUD_JOB_ID"]
     run_data = trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
+        retry_filtered_models_attempts=0,
         trigger_job_run_options=trigger_job_run_options,
         max_wait_seconds=max_wait_seconds,
         poll_frequency_seconds=poll_frequency_seconds,
