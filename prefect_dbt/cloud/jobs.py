@@ -1,5 +1,5 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
@@ -333,7 +333,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             try:
                 retry_filtered_models_attempts -= 1
                 run_data = await (
-                    retry_dbt_cloud_job_run_subset_and_wait_for_completion.submit(
+                    retry_dbt_cloud_job_run_subset_and_wait_for_completion(
                         dbt_cloud_credentials=dbt_cloud_credentials,
                         run_id=run_id,
                         trigger_job_run_options=trigger_job_run_options,
@@ -353,6 +353,51 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             f"Triggered job run with ID: {run_id} ended with unexpected"
             f"status {final_run_status.value}."
         )
+
+
+def _filter_model_names_by_status(
+    run_artifact: Dict[str, Any], retry_status_filters: List[str]
+):
+    """
+    Filters model names from model results by status.
+    """
+    model_results = run_artifact.get("results", [])
+
+    model_names = set()
+    for model_result in model_results:
+        if model_result.get("status") in retry_status_filters:
+            model_id = model_result["unique_id"]
+            model_name = model_id.split(".")[-1]
+            model_names.add(model_name)
+
+    if len(model_names) == 0:
+        raise ValueError(
+            f"No valid model names were found using the filters: {retry_status_filters}"
+        )
+    return model_names
+
+
+def _build_trigger_job_run_options(
+    retry_downstream_nodes: bool,
+    model_names: List[str],
+    trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
+):
+    """ """
+    graph_operator = "+ " if retry_downstream_nodes else " "
+    retry_command = f"dbt build --select {graph_operator.join(model_names)}"
+    if retry_downstream_nodes:
+        # Convert: ...stg_customers+ stg_payments
+        # To: ...stg_payments+ stg_orders+
+        retry_command += graph_operator.rstrip()
+
+    if trigger_job_run_options is None:
+        trigger_job_run_options_override = TriggerJobRunOptions(
+            steps_override=[retry_command]
+        )
+    else:
+        trigger_job_run_options_override = trigger_job_run_options.copy()
+        trigger_job_run_options_override.steps_override = [retry_command]
+    return trigger_job_run_options_override
 
 
 @flow(
@@ -424,41 +469,21 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         run_id=run_id,
         path="run_results.json",
     )
-
-    model_names = set()
-    model_results = run_artifact.get("results", [])
-    for model_result in model_results:
-        if model_result.get("status") in retry_status_filters:
-            model_id = model_result["unique_id"]
-            model_name = model_id.split(".")[-1]
-            model_names.add(model_name)
-
-    if len(model_names) == 0:
-        raise ValueError(
-            f"No valid models were found using the filters: {retry_status_filters}"
-        )
-
-    graph_operator = "+ " if retry_downstream_nodes else " "
-    retry_command = f"dbt build --select {graph_operator.join(model_names)}"
-    if retry_downstream_nodes:
-        # Convert: ...stg_customers+ stg_payments
-        # To: ...stg_payments+ stg_orders+
-        retry_command += graph_operator.rstrip()
-
-    if trigger_job_run_options is None:
-        trigger_job_run_options_override = TriggerJobRunOptions(
-            steps_override=[retry_command]
-        )
-    else:
-        trigger_job_run_options_override = trigger_job_run_options.copy()
-        trigger_job_run_options_override.steps_override = [retry_command]
+    model_names = _filter_model_names_by_status(
+        run_artifact=run_artifact, retry_status_filters=retry_status_filters
+    )
+    trigger_job_run_options_override = _build_trigger_job_run_options(
+        retry_downstream_nodes=retry_downstream_nodes,
+        model_names=model_names,
+        trigger_job_run_options=trigger_job_run_options,
+    )
 
     job_id = run_artifact["metadata"]["env"]["DBT_CLOUD_JOB_ID"]
     run_data = trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         retry_filtered_models_attempts=0,
-        trigger_job_run_options=trigger_job_run_options,
+        trigger_job_run_options=trigger_job_run_options_override,
         max_wait_seconds=max_wait_seconds,
         poll_frequency_seconds=poll_frequency_seconds,
     )
