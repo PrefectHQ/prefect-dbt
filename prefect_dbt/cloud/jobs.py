@@ -1,5 +1,5 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
@@ -183,7 +183,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
     retry_filtered_models_attempts: int = 3,
-    retry_status_filters: Tuple[str] = ("error", "fail"),
+    retry_status_filters: List[str] = ["error", "fail"],
     retry_downstream_nodes: bool = True,
 ) -> Dict:
     """
@@ -198,7 +198,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
         retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.
-        retry_status_filters: A tuple of statuses to filter the models by.
+        retry_status_filters: A list of statuses to filter the models by.
         retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
@@ -368,7 +368,7 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
-    retry_status_filters: Tuple[str] = ("error", "fail"),
+    retry_status_filters: List[str] = ["error", "fail"],
     retry_downstream_nodes: bool = True,
 ) -> Dict:
     """
@@ -383,7 +383,7 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
         run_id: The ID of the job run to retry.
-        retry_status_filters: A tuple of statuses to filter the models by.
+        retry_status_filters: A list of statuses to filter the models by.
         retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
@@ -432,6 +432,11 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
             model_id = model_result["unique_id"]
             model_name = model_id.split(".")[-1]
             model_names.add(model_name)
+
+    if len(model_names) == 0:
+        raise ValueError(
+            f"No valid models were found using the filters: {retry_status_filters}"
+        )
 
     graph_operator = "+ " if retry_downstream_nodes else " "
     retry_command = f"dbt build --select {graph_operator.join(model_names)}"
