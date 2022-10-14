@@ -458,17 +458,18 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow()
         ```
     """  # noqa
-    if trigger_job_run_options.steps_override is not None:
+    if trigger_job_run_options and trigger_job_run_options.steps_override is not None:
         raise ValueError(
             "Do not set `steps_override` in `trigger_job_run_options` "
             "because this flow will automatically set it"
         )
 
-    run_artifact = await get_dbt_cloud_run_artifact.submit(
+    run_artifact_future = await get_dbt_cloud_run_artifact.submit(
         dbt_cloud_credentials=dbt_cloud_credentials,
         run_id=run_id,
         path="run_results.json",
     )
+    run_artifact = await run_artifact_future.result()
     model_names = _filter_model_names_by_status(
         run_artifact=run_artifact, retry_status_filters=retry_status_filters
     )
@@ -479,7 +480,7 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     )
 
     job_id = run_artifact["metadata"]["env"]["DBT_CLOUD_JOB_ID"]
-    run_data = trigger_dbt_cloud_job_run_and_wait_for_completion(
+    run_data = await trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         retry_filtered_models_attempts=0,

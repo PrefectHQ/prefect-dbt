@@ -10,6 +10,7 @@ from prefect_dbt.cloud.jobs import (
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
     DbtCloudJobRunTriggerFailed,
+    retry_dbt_cloud_job_run_subset_and_wait_for_completion,
     trigger_dbt_cloud_job_run,
     trigger_dbt_cloud_job_run_and_wait_for_completion,
 )
@@ -330,6 +331,85 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
             dbt_cloud_credentials=dbt_cloud_credentials, job_id=1
         )
         assert result == {"id": 10000, "status": 10}
+
+
+class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
+    async def test_run_steps_override_error(self, respx_mock, dbt_cloud_credentials):
+        with pytest.raises(ValueError, match="Do not set `steps_override"):
+            await retry_dbt_cloud_job_run_subset_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                trigger_job_run_options=TriggerJobRunOptions(steps_override=["step"]),
+                run_id=12,
+            )
+
+    async def test_run_no_valid_names(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/artifacts/run_results.json",  # noqa
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "metadata": {"env": {"DBT_CLOUD_JOB_ID": "33"}},
+                    "results": [
+                        {
+                            "status": "success",
+                            "message": "SUCCESS 1",
+                            "failures": None,
+                            "unique_id": "model.jaffle_shop.stg_customers",
+                        },
+                    ],
+                },
+            )
+        )
+        with pytest.raises(
+            ValueError, match="No valid model names were found using the filters"
+        ):
+            await retry_dbt_cloud_job_run_subset_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                run_id=12,
+            )
+
+    async def test_run(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": {"id": 10000, "status": 10}}))
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": ["run_results.json"]}))
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/run_results.json",  # noqa
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "metadata": {"env": {"DBT_CLOUD_JOB_ID": "1"}},
+                    "results": [
+                        {
+                            "status": "fail",
+                            "message": "FAIL 1",
+                            "failures": None,
+                            "unique_id": "model.jaffle_shop.stg_customers",
+                        },
+                    ],
+                },
+            )
+        )
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200, json={"data": {"id": 10000, "project_id": 12345}}
+            )
+        )
+        await retry_dbt_cloud_job_run_subset_and_wait_for_completion(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            run_id=10000,
+        )
 
 
 @pytest.fixture
