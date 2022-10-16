@@ -342,43 +342,64 @@ class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
                 run_id=12,
             )
 
-    async def test_run_no_valid_names(self, respx_mock, dbt_cloud_credentials):
+    async def test_run(self, respx_mock, dbt_cloud_credentials):
+        # mock get_dbt_cloud_run_info
         respx_mock.get(
-            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/12/artifacts/run_results.json",  # noqa
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(
             return_value=Response(
                 200,
                 json={
-                    "metadata": {"env": {"DBT_CLOUD_JOB_ID": "33"}},
-                    "results": [
-                        {
-                            "status": "success",
-                            "message": "SUCCESS 1",
-                            "failures": None,
-                            "unique_id": "model.jaffle_shop.stg_customers",
-                        },
-                    ],
+                    "data": {
+                        "id": 10000,
+                        "status": 10,
+                        "run_steps": [
+                            {
+                                "id": 432100123,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 1,
+                                "name": "Clone Git Repository",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "id": 432100124,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 1,
+                                "name": "Create Profile from Connection Snowflake ",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "id": 432100125,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 1,
+                                "name": "Invoke dbt with `dbt deps`",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 1,
+                                "name": "Invoke dbt with `dbt build`",
+                                "status_humanized": "Success",
+                            },
+                        ],
+                        "job_id": "1",
+                    }
                 },
             )
         )
-        with pytest.raises(
-            ValueError, match="No valid model names were found using the filters"
-        ):
-            await retry_dbt_cloud_job_run_subset_and_wait_for_completion(
-                dbt_cloud_credentials=dbt_cloud_credentials,
-                run_id=12,
-            )
 
-    async def test_run(self, respx_mock, dbt_cloud_credentials):
-        respx_mock.get(
-            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
-            headers={"Authorization": "Bearer my_api_key"},
-        ).mock(return_value=Response(200, json={"data": {"id": 10000, "status": 10}}))
+        # mock list_dbt_cloud_run_artifacts
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/",
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": ["run_results.json"]}))
+
+        # mock get_dbt_cloud_run_artifact
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/run_results.json",  # noqa
             headers={"Authorization": "Bearer my_api_key"},

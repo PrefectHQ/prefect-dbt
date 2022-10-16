@@ -1,5 +1,5 @@
 """Module containing clients for interacting with the dbt Cloud API"""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import prefect
 from httpx import AsyncClient, Response
@@ -80,18 +80,27 @@ class DbtCloudAdministrativeClient:
             json=options.dict(exclude_none=True),
         )
 
-    async def get_run(self, run_id: int) -> Response:
+    async def get_run(
+        self, run_id: int, include_related: Optional[List[str]] = None
+    ) -> Response:
         """
         Sends a request to the [get run endpoint](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getRunById)
         to get details about a job run.
 
         Args:
             run_id: The ID of the run to get details for.
+            include_related: List of related fields to pull with the run.
+                Valid values are "trigger", "job", "debug_logs", and "run_steps".
+                If "debug_logs" is not provided in a request, then the included debug
+                logs will be truncated to the last 1,000 lines of the debug log output file.
 
         Returns:
             The response from the dbt Cloud administrative API.
         """  # noqa
-        return await self.call_endpoint(path=f"/runs/{run_id}/", http_method="GET")
+        params = {"include_related": include_related} if include_related else None
+        return await self.call_endpoint(
+            path=f"/runs/{run_id}/", http_method="GET", params=params
+        )
 
     async def list_run_artifacts(
         self, run_id: int, step: Optional[int] = None
