@@ -367,7 +367,10 @@ def _filter_model_names_by_status(
     for model_result in model_results:
         if model_result.get("status") in retry_status_filters:
             model_id = model_result["unique_id"]
-            model_name = model_id.split(".")[-1]
+            if not model_id.startswith("model."):
+                # skip test nodes
+                continue
+            model_name = model_id.split(".")[2]
             model_names.add(model_name)
 
     if len(model_names) == 0:
