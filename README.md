@@ -47,7 +47,8 @@ pip install dbt-databricks
 Then, register to [view the blocks](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
 
 ```bash
-prefect block register -m prefect_dbt
+prefect block register -m prefect_dbt.commands
+prefect block register -m prefect_dbt.cli
 ```
 
 
