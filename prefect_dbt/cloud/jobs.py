@@ -20,6 +20,8 @@ from prefect_dbt.cloud.runs import (
 )
 from prefect_dbt.cloud.utils import extract_user_message
 
+EXE_COMMANDS = ("build", "run", "test", "seed", "snapshot")
+
 
 class DbtCloudJobRunTriggerFailed(Exception):
     """Raised when a dbt Cloud job trigger fails"""
@@ -373,12 +375,17 @@ async def _build_trigger_job_run_options(
             continue
         # get dbt build from "Invoke dbt with `dbt build`"
         command = run_step["name"].partition("`")[2].partition("`")[0]
-        sub_command = shlex.split(command)[1]
+        command_components = shlex.split(command)
 
-        is_run_command = command in ("build", "run", "test", "seed", "snapshot")
+        for exe_command in EXE_COMMANDS:
+            if exe_command in command_components:
+                command.partition(exe_command)
+                break
+
+        is_exe_command = command in EXE_COMMANDS
         is_not_success = status in ("error", "skipped", "cancelled")
         is_skipped = status == "skipped"
-        if (not is_run_command and is_not_success) or (is_run_command and is_skipped):
+        if (not is_exe_command and is_not_success) or (is_exe_command and is_skipped):
             steps_override.append(command)
         # errors and failures are when we need to inspect to figure
         # out the point of failure
@@ -397,17 +404,22 @@ async def _build_trigger_job_run_options(
                     step=run_step["index"],
                 )
                 run_artifact = await run_artifact_future.result()
-                run_results = run_artifact["results"]
             except DbtCloudGetRunArtifactFailed:
                 steps_override.append(command)
             else:
-                run_nodes = " ".join(
+                run_results = run_artifact["results"]
+                run_nodes = [
                     run_result["unique_id"].split(".")[2]
                     for run_result in run_results
                     # "fail" here instead of "cancelled"
                     if run_result["status"] in ("error", "skipped", "fail")
+                ]
+
+                # e.g. dbt --experimental_parser, build, --vars '{"env": "prod"}'
+                dbt_global_args, exe_command, exe_args = command.partition(exe_command)
+                modified_command = (
+                    f"{dbt_global_args} {exe_command} --select {run_nodes} {exe_args}"
                 )
-                modified_command = f"dbt {sub_command} --select {run_nodes}"
                 steps_override.append(modified_command)
 
     if trigger_job_run_options is None:
