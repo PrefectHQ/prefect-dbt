@@ -375,27 +375,28 @@ async def _build_trigger_job_run_options(
             continue
         # get dbt build from "Invoke dbt with `dbt build`"
         command = run_step["name"].partition("`")[2].partition("`")[0]
-        command_components = shlex.split(command)
 
+        # find an executable command like `build` or `run`
+        # search in a list so that there aren't false positives, like
+        # `"run" in "dbt run-operation"`, which is True; we actually want
+        # `"run" in ["dbt", "run-operation"]` which is False
+        command_components = shlex.split(command)
         for exe_command in EXE_COMMANDS:
             if exe_command in command_components:
-                command.partition(exe_command)
                 break
+        else:
+            exe_command = ""
 
-        is_exe_command = command in EXE_COMMANDS
+        is_exe_command = exe_command in EXE_COMMANDS
         is_not_success = status in ("error", "skipped", "cancelled")
         is_skipped = status == "skipped"
         if (not is_exe_command and is_not_success) or (is_exe_command and is_skipped):
+            # if no matches like `run-operation`, we will be rerunning entirely
+            # or if it's one of the expected commands and is skipped
             steps_override.append(command)
-        # errors and failures are when we need to inspect to figure
-        # out the point of failure
         else:
-            # get the run results scoped to the step which had an error
-            # an error here indicates that either:
-            # 1) the fail-fast flag was set, in which case
-            #    the run_results.json file was never created; or
-            # 2) there was a problem on dbt Cloud's side saving
-            #    this artifact
+            # errors and failures are when we need to inspect to figure
+            # out the point of failure
             try:
                 run_artifact_future = await get_dbt_cloud_run_artifact.submit(
                     dbt_cloud_credentials=dbt_cloud_credentials,
@@ -405,8 +406,15 @@ async def _build_trigger_job_run_options(
                 )
                 run_artifact = await run_artifact_future.result()
             except DbtCloudGetRunArtifactFailed:
+                # get the run results scoped to the step which had an error
+                # an error here indicates that either:
+                # 1) the fail-fast flag was set, in which case
+                #    the run_results.json file was never created; or
+                # 2) there was a problem on dbt Cloud's side saving
+                #    this artifact
                 steps_override.append(command)
             else:
+                # we only need to find the individual nodes for those run commands
                 run_results = run_artifact["results"]
                 run_nodes = [
                     run_result["unique_id"].split(".")[2]
