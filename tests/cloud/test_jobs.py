@@ -139,6 +139,7 @@ class TestTriggerDbtCloudJobRun:
 
         await trigger_nonexistent_run_id()
 
+
 class TestTriggerDbtCloudJobRunAndWaitForCompletion:
     @pytest.mark.respx(assert_all_called=True)
     async def test_run_success(self, respx_mock, dbt_cloud_credentials):
