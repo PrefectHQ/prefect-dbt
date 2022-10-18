@@ -119,8 +119,6 @@ async def trigger_dbt_cloud_job_run(
         raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
 
     run_data = response.json()["data"]
-    if run_data.get("id") is None:
-        raise RuntimeError("Unable to determine run ID for triggered job.")
 
     if "project_id" in run_data and "id" in run_data:
         logger.info(
