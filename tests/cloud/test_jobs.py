@@ -404,8 +404,12 @@ class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
         "trigger_job_run_options",
         [TriggerJobRunOptions(timeout_seconds_override=42), None],
     )
-    async def test_run(
-        self, trigger_job_run_options, respx_mock, dbt_cloud_credentials
+    @pytest.mark.parametrize(
+        "exe_command",
+        ["run", "run-operation"],
+    )
+    async def test_retry_run(
+        self, trigger_job_run_options, exe_command, respx_mock, dbt_cloud_credentials
     ):
         # mock get_dbt_cloud_run_info
         respx_mock.get(
@@ -447,8 +451,8 @@ class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
                                 "run_id": 10000,
                                 "account_id": 123456789,
                                 "index": 4,
-                                "name": "Invoke dbt with `dbt build`",
-                                "status_humanized": "Success",
+                                "name": f"Invoke dbt with `dbt {exe_command}`",
+                                "status_humanized": "Error",
                             },
                         ],
                         "job_id": "1",
@@ -515,18 +519,18 @@ def real_dbt_cloud_account_id():
     return os.environ.get("DBT_CLOUD_ACCOUNT_ID")
 
 
-# @pytest.mark.integration
-# async def test_run_real_dbt_cloud_job(
-#     real_dbt_cloud_job_id, real_dbt_cloud_api_key, real_dbt_cloud_account_id
-# ):
-#     result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
-#         dbt_cloud_credentials=DbtCloudCredentials(
-#             api_key=real_dbt_cloud_api_key, account_id=real_dbt_cloud_account_id
-#         ),
-#         job_id=real_dbt_cloud_job_id,
-#         poll_frequency_seconds=1,
-#     )
-#     assert result.get("status") == 10
+@pytest.mark.integration
+async def test_run_real_dbt_cloud_job(
+    real_dbt_cloud_job_id, real_dbt_cloud_api_key, real_dbt_cloud_account_id
+):
+    result = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+        dbt_cloud_credentials=DbtCloudCredentials(
+            api_key=real_dbt_cloud_api_key, account_id=real_dbt_cloud_account_id
+        ),
+        job_id=real_dbt_cloud_job_id,
+        poll_frequency_seconds=1,
+    )
+    assert result.get("status") == 10
 
 
 class TestGetRunId:

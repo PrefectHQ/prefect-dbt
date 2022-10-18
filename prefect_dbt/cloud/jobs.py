@@ -1,5 +1,5 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
-from shlex import shlex
+import shlex
 from typing import Any, Dict, Optional
 
 from httpx import HTTPStatusError
