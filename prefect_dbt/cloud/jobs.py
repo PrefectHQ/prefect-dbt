@@ -418,18 +418,38 @@ async def _build_trigger_job_run_options(
             else:
                 # we only need to find the individual nodes for those run commands
                 run_results = run_artifact["results"]
-                run_nodes = [
+                run_nodes = " ".join(
                     run_result["unique_id"].split(".")[2]
                     for run_result in run_results
                     # "fail" here instead of "cancelled"
                     if run_result["status"] in ("error", "skipped", "fail")
-                ]
-
-                # e.g. dbt --experimental_parser, build, --vars '{"env": "prod"}'
-                dbt_global_args, exe_command, exe_args = command.partition(exe_command)
-                modified_command = (
-                    f"{dbt_global_args} {exe_command} --select {run_nodes} {exe_args}"
                 )
+
+                select_arg = None
+                if "-s" in command_components:
+                    select_arg = "-s"
+                elif "--select" in command_components:
+                    select_arg = "--select"
+
+                # prevent duplicate --select/-s statements
+                if select_arg is not None:
+                    # dbt --fail-fast run, -s, bad_mod --vars '{"env": "prod"}' to:
+                    # dbt --fail-fast run -s other_mod bad_mod --vars '{"env": "prod"}'
+                    command_start, select_arg, command_end = command.partition(
+                        select_arg
+                    )
+                    modified_command = (
+                        f"{command_start} {select_arg} {run_nodes} {command_end}"
+                    )
+                else:
+                    # dbt --fail-fast, build, --vars '{"env": "prod"}' to:
+                    # dbt --fail-fast build --select bad_model --vars '{"env": "prod"}'
+                    dbt_global_args, exe_command, exe_args = command.partition(
+                        exe_command
+                    )
+                    modified_command = (
+                        f"{dbt_global_args} {exe_command} -s {run_nodes} {exe_args}"
+                    )
                 steps_override.append(modified_command)
 
     if trigger_job_run_options is None:
