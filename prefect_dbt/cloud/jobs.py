@@ -204,7 +204,6 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             run completion.
         retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.
         retry_status_filters: A list of statuses to filter the models by.
-        retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
         DbtCloudJobRunCancelled: The triggered dbt Cloud job run was cancelled.
@@ -453,7 +452,6 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     max_wait_seconds: int = 900,
     poll_frequency_seconds: int = 10,
-    retry_downstream_nodes: bool = True,
 ) -> Dict:
     """
     Flow that retrys a subset of dbt Cloud job run, filtered by select statuses,
@@ -467,7 +465,6 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
         run_id: The ID of the job run to retry.
-        retry_downstream_nodes: Whether to also retry nodes downstream of the filtered models.
 
     Raises:
         ValueError: If `trigger_job_run_options.steps_override` is set by the user.
@@ -489,7 +486,6 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
             retry_dbt_cloud_job_run_subset_and_wait_for_completion(
                 dbt_cloud_credentials=credentials,
                 run_id=88640123,
-                retry_downstream_nodes=True,
             )
 
         retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow()
