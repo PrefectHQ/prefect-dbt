@@ -113,16 +113,15 @@ async def trigger_dbt_cloud_job_run(
         raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
 
     run_data = response.json()["data"]
-    if run_data.get("id") is None:
-        raise RuntimeError("Unable to determine run ID for triggered job.")
 
-    logger.info(
-        f"Run successfully triggered for job with ID {job_id}. "
-        "You can view the status of this run at "
-        f"https://{dbt_cloud_credentials.domain}/#/accounts/"
-        f"{dbt_cloud_credentials.account_id}/projects/{run_data['project_id']}/"
-        f"runs/{run_data['id']}/"
-    )
+    if "project_id" in run_data and "id" in run_data:
+        logger.info(
+            f"Run successfully triggered for job with ID {job_id}. "
+            "You can view the status of this run at "
+            f"https://{dbt_cloud_credentials.domain}/#/accounts/"
+            f"{dbt_cloud_credentials.account_id}/projects/{run_data['project_id']}/"
+            f"runs/{run_data['id']}/"
+        )
 
     return run_data
 
@@ -287,6 +286,8 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         options=trigger_job_run_options,
     )
     run_id = (await triggered_run_data_future.result()).get("id")
+    if run_id is None:
+        raise RuntimeError("Unable to determine run ID for triggered job.")
 
     final_run_status, run_data = await wait_for_dbt_cloud_job_run(
         run_id=run_id,

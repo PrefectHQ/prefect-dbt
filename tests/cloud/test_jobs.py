@@ -117,14 +117,16 @@ class TestTriggerDbtCloudJobRun:
         with pytest.raises(DbtCloudJobRunTriggerFailed, match="Not found!"):
             await test_trigger_nonexistent_job()
 
-    async def test_trigger_nonexistent_run_id(self, respx_mock, dbt_cloud_credentials):
+    async def test_trigger_nonexistent_run_id_no_logs(
+        self, respx_mock, dbt_cloud_credentials, caplog
+    ):
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": {"project_id": 12345}}))
 
         @flow
-        async def test_trigger_nonexistent_run_id_flow():
+        async def trigger_nonexistent_run_id():
             task_shorter_retry = trigger_dbt_cloud_job_run.with_options(
                 retries=1, retry_delay_seconds=1
             )
@@ -133,8 +135,7 @@ class TestTriggerDbtCloudJobRun:
                 job_id=1,
             )
 
-        with pytest.raises(RuntimeError, match="Unable to determine run ID"):
-            await test_trigger_nonexistent_run_id_flow()
+        await trigger_nonexistent_run_id()
 
 
 class TestTriggerDbtCloudJobRunAndWaitForCompletion:
@@ -256,6 +257,20 @@ class TestTriggerDbtCloudJobRunAndWaitForCompletion:
         )
 
         with pytest.raises(DbtCloudJobRunFailed):
+            await trigger_dbt_cloud_job_run_and_wait_for_completion(
+                dbt_cloud_credentials=dbt_cloud_credentials,
+                job_id=1,
+                poll_frequency_seconds=1,
+            )
+
+    @pytest.mark.respx(assert_all_called=True)
+    async def test_run_failure_no_run_id(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.post(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": {"project_id": 12345}}))
+
+        with pytest.raises(RuntimeError, match="Unable to determine run ID"):
             await trigger_dbt_cloud_job_run_and_wait_for_completion(
                 dbt_cloud_credentials=dbt_cloud_credentials,
                 job_id=1,
