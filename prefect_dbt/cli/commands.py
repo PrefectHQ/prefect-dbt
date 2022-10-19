@@ -1,5 +1,6 @@
 """Module containing tasks and flows for interacting with dbt CLI"""
 import os
+import sys
 from pathlib import Path
 from shutil import which
 from typing import Any, Dict, List, Optional, Union
@@ -154,9 +155,10 @@ async def trigger_dbt_cli_command(
     # fix up empty shell_run_command_kwargs
     shell_run_command_kwargs = shell_run_command_kwargs or {}
 
-    # on Windows use PowerShell; else use bash
-    shell = "powershell" if sys.platform == "win32" else "bash"
+    # if shell is not specified: use PowerShell on Windows, else use bash
+    if "shell" not in shell_run_command_kwargs:
+        shell_run_command_kwargs["shell"] = "powershell" if sys.platform == "win32" else "bash"
 
     logger.info(f"Running dbt command: {command}")
-    result = await shell_run_command.fn(command=command, shell=shell, **shell_run_command_kwargs)
+    result = await shell_run_command.fn(command=command, **shell_run_command_kwargs)
     return result

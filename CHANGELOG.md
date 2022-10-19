@@ -33,6 +33,7 @@ Released on October 4th, 2022.
 
 - `BigQueryTargetConfigs.project` now overrides `GcpCredential.project` rather than error - [#68](https://github.com/PrefectHQ/prefect-dbt/pull/68)
 - `trigger_dbt_cloud_job_run_and_wait_for_completion` no longer hangs when called from a synchronous flow = [#71](https://github.com/PrefectHQ/prefect-dbt/pull/71)
+- On Windows, use PowerShell as shell in `trigger_dbt_cli_command` - [#88](https://github.com/PrefectHQ/prefect-dbt/pull/88)
 
 ## 0.2.2
 
