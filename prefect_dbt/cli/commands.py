@@ -154,6 +154,9 @@ async def trigger_dbt_cli_command(
     # fix up empty shell_run_command_kwargs
     shell_run_command_kwargs = shell_run_command_kwargs or {}
 
+    # on Windows use PowerShell; else use bash
+    shell = "powershell" if sys.platform == "win32" else "bash"
+
     logger.info(f"Running dbt command: {command}")
-    result = await shell_run_command.fn(command=command, **shell_run_command_kwargs)
+    result = await shell_run_command.fn(command=command, shell=shell, **shell_run_command_kwargs)
     return result
