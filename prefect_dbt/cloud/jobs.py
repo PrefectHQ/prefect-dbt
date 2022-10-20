@@ -1,5 +1,6 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
 import shlex
+from json import JSONDecodeError
 from typing import Any, Dict, Optional
 
 from httpx import HTTPStatusError
@@ -8,7 +9,6 @@ from prefect import flow, get_run_logger, task
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 from prefect_dbt.cloud.runs import (
-    DbtCloudGetRunArtifactFailed,
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
     DbtCloudJobRunStatus,
@@ -202,7 +202,6 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
         retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.
-        retry_status_filters: A list of statuses to filter the models by.
 
     Raises:
         DbtCloudJobRunCancelled: The triggered dbt Cloud job run was cancelled.
@@ -398,14 +397,16 @@ async def _build_trigger_job_run_options(
             # errors and failures are when we need to inspect to figure
             # out the point of failure
             try:
-                run_artifact_future = await get_dbt_cloud_run_artifact.submit(
+                run_artifact_future = await get_dbt_cloud_run_artifact.with_options(
+                    retries=0, retry_delay_seconds=0
+                ).submit(
                     dbt_cloud_credentials=dbt_cloud_credentials,
                     run_id=run_id,
                     path="run_results.json",
                     step=run_step["index"],
                 )
                 run_artifact = await run_artifact_future.result()
-            except DbtCloudGetRunArtifactFailed:
+            except JSONDecodeError:
                 # get the run results scoped to the step which had an error
                 # an error here indicates that either:
                 # 1) the fail-fast flag was set, in which case
@@ -416,10 +417,12 @@ async def _build_trigger_job_run_options(
             else:
                 # we only need to find the individual nodes for those run commands
                 run_results = run_artifact["results"]
+                # select nodes that were not successful
+                # note "fail" here instead of "cancelled" because
+                # nodes do not have a cancelled state
                 run_nodes = " ".join(
                     run_result["unique_id"].split(".")[2]
                     for run_result in run_results
-                    # "fail" here instead of "cancelled"
                     if run_result["status"] in ("error", "skipped", "fail")
                 )
 

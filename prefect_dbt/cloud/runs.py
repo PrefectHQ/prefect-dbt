@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
+from typing_extensions import Literal
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.utils import extract_user_message
@@ -78,7 +79,9 @@ class DbtCloudJobRunStatus(Enum):
 async def get_dbt_cloud_run_info(
     dbt_cloud_credentials: DbtCloudCredentials,
     run_id: int,
-    include_related: Optional[List[str]] = None,
+    include_related: Optional[
+        List[Literal["trigger", "job", "debug_logs", "run_steps"]]
+    ] = None,
 ) -> Dict:
     """
     A task to retrieve information about a dbt Cloud job run.

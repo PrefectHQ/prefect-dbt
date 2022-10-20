@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import prefect
 from httpx import AsyncClient, Response
+from typing_extensions import Literal
 
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 
@@ -81,7 +82,11 @@ class DbtCloudAdministrativeClient:
         )
 
     async def get_run(
-        self, run_id: int, include_related: Optional[List[str]] = None
+        self,
+        run_id: int,
+        include_related: Optional[
+            List[Literal["trigger", "job", "debug_logs", "run_steps"]]
+        ] = None,
     ) -> Response:
         """
         Sends a request to the [get run endpoint](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getRunById)
