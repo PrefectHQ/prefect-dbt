@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flow and `retry_*` keywords in `trigger_dbt_cloud_job_run_and_wait_for_completion` flow - [#81](https://github.com/PrefectHQ/prefect-dbt/pull/81)
+- `get_dbt_cloud_job_info` task [#81](https://github.com/PrefectHQ/prefect-dbt/pull/81)
+
 ### Changed
 
 - Allow registering all blocks at top level - [#79](https://github.com/PrefectHQ/prefect-dbt/pull/79)

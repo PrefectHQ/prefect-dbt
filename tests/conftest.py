@@ -1,4 +1,5 @@
 import pytest
+from prefect.testing.utilities import prefect_test_harness
 
 from prefect_dbt.cli.configs.base import GlobalConfigs, TargetConfigs
 from prefect_dbt.cli.credentials import DbtCliProfile
@@ -8,6 +9,12 @@ from prefect_dbt.cloud.credentials import DbtCloudCredentials
 @pytest.fixture
 def dbt_cloud_credentials():
     return DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def prefect_db():
+    with prefect_test_harness():
+        yield
 
 
 @pytest.fixture
