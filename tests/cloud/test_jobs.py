@@ -10,6 +10,7 @@ from prefect_dbt.cloud.jobs import (
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
     DbtCloudJobRunTriggerFailed,
+    get_dbt_cloud_job_info,
     get_run_id,
     retry_dbt_cloud_job_run_subset_and_wait_for_completion,
     trigger_dbt_cloud_job_run,
@@ -25,6 +26,20 @@ def dbt_cloud_credentials():
 
 
 class TestTriggerDbtCloudJobRun:
+    async def test_get_dbt_cloud_job_info(self, respx_mock, dbt_cloud_credentials):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/12/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": {"id": 10000}}))
+
+        response = await get_dbt_cloud_job_info.fn(
+            dbt_cloud_credentials=dbt_cloud_credentials,
+            job_id=12,
+            order_by="id",
+        )
+
+        assert response == {"id": 10000}
+
     async def test_trigger_job_with_no_options(self, respx_mock, dbt_cloud_credentials):
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/run/",
@@ -426,6 +441,22 @@ class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
     async def test_retry_run(
         self, trigger_job_run_options, exe_command, respx_mock, dbt_cloud_credentials
     ):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/1/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "data": {
+                        "id": 10000,
+                        "generate_docs": False,
+                        "generate_sources": False,
+                    }
+                },
+            )
+        )
+
         # mock get_dbt_cloud_run_info
         respx_mock.get(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",

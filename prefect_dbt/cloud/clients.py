@@ -58,6 +58,26 @@ class DbtCloudAdministrativeClient:
 
         return response
 
+    async def get_job(
+        self,
+        job_id: int,
+        order_by: Optional[str] = None,
+    ) -> Response:
+        """
+        Return job details for a job on an account.
+
+        Args:
+            job_id: Numeric ID of the job.
+            order_by: Field to order the result by. Use - to indicate reverse order.
+
+        Returns:
+            The response from the dbt Cloud administrative API.
+        """  # noqa
+        params = {"order_by": order_by} if order_by else None
+        return await self.call_endpoint(
+            path=f"/jobs/{job_id}/", http_method="GET", params=params
+        )
+
     async def trigger_job_run(
         self, job_id: int, options: Optional[TriggerJobRunOptions] = None
     ) -> Response:

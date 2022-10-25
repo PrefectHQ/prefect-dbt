@@ -24,9 +24,64 @@ EXE_COMMANDS = ("build", "run", "test", "seed", "snapshot")
 
 
 class DbtCloudJobRunTriggerFailed(Exception):
-    """Raised when a dbt Cloud job trigger fails"""
+    """Raised when a dbt Cloud job trigger fails."""
 
-    pass
+
+class DbtCloudGetJobFailed(Exception):
+    """Raised when unable to retrieve dbt Cloud job."""
+
+
+@task(
+    name="Get dbt Cloud job details",
+    description="Retrieves details of a dbt Cloud job "
+    "for the job with the given job_id.",
+    retries=3,
+    retry_delay_seconds=10,
+)
+async def get_dbt_cloud_job_info(
+    dbt_cloud_credentials: DbtCloudCredentials,
+    job_id: int,
+    order_by: Optional[str] = None,
+) -> Dict:
+    """
+    A task to retrieve information about a dbt Cloud job.
+
+    Args:
+        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
+        job_id: The ID of the job to get.
+
+    Returns:
+        The job data returned by the dbt Cloud administrative API.
+
+    Example:
+        Get status of a dbt Cloud job:
+        ```python
+        from prefect import flow
+
+        from prefect_dbt.cloud import DbtCloudCredentials
+        from prefect_dbt.cloud.jobs import get_job
+
+        @flow
+        def get_job_flow():
+            credentials = DbtCloudCredentials(api_key="my_api_key", account_id=123456789)
+
+            return get_job(
+                dbt_cloud_credentials=credentials,
+                job_id=42
+            )
+
+        get_job_flow()
+        ```
+    """  # noqa
+    try:
+        async with dbt_cloud_credentials.get_administrative_client() as client:
+            response = await client.get_job(
+                job_id=job_id,
+                order_by=order_by,
+            )
+    except HTTPStatusError as ex:
+        raise DbtCloudGetJobFailed(extract_user_message(ex)) from ex
+    return response.json()["data"]
 
 
 @task(
@@ -360,11 +415,15 @@ async def _build_trigger_job_run_options(
     trigger_job_run_options: TriggerJobRunOptions,
     run_id: str,
     run_info: Dict[str, Any],
+    job_info: Dict[str, Any],
 ):
     """
     Compiles a list of steps (commands) to retry, then either build trigger job
     run options from scratch if it does not exist, else overrides the existing.
     """
+    generate_docs = job_info.get("generate_docs", False)
+    generate_sources = job_info.get("generate_sources", False)
+
     steps_override = []
     for run_step in run_info["run_steps"]:
         status = run_step["status_humanized"].lower()
@@ -374,6 +433,18 @@ async def _build_trigger_job_run_options(
             continue
         # get dbt build from "Invoke dbt with `dbt build`"
         command = run_step["name"].partition("`")[2].partition("`")[0]
+
+        # These steps will be re-run regardless if
+        # generate_docs or generate_sources are enabled for a given job
+        # so if we don't skip, it'll run twice
+        freshness_in_command = (
+            "dbt source snapshot-freshness" in command
+            or "dbt source freshness" in command
+        )
+        if "dbt docs generate" in command and generate_docs:
+            continue
+        elif freshness_in_command and generate_sources:
+            continue
 
         # find an executable command like `build` or `run`
         # search in a list so that there aren't false positives, like
@@ -528,14 +599,21 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     )
     run_info = await run_info_future.result()
 
+    job_id = run_info["job_id"]
+    job_info_future = await get_dbt_cloud_job_info.submit(
+        dbt_cloud_credentials=dbt_cloud_credentials,
+        job_id=job_id,
+    )
+    job_info = await job_info_future.result()
+
     trigger_job_run_options_override = await _build_trigger_job_run_options(
         dbt_cloud_credentials=dbt_cloud_credentials,
         trigger_job_run_options=trigger_job_run_options,
         run_id=run_id,
         run_info=run_info,
+        job_info=job_info,
     )
 
-    job_id = run_info["job_id"]
     run_data = await trigger_dbt_cloud_job_run_and_wait_for_completion(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,

@@ -14,31 +14,21 @@ from prefect_dbt.cloud.utils import extract_user_message
 class DbtCloudGetRunFailed(Exception):
     """Raised when unable to retrieve dbt Cloud run"""
 
-    pass
-
 
 class DbtCloudListRunArtifactsFailed(Exception):
     """Raised when unable to list dbt Cloud run artifacts"""
-
-    pass
 
 
 class DbtCloudGetRunArtifactFailed(Exception):
     """Raised when unable to get a dbt Cloud run artifact"""
 
-    pass
-
 
 class DbtCloudJobRunFailed(Exception):
     """Raised when a triggered job run fails"""
 
-    pass
-
 
 class DbtCloudJobRunCancelled(Exception):
     """Raised when a triggered job run is cancelled"""
-
-    pass
 
 
 class DbtCloudJobRunTimedOut(Exception):
@@ -46,8 +36,6 @@ class DbtCloudJobRunTimedOut(Exception):
     Raised when a triggered job run does not complete in the configured max
     wait seconds
     """
-
-    pass
 
 
 class DbtCloudJobRunStatus(Enum):
