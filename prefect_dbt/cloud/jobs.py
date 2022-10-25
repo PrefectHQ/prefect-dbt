@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
+from prefect.context import FlowRunContext
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
@@ -614,7 +615,13 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         job_info=job_info,
     )
 
-    run_data = await trigger_dbt_cloud_job_run_and_wait_for_completion(
+    # to circumvent `RuntimeError: The task runner is already started!`
+    flow_run_context = FlowRunContext.get()
+    task_runner_type = type(flow_run_context.task_runner)
+
+    run_data = await trigger_dbt_cloud_job_run_and_wait_for_completion.with_options(
+        task_runner=task_runner_type()
+    )(
         dbt_cloud_credentials=dbt_cloud_credentials,
         job_id=job_id,
         retry_filtered_models_attempts=0,
