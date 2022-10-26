@@ -9,12 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flow and `retry_*` keywords in `trigger_dbt_cloud_job_run_and_wait_for_completion` flow - [#81](https://github.com/PrefectHQ/prefect-dbt/pull/81)
-- `get_dbt_cloud_job_info` task [#81](https://github.com/PrefectHQ/prefect-dbt/pull/81)
-
 ### Changed
-
-- Allow registering all blocks at top level - [#79](https://github.com/PrefectHQ/prefect-dbt/pull/79)
 
 ### Deprecated
 
@@ -23,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.2.4
+
+Released on October 26th, 2022.
+
+### Added
+
+- `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flow and `retry_*` keywords in `trigger_dbt_cloud_job_run_and_wait_for_completion` flow - [#89](https://github.com/PrefectHQ/prefect-dbt/pull/89)
+- `get_dbt_cloud_job_info` task [#89](https://github.com/PrefectHQ/prefect-dbt/pull/89)
+
+### Changed
+
+- Allow registering all blocks at top level - [#79](https://github.com/PrefectHQ/prefect-dbt/pull/79)
 
 ## 0.2.3
 
