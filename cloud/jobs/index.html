@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://PrefectHQ.github.io/prefect-dbt/cloud/jobs/">
       
       <link rel="icon" href="../../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
     
     
       
@@ -312,6 +312,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.DbtCloudGetJobFailed" class="md-nav__link">
+    DbtCloudGetJobFailed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.jobs.DbtCloudJobRunTriggerFailed" class="md-nav__link">
     DbtCloudJobRunTriggerFailed
   </a>
@@ -332,8 +339,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.get_dbt_cloud_job_info" class="md-nav__link">
+    get_dbt_cloud_job_info()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.jobs.get_run_id" class="md-nav__link">
     get_run_id()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.retry_dbt_cloud_job_run_subset_and_wait_for_completion" class="md-nav__link">
+    retry_dbt_cloud_job_run_subset_and_wait_for_completion()
   </a>
   
 </li>
@@ -614,6 +635,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.DbtCloudGetJobFailed" class="md-nav__link">
+    DbtCloudGetJobFailed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.jobs.DbtCloudJobRunTriggerFailed" class="md-nav__link">
     DbtCloudJobRunTriggerFailed
   </a>
@@ -634,8 +662,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.get_dbt_cloud_job_info" class="md-nav__link">
+    get_dbt_cloud_job_info()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.jobs.get_run_id" class="md-nav__link">
     get_run_id()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.jobs.retry_dbt_cloud_job_run_subset_and_wait_for_completion" class="md-nav__link">
+    retry_dbt_cloud_job_run_subset_and_wait_for_completion()
   </a>
   
 </li>
@@ -708,6 +750,37 @@
 
 
 
+<h3 id="prefect_dbt.cloud.jobs.DbtCloudGetJobFailed" class="doc doc-heading">
+        <code>DbtCloudGetJobFailed</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code>Exception</code></p>
+
+  
+      <p>Raised when unable to retrieve dbt Cloud job.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudGetJobFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when unable to retrieve dbt Cloud job.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h3 id="prefect_dbt.cloud.jobs.DbtCloudJobRunTriggerFailed" class="doc doc-heading">
         <code>DbtCloudJobRunTriggerFailed</code>
 
@@ -720,18 +793,14 @@
         Bases: <code>Exception</code></p>
 
   
-      <p>Raised when a dbt Cloud job trigger fails</p>
+      <p>Raised when a dbt Cloud job trigger fails.</p>
 
 
         <details class="quote">
           <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunTriggerFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raised when a dbt Cloud job trigger fails&quot;&quot;&quot;</span>
-
-    <span class="k">pass</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunTriggerFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a dbt Cloud job trigger fails.&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -739,6 +808,205 @@
 
 </div>
 <h2 id="prefect_dbt.cloud.jobs-functions">Functions</h2>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="prefect_dbt.cloud.jobs.get_dbt_cloud_job_info" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_dbt_cloud_job_info</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>A task to retrieve information about a dbt Cloud job.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dbt_cloud_credentials</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="prefect_dbt.cloud.credentials.DbtCloudCredentials" href="../credentials/#prefect_dbt.cloud.credentials.DbtCloudCredentials">DbtCloudCredentials</a></code>
+          </td>
+          <td><p>Credentials for authenticating with dbt Cloud.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>job_id</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>The ID of the job to get.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="typing.Dict">Dict</span></code>
+          </td>
+          <td><p>The job data returned by the dbt Cloud administrative API.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="example">
+  <summary>Example</summary>
+  <p>Get status of a dbt Cloud job:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">get_job</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">get_job_flow</span><span class="p">():</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span> <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_job</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">)</span>
+
+<span class="n">get_job_flow</span><span class="p">()</span>
+</code></pre></div></p>
+</details>
+      <details class="quote">
+        <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Get dbt Cloud job details&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Retrieves details of a dbt Cloud job &quot;</span>
+    <span class="s2">&quot;for the job with the given job_id.&quot;</span><span class="p">,</span>
+    <span class="n">retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">retry_delay_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_dbt_cloud_job_info</span><span class="p">(</span>
+    <span class="n">dbt_cloud_credentials</span><span class="p">:</span> <span class="n">DbtCloudCredentials</span><span class="p">,</span>
+    <span class="n">job_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">order_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A task to retrieve information about a dbt Cloud job.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.</span>
+<span class="sd">        job_id: The ID of the job to get.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The job data returned by the dbt Cloud administrative API.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        Get status of a dbt Cloud job:</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from prefect import flow</span>
+
+<span class="sd">        from prefect_dbt.cloud import DbtCloudCredentials</span>
+<span class="sd">        from prefect_dbt.cloud.jobs import get_job</span>
+
+<span class="sd">        @flow</span>
+<span class="sd">        def get_job_flow():</span>
+<span class="sd">            credentials = DbtCloudCredentials(api_key=&quot;my_api_key&quot;, account_id=123456789)</span>
+
+<span class="sd">            return get_job(</span>
+<span class="sd">                dbt_cloud_credentials=credentials,</span>
+<span class="sd">                job_id=42</span>
+<span class="sd">            )</span>
+
+<span class="sd">        get_job_flow()</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">dbt_cloud_credentials</span><span class="o">.</span><span class="n">get_administrative_client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_job</span><span class="p">(</span>
+                <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+                <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DbtCloudGetJobFailed</span><span class="p">(</span><span class="n">extract_user_message</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">ex</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -807,49 +1075,49 @@
 </details>
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Get dbt Cloud job run ID&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Extracts the run ID from a trigger job run API response&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -892,6 +1160,342 @@
     <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to determine run ID for triggered job.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">id</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="prefect_dbt.cloud.jobs.retry_dbt_cloud_job_run_subset_and_wait_for_completion" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Flow that retrys a subset of dbt Cloud job run, filtered by select statuses,
+and waits for the triggered retry to complete.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dbt_cloud_credentials</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="prefect_dbt.cloud.credentials.DbtCloudCredentials" href="../credentials/#prefect_dbt.cloud.credentials.DbtCloudCredentials">DbtCloudCredentials</a></code>
+          </td>
+          <td><p>Credentials for authenticating with dbt Cloud.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>trigger_job_run_options</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_dbt.cloud.models.TriggerJobRunOptions" href="../models/#prefect_dbt.cloud.models.TriggerJobRunOptions">TriggerJobRunOptions</a>]</code>
+          </td>
+          <td><p>An optional TriggerJobRunOptions instance to
+specify overrides for the triggered job run.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>max_wait_seconds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>Maximum number of seconds to wait for job to complete</p></td>
+          <td>
+                <code>900</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>poll_frequency_seconds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>Number of seconds to wait in between checks for
+run completion.</p></td>
+          <td>
+                <code>10</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>run_id</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>The ID of the job run to retry.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td><p>If <code>trigger_job_run_options.steps_override</code> is set by the user.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="typing.Dict">Dict</span></code>
+          </td>
+          <td><p>The run data returned by the dbt Cloud administrative API.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+<p><strong>Examples:</strong></p>
+    <p>Retry a subset of models in a dbt Cloud job run and wait for completion:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">():</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+    <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="mi">88640123</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">()</span>
+</code></pre></div></p>
+
+      <details class="quote">
+        <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Retry subset of dbt Cloud job run and wait for completion&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Retries a subset of dbt Cloud job run, filtered by select statuses, &quot;</span>
+        <span class="s2">&quot;and waits for the triggered retry to complete.&quot;</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span><span class="p">(</span>
+    <span class="n">dbt_cloud_credentials</span><span class="p">:</span> <span class="n">DbtCloudCredentials</span><span class="p">,</span>
+    <span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">trigger_job_run_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TriggerJobRunOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_wait_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">900</span><span class="p">,</span>
+    <span class="n">poll_frequency_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flow that retrys a subset of dbt Cloud job run, filtered by select statuses,</span>
+<span class="sd">    and waits for the triggered retry to complete.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.</span>
+<span class="sd">        trigger_job_run_options: An optional TriggerJobRunOptions instance to</span>
+<span class="sd">            specify overrides for the triggered job run.</span>
+<span class="sd">        max_wait_seconds: Maximum number of seconds to wait for job to complete</span>
+<span class="sd">        poll_frequency_seconds: Number of seconds to wait in between checks for</span>
+<span class="sd">            run completion.</span>
+<span class="sd">        run_id: The ID of the job run to retry.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `trigger_job_run_options.steps_override` is set by the user.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The run data returned by the dbt Cloud administrative API.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Retry a subset of models in a dbt Cloud job run and wait for completion:</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from prefect import flow</span>
+
+<span class="sd">        from prefect_dbt.cloud import DbtCloudCredentials</span>
+<span class="sd">        from prefect_dbt.cloud.jobs import retry_dbt_cloud_job_run_subset_and_wait_for_completion</span>
+
+<span class="sd">        @flow</span>
+<span class="sd">        def retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow():</span>
+<span class="sd">            credentials = DbtCloudCredentials.load(&quot;MY_BLOCK_NAME&quot;)</span>
+<span class="sd">            retry_dbt_cloud_job_run_subset_and_wait_for_completion(</span>
+<span class="sd">                dbt_cloud_credentials=credentials,</span>
+<span class="sd">                run_id=88640123,</span>
+<span class="sd">            )</span>
+
+<span class="sd">        retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow()</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="k">if</span> <span class="n">trigger_job_run_options</span> <span class="ow">and</span> <span class="n">trigger_job_run_options</span><span class="o">.</span><span class="n">steps_override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Do not set `steps_override` in `trigger_job_run_options` &quot;</span>
+            <span class="s2">&quot;because this flow will automatically set it&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">run_info_future</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_dbt_cloud_run_info</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+        <span class="n">include_related</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;run_steps&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">run_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_info_future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">run_info</span><span class="p">[</span><span class="s2">&quot;job_id&quot;</span><span class="p">]</span>
+    <span class="n">job_info_future</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_dbt_cloud_job_info</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">job_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">job_info_future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="n">trigger_job_run_options_override</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_build_trigger_job_run_options</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+        <span class="n">trigger_job_run_options</span><span class="o">=</span><span class="n">trigger_job_run_options</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+        <span class="n">run_info</span><span class="o">=</span><span class="n">run_info</span><span class="p">,</span>
+        <span class="n">job_info</span><span class="o">=</span><span class="n">job_info</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># to circumvent `RuntimeError: The task runner is already started!`</span>
+    <span class="n">flow_run_context</span> <span class="o">=</span> <span class="n">FlowRunContext</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">task_runner_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">flow_run_context</span><span class="o">.</span><span class="n">task_runner</span><span class="p">)</span>
+
+    <span class="n">run_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">trigger_dbt_cloud_job_run_and_wait_for_completion</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span>
+        <span class="n">task_runner</span><span class="o">=</span><span class="n">task_runner_type</span><span class="p">()</span>
+    <span class="p">)(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+        <span class="n">retry_filtered_models_attempts</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">trigger_job_run_options</span><span class="o">=</span><span class="n">trigger_job_run_options_override</span><span class="p">,</span>
+        <span class="n">max_wait_seconds</span><span class="o">=</span><span class="n">max_wait_seconds</span><span class="p">,</span>
+        <span class="n">poll_frequency_seconds</span><span class="o">=</span><span class="n">poll_frequency_seconds</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">run_data</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1033,69 +1637,7 @@ for the triggered job run.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 26</span>
-<span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
-<span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
 <span class="normal"> 89</span>
 <span class="normal"> 90</span>
 <span class="normal"> 91</span>
@@ -1132,7 +1674,70 @@ for the triggered job run.</p></td>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
-<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Trigger dbt Cloud job run&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Triggers a dbt Cloud job run for the job &quot;</span>
     <span class="s2">&quot;with the given job_id and optional overrides.&quot;</span><span class="p">,</span>
@@ -1223,13 +1828,14 @@ for the triggered job run.</p></td>
 
     <span class="n">run_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Run successfully triggered for job with ID </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">. &quot;</span>
-        <span class="s2">&quot;You can view the status of this run at &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;https://</span><span class="si">{</span><span class="n">dbt_cloud_credentials</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s2">/#/accounts/&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dbt_cloud_credentials</span><span class="o">.</span><span class="n">account_id</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">run_data</span><span class="p">[</span><span class="s1">&#39;project_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;runs/</span><span class="si">{</span><span class="n">run_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/&quot;</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;project_id&quot;</span> <span class="ow">in</span> <span class="n">run_data</span> <span class="ow">and</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="n">run_data</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Run successfully triggered for job with ID </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="s2">&quot;You can view the status of this run at &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;https://</span><span class="si">{</span><span class="n">dbt_cloud_credentials</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s2">/#/accounts/&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dbt_cloud_credentials</span><span class="o">.</span><span class="n">account_id</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">run_data</span><span class="p">[</span><span class="s1">&#39;project_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;runs/</span><span class="si">{</span><span class="n">run_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">run_data</span>
 </code></pre></div></td></tr></table></div>
@@ -1317,6 +1923,16 @@ specify overrides for the triggered job run.</p></td>
 run completion.</p></td>
           <td>
                 <code>10</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>retry_filtered_models_attempts</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>Number of times to retry models selected by <code>retry_status_filters</code>.</p></td>
+          <td>
+                <code>3</code>
           </td>
         </tr>
     </tbody>
@@ -1441,70 +2057,7 @@ run completion.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/jobs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
@@ -1594,7 +2147,92 @@ run completion.</p></td>
 <span class="normal">323</span>
 <span class="normal">324</span>
 <span class="normal">325</span>
-<span class="normal">326</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Trigger dbt Cloud job run and wait for completion&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Triggers a dbt Cloud job run and waits for the&quot;</span>
     <span class="s2">&quot;triggered run to complete.&quot;</span><span class="p">,</span>
@@ -1605,6 +2243,7 @@ run completion.</p></td>
     <span class="n">trigger_job_run_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TriggerJobRunOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_wait_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">900</span><span class="p">,</span>
     <span class="n">poll_frequency_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">retry_filtered_models_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Flow that triggers a job run and waits for the triggered run to complete.</span>
@@ -1617,6 +2256,7 @@ run completion.</p></td>
 <span class="sd">        max_wait_seconds: Maximum number of seconds to wait for job to complete</span>
 <span class="sd">        poll_frequency_seconds: Number of seconds to wait in between checks for</span>
 <span class="sd">            run completion.</span>
+<span class="sd">        retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        DbtCloudJobRunCancelled: The triggered dbt Cloud job run was cancelled.</span>
@@ -1709,7 +2349,7 @@ run completion.</p></td>
         <span class="n">options</span><span class="o">=</span><span class="n">trigger_job_run_options</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">triggered_run_data_future</span><span class="o">.</span><span class="n">result</span><span class="p">())</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to determine run ID for triggered job.&quot;</span><span class="p">)</span>
 
     <span class="n">final_run_status</span><span class="p">,</span> <span class="n">run_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">wait_for_dbt_cloud_job_run</span><span class="p">(</span>
@@ -1742,7 +2382,27 @@ run completion.</p></td>
             <span class="sa">f</span><span class="s2">&quot;Triggered job run with ID </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> was cancelled.&quot;</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">final_run_status</span> <span class="o">==</span> <span class="n">DbtCloudJobRunStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">DbtCloudJobRunFailed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Triggered job run with ID: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> failed.&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">retry_filtered_models_attempts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Retrying job run with ID: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">retry_filtered_models_attempts</span><span class="si">}</span><span class="s2"> more times&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">retry_filtered_models_attempts</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">run_data</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span><span class="p">(</span>
+                        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+                        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+                        <span class="n">trigger_job_run_options</span><span class="o">=</span><span class="n">trigger_job_run_options</span><span class="p">,</span>
+                        <span class="n">max_wait_seconds</span><span class="o">=</span><span class="n">max_wait_seconds</span><span class="p">,</span>
+                        <span class="n">poll_frequency_seconds</span><span class="o">=</span><span class="n">poll_frequency_seconds</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">run_data</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DbtCloudJobRunFailed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Triggered job run with ID: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> failed.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Triggered job run with ID: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> ended with unexpected&quot;</span>
@@ -1834,10 +2494,10 @@ run completion.</p></td>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.078830c0.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8492ddcf.min.js"></script>
       
     
   </body>
