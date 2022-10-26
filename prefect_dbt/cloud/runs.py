@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
+from typing_extensions import Literal
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.utils import extract_user_message
@@ -13,31 +14,21 @@ from prefect_dbt.cloud.utils import extract_user_message
 class DbtCloudGetRunFailed(Exception):
     """Raised when unable to retrieve dbt Cloud run"""
 
-    pass
-
 
 class DbtCloudListRunArtifactsFailed(Exception):
     """Raised when unable to list dbt Cloud run artifacts"""
-
-    pass
 
 
 class DbtCloudGetRunArtifactFailed(Exception):
     """Raised when unable to get a dbt Cloud run artifact"""
 
-    pass
-
 
 class DbtCloudJobRunFailed(Exception):
     """Raised when a triggered job run fails"""
 
-    pass
-
 
 class DbtCloudJobRunCancelled(Exception):
     """Raised when a triggered job run is cancelled"""
-
-    pass
 
 
 class DbtCloudJobRunTimedOut(Exception):
@@ -45,8 +36,6 @@ class DbtCloudJobRunTimedOut(Exception):
     Raised when a triggered job run does not complete in the configured max
     wait seconds
     """
-
-    pass
 
 
 class DbtCloudJobRunStatus(Enum):
@@ -76,7 +65,11 @@ class DbtCloudJobRunStatus(Enum):
     retry_delay_seconds=10,
 )
 async def get_dbt_cloud_run_info(
-    dbt_cloud_credentials: DbtCloudCredentials, run_id: int
+    dbt_cloud_credentials: DbtCloudCredentials,
+    run_id: int,
+    include_related: Optional[
+        List[Literal["trigger", "job", "debug_logs", "run_steps"]]
+    ] = None,
 ) -> Dict:
     """
     A task to retrieve information about a dbt Cloud job run.
@@ -84,6 +77,10 @@ async def get_dbt_cloud_run_info(
     Args:
         dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
         run_id: The ID of the job to trigger.
+        include_related: List of related fields to pull with the run.
+            Valid values are "trigger", "job", "debug_logs", and "run_steps".
+            If "debug_logs" is not provided in a request, then the included debug
+            logs will be truncated to the last 1,000 lines of the debug log output file.
 
     Returns:
         The run data returned by the dbt Cloud administrative API.
@@ -110,7 +107,9 @@ async def get_dbt_cloud_run_info(
     """  # noqa
     try:
         async with dbt_cloud_credentials.get_administrative_client() as client:
-            response = await client.get_run(run_id=run_id)
+            response = await client.get_run(
+                run_id=run_id, include_related=include_related
+            )
     except HTTPStatusError as ex:
         raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
     return response.json()["data"]
