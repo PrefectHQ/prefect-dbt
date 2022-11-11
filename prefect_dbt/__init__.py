@@ -1,7 +1,12 @@
 from . import _version
 
 from .cloud import DbtCloudCredentials  # noqa
-from .cli import DbtCliProfile, MissingExtrasRequireError  # noqa
+from .cli import (  # noqa
+    DbtCliProfile,
+    GlobalConfigs,
+    MissingExtrasRequireError,
+    TargetConfigs,
+)
 
 try:
     from .cli.configs.snowflake import SnowflakeTargetConfigs  # noqa
