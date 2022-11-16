@@ -307,7 +307,7 @@ async def wait_for_dbt_cloud_job_run(
             return DbtCloudJobRunStatus(run_status_code), run_data
 
         wait_for = [run_data_future]
-        logger.info(
+        logger.debug(
             "dbt Cloud job run with ID %i has status %s. Waiting for %i seconds.",
             run_id,
             DbtCloudJobRunStatus(run_status_code).name,

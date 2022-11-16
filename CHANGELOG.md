@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.5
+
+Released on November 16th, 2022.
+
+### Changed
+
+- Changed log level of dbt Cloud job run status polling from info to debug - [#95](https://github.com/PrefectHQ/prefect-dbt/pull/95)
+
 ## 0.2.4
 
 Released on October 26th, 2022.
