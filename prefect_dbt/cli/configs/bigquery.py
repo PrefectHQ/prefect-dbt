@@ -110,8 +110,12 @@ class BigQueryTargetConfigs(TargetConfigs):
             google_credentials = (
                 self_copy.credentials.get_credentials_from_service_account()
             )
-            for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
-                configs_json[key] = getattr(google_credentials, key)
+            try:
+                for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
+                    configs_json[key] = getattr(google_credentials, key)
+            except AttributeError:
+                if hasattr(google_credentials, "token"):
+                    configs_json["token"] = google_credentials.token
 
         if "project" not in configs_json:
             raise ValueError(
