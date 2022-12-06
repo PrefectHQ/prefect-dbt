@@ -1,6 +1,8 @@
 """Module containing models for BigQuery configs"""
 from typing import Any, Dict, Optional
 
+import google
+
 try:
     from typing import Literal
 except ImportError:
@@ -111,6 +113,9 @@ class BigQueryTargetConfigs(TargetConfigs):
                 self_copy.credentials.get_credentials_from_service_account()
             )
             if hasattr(google_credentials, "token"):
+                configs_json["method"] = "oauth-secrets"
+                request = google.auth.transport.requests.Request()
+                google_credentials.refresh(request)
                 configs_json["token"] = google_credentials.token
             else:
                 for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
