@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.6
+
+Released on December 7th, 2022.
+
+### Fixed
+
+- Using the `oauth-secrets` method in `BigQueryTargetConfigs` - [#98](https://github.com/PrefectHQ/prefect-dbt/pull/98)
+
 ## 0.2.5
 
 Released on November 16th, 2022.
