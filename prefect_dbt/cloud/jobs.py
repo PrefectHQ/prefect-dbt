@@ -1,11 +1,18 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
+import asyncio
 import shlex
+import time
+from abc import ABC
 from json import JSONDecodeError
 from typing import Any, Dict, Optional
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
+from prefect.blocks.core import Block
 from prefect.context import FlowRunContext
+from prefect.exceptions import MissingContextError
+from prefect.logging import get_logger
+from prefect.utilities.asyncutils import sync_compatible
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
@@ -13,6 +20,7 @@ from prefect_dbt.cloud.runs import (
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
     DbtCloudJobRunStatus,
+    DbtCloudJobRunTimedOut,
     DbtCloudListRunArtifactsFailed,
     get_dbt_cloud_run_artifact,
     get_dbt_cloud_run_info,
@@ -630,3 +638,134 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         poll_frequency_seconds=poll_frequency_seconds,
     )
     return run_data
+
+
+class DbtCloudJob(Block, ABC):
+    """
+    placeholder
+    """
+
+    _block_schema_capabilities = [
+        "trigger-job",
+        "wait-for-job-completion",
+        "fetch-job-results",
+    ]
+
+    dbt_cloud_credentials: DbtCloudCredentials
+
+    @property
+    def logger(self):
+        try:
+            return get_run_logger()
+        except MissingContextError:
+            return get_logger()
+
+    @sync_compatible
+    async def trigger(self, job_id, **trigger_job_run_options):
+        """
+        placeholder
+        """
+        triggered_run_data_future = await trigger_dbt_cloud_job_run.submit(
+            dbt_cloud_credentials=self.dbt_cloud_credentials,
+            job_id=job_id,
+            options=trigger_job_run_options,
+        )
+        run_id = (await triggered_run_data_future.result()).get("id")
+        self.logger.info("Triggered job {job_id!r} with run ID {run_id!r}")
+        return run_id
+
+    @sync_compatible
+    async def wait_for_completion(
+        self, run_id, max_wait_seconds, poll_frequency_seconds
+    ):
+        """
+        placeholder
+        """
+        wait_for = []
+        start_time = time.time()
+        last_run_status_code = run_status_code = None
+        while not DbtCloudJobRunStatus.is_terminal_status_code(run_status_code):
+            # get status info
+            run_data_future = await get_dbt_cloud_run_info.submit(
+                dbt_cloud_credentials=self.dbt_cloud_credentials,
+                run_id=run_id,
+                wait_for=wait_for,
+            )
+            run_data = await run_data_future.result()
+            run_status_code = run_data.get("status")
+            wait_for = [run_data_future]
+
+            # report new status
+            if run_status_code != last_run_status_code:
+                self.logger.info(
+                    "dbt Cloud job run with ID %i has new status %s.",
+                    run_id,
+                    DbtCloudJobRunStatus(run_status_code).name,
+                    poll_frequency_seconds,
+                )
+                last_run_status_code = run_status_code
+
+            # check for timeout
+            elapsed_time_seconds = time.time() - start_time
+            if elapsed_time_seconds > max_wait_seconds:
+                raise DbtCloudJobRunTimedOut(
+                    f"Max wait time of {max_wait_seconds} seconds exceeded "
+                    "while waiting for job run with ID {run_id}"
+                )
+
+            await asyncio.sleep(poll_frequency_seconds)
+
+    @sync_compatible
+    async def fetch_results(self, run_id):
+        """
+        placeholder
+        """
+        run_data_future = await get_dbt_cloud_run_info.submit(
+            dbt_cloud_credentials=self.dbt_cloud_credentials,
+            run_id=run_id,
+        )
+        run_data = await run_data_future.result()
+        run_status_code = run_data.get("status")
+        if run_status_code == DbtCloudJobRunStatus.SUCCESS:
+            try:
+                list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
+                    dbt_cloud_credentials=self.dbt_cloud_credentials,
+                    run_id=run_id,
+                )
+                run_data["artifact_paths"] = await list_run_artifacts_future.result()
+            except DbtCloudListRunArtifactsFailed as ex:
+                self.logger.warning(
+                    "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
+                    run_id,
+                    ex,
+                )
+            self.logger.info(
+                "dbt Cloud job run with ID %s completed successfully!",
+                run_id,
+            )
+            return run_data
+        elif run_status_code == DbtCloudJobRunStatus.CANCELLED:
+            raise DbtCloudJobRunCancelled(
+                f"Triggered job run with ID {run_id} was cancelled."
+            )
+        elif run_status_code == DbtCloudJobRunStatus.FAILED:
+            # while retry_filtered_models_attempts > 0:
+            #     self.logger.info(
+            #         f"Retrying job run with ID: {run_id} "
+            #         f"{retry_filtered_models_attempts} more times"
+            #     )
+            #     try:
+            #         retry_filtered_models_attempts -= 1
+            #         run_data = await (
+            #             retry_dbt_cloud_job_run_subset_and_wait_for_completion(
+            #                 dbt_cloud_credentials=dbt_cloud_credentials,
+            #                 run_id=run_id,
+            #                 trigger_job_run_options=trigger_job_run_options,
+            #                 max_wait_seconds=max_wait_seconds,
+            #                 poll_frequency_seconds=poll_frequency_seconds,
+            #             )
+            #         )
+            #         return run_data
+            #     except Exception:
+            #         pass
+            raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
