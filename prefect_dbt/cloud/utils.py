@@ -44,8 +44,6 @@ def extract_developer_message(ex: HTTPStatusError) -> Optional[str]:
 class DbtCloudAdministrativeApiCallFailed(Exception):
     """Raised when a call to dbt Cloud administrative API fails."""
 
-    pass
-
 
 @task(
     name="Call dbt Cloud administrative API endpoint",
