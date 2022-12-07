@@ -6,6 +6,8 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
+from prefect.utilities.asyncutils import sync_compatible
+
 from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
 
 try:
@@ -84,7 +86,8 @@ class BigQueryTargetConfigs(TargetConfigs):
     project: Optional[str] = None
     credentials: GcpCredentials
 
-    def get_configs(self) -> Dict[str, Any]:
+    @sync_compatible
+    async def get_configs(self) -> Dict[str, Any]:
         """
         Returns the dbt configs specific to BigQuery profile.
 
@@ -106,12 +109,16 @@ class BigQueryTargetConfigs(TargetConfigs):
             configs_json["method"] = "service-account"
             configs_json["keyfile"] = str(configs_json.pop("service_account_file"))
         else:
+            configs_json["method"] = "oauth-secrets"
             # through gcloud application-default login
             google_credentials = (
                 self_copy.credentials.get_credentials_from_service_account()
             )
-            for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
-                configs_json[key] = getattr(google_credentials, key)
+            if hasattr(google_credentials, "token"):
+                configs_json["token"] = await self_copy.credentials.get_access_token()
+            else:
+                for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
+                    configs_json[key] = getattr(google_credentials, key)
 
         if "project" not in configs_json:
             raise ValueError(

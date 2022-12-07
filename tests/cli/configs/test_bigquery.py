@@ -1,5 +1,5 @@
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, seal
 
 import pytest
 from prefect_gcp.credentials import GcpCredentials
@@ -36,12 +36,9 @@ def service_account_file(monkeypatch, tmp_path, service_account_info_dict):
 
 @pytest.fixture
 def google_auth(monkeypatch):
-    google_auth_mock = MagicMock()
+    google_auth_mock = MagicMock(name="google_auth")
     default_credentials_mock = MagicMock(
-        refresh_token="my_refresh_token",
-        token_uri="my_token_uri",
-        client_id="my_client_id",
-        client_secret="my_client_secret",
+        name="default_credentials",
         quota_project_id="my_project",
     )
     google_auth_mock.default.side_effect = lambda *args, **kwargs: (
@@ -85,13 +82,24 @@ class TestBigQueryTargetConfigs:
         }
         assert actual == expected
 
-    def test_get_configs_gcloud_cli(self, google_auth):
+    def test_get_configs_gcloud_cli_refresh_token(self, google_auth):
         gcp_credentials = GcpCredentials()
         configs = BigQueryTargetConfigs(
             credentials=gcp_credentials, project="my_project", schema="my_schema"
         )
+        google_credentials = MagicMock(
+            refresh_token="my_refresh_token",
+            token_uri="my_token_uri",
+            client_id="my_client_id",
+            client_secret="my_client_secret",
+        )
+        seal(google_credentials)
+        gcp_credentials.get_credentials_from_service_account = (
+            lambda: google_credentials
+        )
         actual = configs.get_configs()
         expected = {
+            "method": "oauth-secrets",
             "type": "bigquery",
             "schema": "my_schema",
             "threads": 4,
@@ -100,6 +108,29 @@ class TestBigQueryTargetConfigs:
             "token_uri": "my_token_uri",
             "client_id": "my_client_id",
             "client_secret": "my_client_secret",
+        }
+        assert actual == expected
+
+    def test_get_configs_gcloud_cli_temporary_token(self, google_auth):
+        gcp_credentials = GcpCredentials()
+        configs = BigQueryTargetConfigs(
+            credentials=gcp_credentials, project="my_project", schema="my_schema"
+        )
+        google_credentials = MagicMock(
+            token="my_token", refresh=lambda *args, **kwargs: "refreshed"
+        )
+        seal(google_credentials)
+        gcp_credentials.get_credentials_from_service_account = (
+            lambda: google_credentials
+        )
+        actual = configs.get_configs()
+        expected = {
+            "method": "oauth-secrets",
+            "type": "bigquery",
+            "schema": "my_schema",
+            "threads": 4,
+            "project": "my_project",
+            "token": "my_token",
         }
         assert actual == expected
 
