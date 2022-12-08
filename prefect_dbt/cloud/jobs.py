@@ -2,7 +2,6 @@
 import asyncio
 import shlex
 import time
-from abc import ABC
 from json import JSONDecodeError
 from typing import Any, Dict, Optional
 
@@ -641,21 +640,17 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     return run_data
 
 
-class DbtCloudJob(Block, ABC):
+class DbtCloudJob(Block):
     """
     placeholder
     """
 
     _block_schema_capabilities = [
         "trigger-job",
-        "wait-for-job-completion",
-        "fetch-job-results",
     ]
 
     dbt_cloud_credentials: DbtCloudCredentials
     job_id: int
-    max_wait_seconds: int
-    poll_frequency_seconds: int
 
     @property
     def logger(self):
@@ -683,21 +678,10 @@ class DbtCloudJob(Block, ABC):
 
         run_data = response.json()["data"]
         run_id = run_data.get("id")
-        self.logger.info("Job run has ID {run_id!r}")
-        return run_id
-
-    @sync_compatible
-    async def get_run(self, run_id):
-        """
-        placeholder
-        """
-        try:
-            async with self.dbt_cloud_credentials.get_administrative_client() as client:
-                response = await client.get_run(run_id=run_id)
-        except HTTPStatusError as ex:
-            raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
-        run_data = response.json()["data"]
-        return run_data
+        run = DbtCloudJobRun(
+            dbt_cloud_credentials=self.dbt_cloud_credentials, run_id=run_id
+        )
+        return run
 
     @sync_compatible
     async def get_job(self, order_by: Optional[str] = None):
@@ -713,77 +697,6 @@ class DbtCloudJob(Block, ABC):
         except HTTPStatusError as ex:
             raise DbtCloudGetJobFailed(extract_user_message(ex)) from ex
         return response.json()["data"]
-
-    @sync_compatible
-    async def get_status(self, run_id) -> int:
-        """
-        placeholder
-        """
-        run_data = self.get_run_data(run_id)
-        run_status_code = run_data.get("status")
-        return run_status_code
-
-    def terminal_state_reached(self, run_status_code) -> bool:
-        return DbtCloudJobRunStatus.is_terminal_status_code(run_status_code)
-
-    @sync_compatible
-    async def wait_for_completion(self, run_id):
-        """
-        placeholder
-        """
-        start_time = time.time()
-        last_run_status_code = run_status_code = None
-        while not self.terminal_state_reached(run_status_code):
-            # get status info
-            run_status_code = self.get_status(run_id)
-            if run_status_code != last_run_status_code:
-                self.logger.info(
-                    "dbt Cloud job run with ID %i has new status %s.",
-                    run_id,
-                    DbtCloudJobRunStatus(run_status_code).name,
-                    self.poll_frequency_seconds,
-                )
-                last_run_status_code = run_status_code
-            # check for timeout
-            elapsed_time_seconds = time.time() - start_time
-            if elapsed_time_seconds > self.max_wait_seconds:
-                raise DbtCloudJobRunTimedOut(
-                    f"Max wait time of {self.max_wait_seconds} seconds exceeded "
-                    "while waiting for job run with ID {run_id}"
-                )
-            await asyncio.sleep(self.poll_frequency_seconds)
-
-    @sync_compatible
-    async def fetch_results(self, run_id):
-        """
-        placeholder
-        """
-        run_data = await self.get_run(run_id)
-        run_status_code = run_data.get("status")
-        if run_status_code == DbtCloudJobRunStatus.SUCCESS:
-            try:
-                list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
-                    dbt_cloud_credentials=self.dbt_cloud_credentials,
-                    run_id=run_id,
-                )
-                run_data["artifact_paths"] = await list_run_artifacts_future.result()
-            except DbtCloudListRunArtifactsFailed as ex:
-                self.logger.warning(
-                    "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
-                    run_id,
-                    ex,
-                )
-            self.logger.info(
-                "dbt Cloud job run with ID %s completed successfully!",
-                run_id,
-            )
-            return run_data
-        elif run_status_code == DbtCloudJobRunStatus.CANCELLED:
-            raise DbtCloudJobRunCancelled(
-                f"Triggered job run with ID {run_id} was cancelled."
-            )
-        elif run_status_code == DbtCloudJobRunStatus.FAILED:
-            raise DbtCloudJobRunFailed(f"Triggered job run with ID: {run_id} failed.")
 
     async def retry_subset(self, run_id, **trigger_job_run_options):
         """
@@ -804,3 +717,112 @@ class DbtCloudJob(Block, ABC):
             trigger_job_run_options=trigger_job_run_options_override,
         )
         return run_id
+
+
+class DbtCloudJobRun(object):  # NOT A BLOCK
+    """
+    placeholder
+    """
+
+    dbt_cloud_credentials: DbtCloudCredentials
+    run_id: int
+
+    @property
+    def logger(self):
+        """
+        placeholder
+        """
+        try:
+            return get_run_logger()
+        except MissingContextError:
+            return get_logger()
+
+    @sync_compatible
+    async def get_run(self, run_id):
+        """
+        placeholder
+        """
+        try:
+            async with self.dbt_cloud_credentials.get_administrative_client() as client:
+                response = await client.get_run(run_id=run_id)
+        except HTTPStatusError as ex:
+            raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
+        run_data = response.json()["data"]
+        return run_data
+
+    # can properties be async?
+    @sync_compatible
+    async def get_status(self, run_id) -> int:
+        """
+        placeholder
+        """
+        run_data = self.get_run_data(run_id)
+        run_status_code = run_data.get("status")
+        return run_status_code
+
+    # should this be a property
+    def terminal_state_reached(self, run_status_code) -> bool:
+        return DbtCloudJobRunStatus.is_terminal_status_code(run_status_code)
+
+    @sync_compatible
+    async def wait_for_completion(
+        self, max_wait_seconds: int, poll_frequency_seconds: int
+    ):
+        """
+        placeholder
+        """
+        start_time = time.time()
+        last_run_status_code = run_status_code = None
+        while not self.terminal_state_reached(run_status_code):
+            # get status info
+            run_status_code = self.get_status(self.run_id)
+            if run_status_code != last_run_status_code:
+                self.logger.info(
+                    "dbt Cloud job run with ID %i has new status %s.",
+                    self.run_id,
+                    DbtCloudJobRunStatus(run_status_code).name,
+                    self.poll_frequency_seconds,
+                )
+                last_run_status_code = run_status_code
+            # check for timeout
+            elapsed_time_seconds = time.time() - start_time
+            if elapsed_time_seconds > max_wait_seconds:
+                raise DbtCloudJobRunTimedOut(
+                    f"Max wait time of {max_wait_seconds} seconds exceeded "
+                    "while waiting for job run with ID {self.run_id}"
+                )
+            await asyncio.sleep(self.poll_frequency_seconds)
+
+    @sync_compatible
+    async def fetch_results(self):
+        """
+        placeholder
+        """
+        run_data = await self.get_run(self.run_id)
+        run_status_code = run_data.get("status")
+        if run_status_code == DbtCloudJobRunStatus.SUCCESS:
+            try:
+                list_run_artifacts_future = await list_dbt_cloud_run_artifacts.submit(
+                    dbt_cloud_credentials=self.dbt_cloud_credentials,
+                    run_id=self.run_id,
+                )
+                run_data["artifact_paths"] = await list_run_artifacts_future.result()
+            except DbtCloudListRunArtifactsFailed as ex:
+                self.logger.warning(
+                    "Unable to retrieve artifacts for job run with ID %s. Reason: %s",
+                    self.run_id,
+                    ex,
+                )
+            self.logger.info(
+                "dbt Cloud job run with ID %s completed successfully!",
+                self.run_id,
+            )
+            return run_data
+        elif run_status_code == DbtCloudJobRunStatus.CANCELLED:
+            raise DbtCloudJobRunCancelled(
+                f"Triggered job run with ID {self.run_id} was cancelled."
+            )
+        elif run_status_code == DbtCloudJobRunStatus.FAILED:
+            raise DbtCloudJobRunFailed(
+                f"Triggered job run with ID: {self.run_id} failed."
+            )
