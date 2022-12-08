@@ -654,6 +654,8 @@ class DbtCloudJob(Block, ABC):
 
     dbt_cloud_credentials: DbtCloudCredentials
     job_id: int
+    max_wait_seconds: int
+    poll_frequency_seconds: int
 
     @property
     def logger(self):
@@ -725,9 +727,7 @@ class DbtCloudJob(Block, ABC):
         return DbtCloudJobRunStatus.is_terminal_status_code(run_status_code)
 
     @sync_compatible
-    async def wait_for_completion(
-        self, run_id, max_wait_seconds, poll_frequency_seconds
-    ):
+    async def wait_for_completion(self, run_id):
         """
         placeholder
         """
@@ -741,17 +741,17 @@ class DbtCloudJob(Block, ABC):
                     "dbt Cloud job run with ID %i has new status %s.",
                     run_id,
                     DbtCloudJobRunStatus(run_status_code).name,
-                    poll_frequency_seconds,
+                    self.poll_frequency_seconds,
                 )
                 last_run_status_code = run_status_code
             # check for timeout
             elapsed_time_seconds = time.time() - start_time
-            if elapsed_time_seconds > max_wait_seconds:
+            if elapsed_time_seconds > self.max_wait_seconds:
                 raise DbtCloudJobRunTimedOut(
-                    f"Max wait time of {max_wait_seconds} seconds exceeded "
+                    f"Max wait time of {self.max_wait_seconds} seconds exceeded "
                     "while waiting for job run with ID {run_id}"
                 )
-            await asyncio.sleep(poll_frequency_seconds)
+            await asyncio.sleep(self.poll_frequency_seconds)
 
     @sync_compatible
     async def fetch_results(self, run_id):
