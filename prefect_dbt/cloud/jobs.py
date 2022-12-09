@@ -1,17 +1,15 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
-import asyncio
 import shlex
-import time
 from json import JSONDecodeError
 from typing import Any, Dict, Optional
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
-from prefect.blocks.core import Block
+from prefect.blocks.abstract import JobBlock, JobRun
 from prefect.context import FlowRunContext
-from prefect.exceptions import MissingContextError
-from prefect.logging import get_logger
+from prefect.exceptions import JobRunIsRunning, JobRunTimeoutError
 from prefect.utilities.asyncutils import sync_compatible
+from prefect.utilities.wait import async_wait_until_state
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.models import TriggerJobRunOptions
@@ -38,8 +36,8 @@ class DbtCloudGetJobFailed(Exception):
     """Raised when unable to retrieve dbt Cloud job."""
 
 
-class DbtCloudJobRunIsRunning(Exception):
-    """Raised when dbt Cloud job run is still running."""
+# ^ these should go inside exceptions.py and also
+# inherit from base exception
 
 
 @task(
@@ -464,122 +462,10 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     return run_data
 
 
-class DbtCloudJob(Block):
+class DbtCloudJobRun(JobRun):  # NOT A BLOCK
     """
     placeholder
     """
-
-    _block_schema_capabilities = [
-        "trigger-job",
-    ]
-
-    dbt_cloud_credentials: DbtCloudCredentials
-    job_id: int
-    max_wait_seconds: int = 900
-    poll_frequency_seconds: int = 10
-
-    @property
-    def logger(self):
-        """
-        placeholder
-        """
-        try:
-            return get_run_logger()
-        except MissingContextError:
-            return get_logger()
-
-    @sync_compatible
-    async def trigger(
-        self, trigger_job_run_options: Optional[TriggerJobRunOptions] = None
-    ):
-        """
-        placeholder
-        """
-        try:
-            async with self.dbt_cloud_credentials.get_administrative_client() as client:
-                response = await client.trigger_job_run(
-                    job_id=self.job_id, options=trigger_job_run_options
-                )
-                self.logger.info(f"Triggered job {self.job_id!r}")
-        except HTTPStatusError as ex:
-            raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
-
-        run_data = response.json()["data"]
-        run_id = run_data.get("id")
-        run = DbtCloudJobRun(
-            dbt_cloud_credentials=self.dbt_cloud_credentials,
-            run_id=run_id,
-            poll_frequency_seconds=self.poll_frequency_seconds,
-            max_wait_seconds=self.max_wait_seconds,
-        )
-        return run
-
-    @sync_compatible
-    async def get_job(self, order_by: Optional[str] = None):
-        """
-        placeholder
-        """
-        try:
-            async with self.dbt_cloud_credentials.get_administrative_client() as client:
-                response = await client.get_job(
-                    job_id=self.job_id,
-                    order_by=order_by,
-                )
-        except HTTPStatusError as ex:
-            raise DbtCloudGetJobFailed(extract_user_message(ex)) from ex
-        return response.json()["data"]
-
-    async def trigger_retry(
-        self,
-        run_id: int,
-        trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
-    ):
-        """
-        placeholder
-        """
-        run_info = await self.get_run(run_id=run_id)
-        job_info = await self.get_job()
-
-        trigger_job_run_options_override = await _build_trigger_job_run_options(
-            dbt_cloud_credentials=self.dbt_cloud_credentials,
-            trigger_job_run_options=trigger_job_run_options,
-            run_id=run_id,
-            run_info=run_info,
-            job_info=job_info,
-        )
-
-        run = await self.trigger(
-            trigger_job_run_options=trigger_job_run_options_override,
-        )
-        return run
-
-
-class DbtCloudJobRun(object):  # NOT A BLOCK
-    """
-    placeholder
-    """
-
-    def __init__(
-        self,
-        dbt_cloud_credentials: DbtCloudCredentials,
-        run_id: int,
-        max_wait_seconds: int,
-        poll_frequency_seconds: int,
-    ):
-        self.dbt_cloud_credentials = dbt_cloud_credentials
-        self.run_id = run_id
-        self.max_wait_seconds = max_wait_seconds
-        self.poll_frequency_seconds = poll_frequency_seconds
-
-    @property
-    def logger(self):
-        """
-        placeholder
-        """
-        try:
-            return get_run_logger()
-        except MissingContextError:
-            return get_logger()
 
     @sync_compatible
     async def get_run(self, run_id):
@@ -587,7 +473,7 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
         placeholder
         """
         try:
-            async with self.dbt_cloud_credentials.get_administrative_client() as client:
+            async with self.credentials.get_administrative_client() as client:
                 response = await client.get_run(run_id=run_id)
         except HTTPStatusError as ex:
             raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
@@ -595,7 +481,7 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
         return run_data
 
     @sync_compatible
-    async def get_status(self, run_id) -> int:
+    async def get_status_code(self, run_id) -> int:
         """
         placeholder
         """
@@ -603,49 +489,28 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
         run_status_code = run_data.get("status")
         return run_status_code
 
-    def status_is_terminal(self, run_status_code) -> bool:
-        return DbtCloudJobRunStatus.is_terminal_status_code(run_status_code)
-
     @sync_compatible
-    async def wait_for_completion(
-        self,
-        max_wait_seconds: int = 900,
-        poll_frequency_seconds: int = 10,
-    ):
-        """
-        placeholder
-        """
-        start_time = time.time()
-        last_run_status_code = run_status_code = None
-        while not self.status_is_terminal(run_status_code):
-            # get status info
-            run_status_code = await self.get_status(self.run_id)
-            if run_status_code != last_run_status_code:
-                self.logger.info(
-                    "dbt Cloud job run with ID %i has new status %s.",
-                    self.run_id,
-                    DbtCloudJobRunStatus(run_status_code).name,
-                )
-                last_run_status_code = run_status_code
-            # check for timeout
-            elapsed_time_seconds = time.time() - start_time
-            if elapsed_time_seconds > max_wait_seconds:
-                raise DbtCloudJobRunTimedOut(
-                    f"Max wait time of {max_wait_seconds} seconds exceeded "
-                    "while waiting for job run with ID {self.run_id}"
-                )
-            await asyncio.sleep(poll_frequency_seconds)
+    async def wait_for_completion(self):
+        try:
+            await async_wait_until_state(
+                in_final_state_fn=DbtCloudJobRunStatus.is_terminal_status_code,
+                get_state_fn=self.get_status_code,
+                log_state_fn=DbtCloudJobRunStatus,
+                timeout_seconds=self.timeout_seconds,
+                interval_seconds=self.interval_seconds,
+                logger=self.logger,
+                run_id=self.run_id,
+            )
+        except JobRunTimeoutError as exc:
+            raise DbtCloudJobRunTimedOut from exc
 
     @sync_compatible
     async def fetch_results(self, step: Optional[int] = None):
-        """
-        placeholder
-        """
         run_data = await self.get_run(self.run_id)
         run_status = DbtCloudJobRunStatus(run_data.get("status"))
         if run_status == DbtCloudJobRunStatus.SUCCESS:
             try:
-                async with self.dbt_cloud_credentials.get_administrative_client() as client:  # noqa
+                async with self.credentials.get_administrative_client() as client:  # noqa
                     response = await client.list_run_artifacts(
                         run_id=self.run_id, step=step
                     )
@@ -666,10 +531,75 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
                 f"Triggered job run with ID: {self.run_id} failed."
             )
         else:
-            raise DbtCloudJobRunIsRunning(
+            raise JobRunIsRunning(
                 f"Triggered job run with ID: {self.run_id} is still running; "
                 "use wait_for_completion() to wait for completion before calling fetch."
             )
+
+
+class DbtCloudJob(JobBlock):
+    """
+    placeholder
+    """
+
+    credentials: DbtCloudCredentials
+    timeout_seconds: int = 900
+    interval_seconds: int = 10
+    trigger_job_run_options: Optional[TriggerJobRunOptions] = None
+
+    @sync_compatible
+    async def get_job(self, order_by: Optional[str] = None) -> Dict[str, Any]:
+        try:
+            async with self.credentials.get_administrative_client() as client:
+                response = await client.get_job(
+                    job_id=self.job_id,
+                    order_by=order_by,
+                )
+        except HTTPStatusError as ex:
+            raise DbtCloudGetJobFailed(extract_user_message(ex)) from ex
+
+        return response.json()["data"]
+
+    @sync_compatible
+    async def trigger(self) -> DbtCloudJobRun:
+        try:
+            async with self.credentials.get_administrative_client() as client:
+                response = await client.trigger_job_run(
+                    job_id=self.job_id, options=self.trigger_job_run_options
+                )
+                self.logger.info(f"Triggered job {self.job_id!r}")
+        except HTTPStatusError as ex:
+            raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
+
+        run_data = response.json()["data"]
+        run_id = run_data.get("id")
+        run = DbtCloudJobRun(
+            credentials=self.credentials,
+            run_id=run_id,
+            timeout_seconds=self.timeout_seconds,
+            interval_seconds=self.interval_seconds,
+        )
+        return run
+
+    async def trigger_retry(
+        self,
+        run_id: int,
+    ) -> DbtCloudJobRun:
+        run_info = await self.get_run(run_id=run_id)
+        job_info = await self.get_job()
+
+        trigger_job_run_options_override = await _build_trigger_job_run_options(
+            dbt_cloud_credentials=self.credentials,
+            trigger_job_run_options=self.trigger_job_run_options,
+            run_id=run_id,
+            run_info=run_info,
+            job_info=job_info,
+        )
+
+        run = await self.trigger(
+            trigger_job_run_options=trigger_job_run_options_override,
+        )
+        return run
 
 
 @flow(
@@ -679,7 +609,6 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
 )
 async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_job: DbtCloudJob,
-    trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
     retry_filtered_models_attempts: int = 3,
 ) -> Dict:
     """
@@ -687,7 +616,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     """  # noqa
     logger = get_run_logger()
 
-    run = await dbt_cloud_job.trigger(trigger_job_run_options=trigger_job_run_options)
+    run = await dbt_cloud_job.trigger()
     while retry_filtered_models_attempts > 0:
         try:
             await run.wait_for_completion()
@@ -699,7 +628,5 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
                 f"{retry_filtered_models_attempts} more times"
             )
             run_id = run.run_id
-            run = await dbt_cloud_job.trigger_retry(
-                run_id=run_id, trigger_job_run_options=trigger_job_run_options
-            )
+            run = await dbt_cloud_job.trigger_retry(run_id=run_id)
             retry_filtered_models_attempts -= 1
