@@ -4,6 +4,7 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
+from prefect.utilities.asyncutils import sync_compatible
 from pydantic import BaseModel, Field, SecretBytes, SecretStr
 
 
@@ -61,7 +62,8 @@ class DbtConfigs(Block, abc.ABC):
 
         return configs_json
 
-    def get_configs(self) -> Dict[str, Any]:
+    @sync_compatible
+    async def get_configs(self) -> Dict[str, Any]:
         """
         Returns the dbt configs, likely used eventually for writing to profiles.yml.
 
