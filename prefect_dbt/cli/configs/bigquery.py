@@ -115,7 +115,7 @@ class BigQueryTargetConfigs(TargetConfigs):
                 self_copy.credentials.get_credentials_from_service_account()
             )
             if hasattr(google_credentials, "token"):
-                configs_json["token"] = await self_copy.credentials.get_access_token()
+                configs_json["token"] = google_credentials.token
             else:
                 for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
                     configs_json[key] = getattr(google_credentials, key)
