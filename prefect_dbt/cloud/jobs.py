@@ -680,7 +680,7 @@ class DbtCloudJobRun(object):  # NOT A BLOCK
 async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     dbt_cloud_job: DbtCloudJob,
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None,
-    retry_filtered_models_attempts: int = 3,  # TODO: implement this
+    retry_filtered_models_attempts: int = 3,
 ) -> Dict:
     """
     Flow that triggers a job run and waits for the triggered run to complete.
@@ -688,9 +688,9 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
     logger = get_run_logger()
 
     run = await dbt_cloud_job.trigger(trigger_job_run_options=trigger_job_run_options)
-    await run.wait_for_completion()
     while retry_filtered_models_attempts > 0:
         try:
+            await run.wait_for_completion()
             result = await run.fetch_results()
             return result
         except DbtCloudJobRunFailed:
