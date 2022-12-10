@@ -282,6 +282,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         import asyncio
         from prefect_dbt.cloud import DbtCloudCredentials
         from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+
         asyncio.run(
             trigger_dbt_cloud_job_run_and_wait_for_completion(
                 dbt_cloud_credentials=DbtCloudCredentials(
@@ -298,6 +299,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         from prefect import flow
         from prefect_dbt.cloud import DbtCloudCredentials
         from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+
         @flow
         def my_flow():
             ...
@@ -309,6 +311,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
                 job_id=1
             )
             ...
+
         my_flow()
         ```
 
@@ -318,6 +321,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         from prefect_dbt.cloud import DbtCloudCredentials
         from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
         from prefect_dbt.cloud.models import TriggerJobRunOptions
+
         asyncio.run(
             trigger_dbt_cloud_job_run_and_wait_for_completion(
                 dbt_cloud_credentials=DbtCloudCredentials(
