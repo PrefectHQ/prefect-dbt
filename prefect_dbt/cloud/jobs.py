@@ -6,7 +6,7 @@ import shlex
 import time
 from contextlib import asynccontextmanager
 from json import JSONDecodeError
-from typing import Any, Awaitable, Callable, Dict, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
@@ -257,6 +257,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
 ) -> Dict:
     """
     Flow that triggers a job run and waits for the triggered run to complete.
+
     Args:
         dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
         job_id: The ID of the job to trigger.
@@ -266,12 +267,15 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
         retry_filtered_models_attempts: Number of times to retry models selected by `retry_status_filters`.
+
     Raises:
         DbtCloudJobRunCancelled: The triggered dbt Cloud job run was cancelled.
         DbtCloudJobRunFailed: The triggered dbt Cloud job run failed.
         RuntimeError: The triggered dbt Cloud job run ended in an unexpected state.
+
     Returns:
         The run data returned by the dbt Cloud administrative API.
+
     Examples:
         Trigger a dbt Cloud job and wait for completion as a stand alone flow:
         ```python
@@ -288,6 +292,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             )
         )
         ```
+
         Trigger a dbt Cloud job and wait for completion as a sub-flow:
         ```python
         from prefect import flow
@@ -306,6 +311,7 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
             ...
         my_flow()
         ```
+
         Trigger a dbt Cloud job with overrides:
         ```python
         import asyncio
@@ -842,6 +848,46 @@ class DbtCloudJob(JobBlock):
                 artifact_contents = response.text
             return artifact_contents
 
+        def _select_unsuccessful_commands(
+            run_results: List[Dict[str, Any]],
+            command_components: List[str],
+            command: str,
+            exe_command: str,
+        ) -> List[str]:
+            """
+            Select nodes that were not successful and rebuild a command.
+            """
+            # note "fail" here instead of "cancelled" because
+            # nodes do not have a cancelled state
+            run_nodes = " ".join(
+                run_result["unique_id"].split(".")[2]
+                for run_result in run_results
+                if run_result["status"] in ("error", "skipped", "fail")
+            )
+
+            select_arg = None
+            if "-s" in command_components:
+                select_arg = "-s"
+            elif "--select" in command_components:
+                select_arg = "--select"
+
+            # prevent duplicate --select/-s statements
+            if select_arg is not None:
+                # dbt --fail-fast run, -s, bad_mod --vars '{"env": "prod"}' to:
+                # dbt --fail-fast run -s other_mod bad_mod --vars '{"env": "prod"}'
+                command_start, select_arg, command_end = command.partition(select_arg)
+                modified_command = (
+                    f"{command_start} {select_arg} {run_nodes} {command_end}"  # noqa
+                )
+            else:
+                # dbt --fail-fast, build, --vars '{"env": "prod"}' to:
+                # dbt --fail-fast build --select bad_model --vars '{"env": "prod"}'
+                dbt_global_args, exe_command, exe_args = command.partition(exe_command)
+                modified_command = (
+                    f"{dbt_global_args} {exe_command} -s {run_nodes} {exe_args}"
+                )
+            return modified_command
+
         async def _build_trigger_job_run_options(
             self,
             job: Dict[str, Any],
@@ -915,36 +961,12 @@ class DbtCloudJob(JobBlock):
                         # we only need to find the individual nodes
                         # for those run commands
                         run_results = run_artifact["results"]
-                        # select nodes that were not successful
-                        # note "fail" here instead of "cancelled" because
-                        # nodes do not have a cancelled state
-                        run_nodes = " ".join(
-                            run_result["unique_id"].split(".")[2]
-                            for run_result in run_results
-                            if run_result["status"] in ("error", "skipped", "fail")
+                        modified_command = self._select_unsuccessful_commands(
+                            run_results=run_results,
+                            command_components=command_components,
+                            command=command,
+                            exe_command=exe_command,
                         )
-
-                        select_arg = None
-                        if "-s" in command_components:
-                            select_arg = "-s"
-                        elif "--select" in command_components:
-                            select_arg = "--select"
-
-                        # prevent duplicate --select/-s statements
-                        if select_arg is not None:
-                            # dbt --fail-fast run, -s, bad_mod --vars '{"env": "prod"}' to:  # noqa
-                            # dbt --fail-fast run -s other_mod bad_mod --vars '{"env": "prod"}'  # noqa
-                            command_start, select_arg, command_end = command.partition(
-                                select_arg
-                            )
-                            modified_command = f"{command_start} {select_arg} {run_nodes} {command_end}"  # noqa
-                        else:
-                            # dbt --fail-fast, build, --vars '{"env": "prod"}' to:
-                            # dbt --fail-fast build --select bad_model --vars '{"env": "prod"}'  # noqa
-                            dbt_global_args, exe_command, exe_args = command.partition(
-                                exe_command
-                            )
-                            modified_command = f"{dbt_global_args} {exe_command} -s {run_nodes} {exe_args}"  # noqa
                         steps_override.append(modified_command)
 
             if self._dbt_cloud_job.trigger_job_run_options is None:
