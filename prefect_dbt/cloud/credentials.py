@@ -59,7 +59,7 @@ class DbtCloudCredentials(Block):
     account_id: int
     domain: str = "cloud.getdbt.com"
 
-    def get_administrative_client(self):
+    def get_administrative_client(self) -> DbtCloudAdministrativeClient:
         """
         Returns a newly instantiated client for working with the dbt Cloud
         administrative API.

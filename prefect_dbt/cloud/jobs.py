@@ -6,7 +6,7 @@ import shlex
 import time
 from contextlib import asynccontextmanager
 from json import JSONDecodeError
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional, Union
 
 from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
@@ -16,6 +16,7 @@ from prefect.exceptions import JobRunIsRunning
 from prefect.utilities.asyncutils import sync_compatible
 from typing_extensions import Literal
 
+from prefect_dbt.cloud.clients import DbtCloudAdministrativeClient
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.exceptions import (
     DbtCloudGetJobFailed,
@@ -719,12 +720,12 @@ class DbtCloudJob(JobBlock):
                 await asyncio.sleep(interval_seconds)
 
         @asynccontextmanager
-        def _get_client(self):
-            """Something to reduce the line length."""
+        def _get_client(self) -> DbtCloudAdministrativeClient:
+            """Helper method to reduce the line length."""
             yield self._dbt_cloud_credentials.get_administrative_client()
 
         @sync_compatible
-        async def get_run(self, run_id):
+        async def get_run(self, run_id) -> Dict[str, Any]:
             """
             Makes a request to the dbt Cloud API to get the run data.
 
@@ -758,7 +759,7 @@ class DbtCloudJob(JobBlock):
             return run_status_code
 
         @sync_compatible
-        async def wait_for_completion(self):
+        async def wait_for_completion(self) -> None:
             """
             Waits for the job run to reach a terminal state.
             """
@@ -771,10 +772,16 @@ class DbtCloudJob(JobBlock):
             )
 
         @sync_compatible
-        async def fetch_results(self, step: Optional[int] = None):
+        async def fetch_results(self, step: Optional[int] = None) -> Dict[str, Any]:
             """
             Gets the results from the job run. Since the results
             may not be ready, use wait_for_completion before calling this method.
+
+            Args:
+                step: The index of the step in the run to query for artifacts. The
+                    first step in the run has the index 1. If the step parameter is
+                    omitted, then this method will return the artifacts compiled
+                    for the last step in the run.
             """
             run_data = await self.get_run(self.run_id)
             run_status = DbtCloudJobRunStatus(run_data.get("status"))
@@ -806,13 +813,11 @@ class DbtCloudJob(JobBlock):
             self,
             path: Literal["manifest.json", "catalog.json", "run_results.json"],
             step: Optional[int] = None,
-        ):
+        ) -> Union[Dict[str, Any], str]:
             """
             Get an artifact generated for a completed run.
 
             Args:
-                dbt_cloud_credentials: Credentials for authenticating with dbt Cloud.
-                run_id: The ID of the run to list run artifacts for.
                 path: The relative path to the run artifact.
                 step: The index of the step in the run to query for artifacts. The
                     first step in the run has the index 1. If the step parameter is
@@ -841,7 +846,7 @@ class DbtCloudJob(JobBlock):
             self,
             job: Dict[str, Any],
             run: Dict[str, Any],
-        ):
+        ) -> TriggerJobRunOptions:
             """
             Compiles a list of steps (commands) to retry, then either build trigger job
             run options from scratch if it does not exist, else overrides the existing.
@@ -1038,7 +1043,7 @@ class DbtCloudJob(JobBlock):
 async def trigger_wait_retry_dbt_cloud_job_run(
     dbt_cloud_job: DbtCloudJob,
     targeted_retries: int = 3,
-) -> Dict:
+) -> Dict[str, Any]:
     """
     Flow that triggers and waits for a dbt Cloud job run, retrying a
     subset of failed nodes if necessary.
