@@ -2,6 +2,7 @@
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
+from prefect.utilities.asyncutils import is_async_fn, sync_compatible
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 
@@ -97,18 +98,24 @@ class DbtCliProfile(Block):
     target_configs: TargetConfigs
     global_configs: Optional[GlobalConfigs] = None
 
-    def get_profile(self) -> Dict[str, Any]:
+    @sync_compatible
+    async def get_profile(self) -> Dict[str, Any]:
         """
         Returns the dbt profile, likely used for writing to profiles.yml.
 
         Returns:
             A JSON compatible dictionary with the expected format of profiles.yml.
         """
+        get_configs = self.target_configs.get_configs
+        if is_async_fn(get_configs):
+            target_configs = await get_configs()
+        else:
+            target_configs = get_configs()
         profile = {
             "config": self.global_configs.get_configs() if self.global_configs else {},
             self.name: {
                 "target": self.target,
-                "outputs": {self.target: self.target_configs.get_configs()},
+                "outputs": {self.target: target_configs},
             },
         }
         return profile
