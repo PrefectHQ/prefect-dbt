@@ -1,11 +1,16 @@
 """Module containing credentials for interacting with dbt Cloud"""
-from prefect.blocks.core import Block
-from pydantic import SecretStr
+from typing import Literal
 
-from prefect_dbt.cloud.clients import DbtCloudAdministrativeClient
+from prefect.blocks.abstract import CredentialsBlock
+from pydantic import Field, SecretStr
+
+from prefect_dbt.cloud.clients import (
+    DbtCloudAdministrativeClient,
+    DbtCloudMetadataClient,
+)
 
 
-class DbtCloudCredentials(Block):
+class DbtCloudCredentials(CredentialsBlock):
     """
     Credentials block for credential use across dbt Cloud tasks and flows.
 
@@ -55,9 +60,18 @@ class DbtCloudCredentials(Block):
     _block_type_name = "dbt Cloud Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
 
-    api_key: SecretStr
-    account_id: int
-    domain: str = "cloud.getdbt.com"
+    api_key: SecretStr = Field(
+        default=...,
+        title="API Key",
+        description="A dbt Cloud API key to use for authentication.",
+    )
+    account_id: int = Field(
+        default=..., title="Account ID", description="The ID of your dbt Cloud account."
+    )
+    domain: str = Field(
+        default="cloud.getdbt.com",
+        description="The base domain of your dbt Cloud instance.",
+    )
 
     def get_administrative_client(self):
         """
@@ -69,3 +83,22 @@ class DbtCloudCredentials(Block):
             account_id=self.account_id,
             domain=self.domain,
         )
+
+    def get_metadata_client(self):
+        """
+        Returns a newly instantiated client for working with the dbt Cloud
+        metadata API.
+        """
+        return DbtCloudMetadataClient(
+            api_key=self.api_key.get_secret_value(),
+            domain=f"metadata.{self.domain}",
+        )
+
+    def get_client(self, client_type: Literal["administrative", "meatadata"]):
+        """
+        Returns a newly instantiated client for working with the dbt Cloud API.
+        """
+        get_client_method = getattr(self, f"get_{client_type}_client", None)
+        if get_client_method is None:
+            raise ValueError(f"'{client_type}' is not a supported client type.")
+        return get_client_method()
