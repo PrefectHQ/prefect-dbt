@@ -102,30 +102,30 @@ class DbtCloudCredentials(CredentialsBlock):
             metadata_client = credentials_block.get_metadata_client()
             query = \"\"\"
             {
-            metrics(jobId: 123) {
-                uniqueId
-                name
-                packageName
-                tags
-                label
-                runId
-                description
-                type
-                sql
-                timestamp
-                timeGrains
-                dimensions
-                meta
-                resourceType
-                filters {
-                field
-                operator
-                value
+                metrics(jobId: 123) {
+                    uniqueId
+                    name
+                    packageName
+                    tags
+                    label
+                    runId
+                    description
+                    type
+                    sql
+                    timestamp
+                    timeGrains
+                    dimensions
+                    meta
+                    resourceType
+                    filters {
+                        field
+                        operator
+                        value
+                    }
+                    model {
+                        name
+                    }
                 }
-                model {
-                name
-                }
-            }
             }
             \"\"\"
             metadata_client.query(query)
