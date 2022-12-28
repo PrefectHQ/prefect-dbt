@@ -1,11 +1,17 @@
 """Module containing credentials for interacting with dbt Cloud"""
-from prefect.blocks.core import Block
-from pydantic import SecretStr
+from typing import Union
 
-from prefect_dbt.cloud.clients import DbtCloudAdministrativeClient
+from prefect.blocks.abstract import CredentialsBlock
+from pydantic import Field, SecretStr
+from typing_extensions import Literal
+
+from prefect_dbt.cloud.clients import (
+    DbtCloudAdministrativeClient,
+    DbtCloudMetadataClient,
+)
 
 
-class DbtCloudCredentials(Block):
+class DbtCloudCredentials(CredentialsBlock):
     """
     Credentials block for credential use across dbt Cloud tasks and flows.
 
@@ -55,17 +61,123 @@ class DbtCloudCredentials(Block):
     _block_type_name = "dbt Cloud Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
 
-    api_key: SecretStr
-    account_id: int
-    domain: str = "cloud.getdbt.com"
+    api_key: SecretStr = Field(
+        default=...,
+        title="API Key",
+        description="A dbt Cloud API key to use for authentication.",
+    )
+    account_id: int = Field(
+        default=..., title="Account ID", description="The ID of your dbt Cloud account."
+    )
+    domain: str = Field(
+        default="cloud.getdbt.com",
+        description="The base domain of your dbt Cloud instance.",
+    )
 
-    def get_administrative_client(self):
+    def get_administrative_client(self) -> DbtCloudAdministrativeClient:
         """
         Returns a newly instantiated client for working with the dbt Cloud
         administrative API.
+
+        Returns:
+            An authenticated dbt Cloud administrative API client.
         """
         return DbtCloudAdministrativeClient(
             api_key=self.api_key.get_secret_value(),
             account_id=self.account_id,
             domain=self.domain,
         )
+
+    def get_metadata_client(self) -> DbtCloudMetadataClient:
+        """
+        Returns a newly instantiated client for working with the dbt Cloud
+        metadata API.
+
+        Example:
+            Sending queries via the returned metadata client:
+            ```python
+            from prefect_dbt import DbtCloudCredentials
+
+            credentials_block = DbtCloudCredentials.load("test-account")
+            metadata_client = credentials_block.get_metadata_client()
+            query = \"\"\"
+            {
+                metrics(jobId: 123) {
+                    uniqueId
+                    name
+                    packageName
+                    tags
+                    label
+                    runId
+                    description
+                    type
+                    sql
+                    timestamp
+                    timeGrains
+                    dimensions
+                    meta
+                    resourceType
+                    filters {
+                        field
+                        operator
+                        value
+                    }
+                    model {
+                        name
+                    }
+                }
+            }
+            \"\"\"
+            metadata_client.query(query)
+            # Result:
+            # {
+            #   "data": {
+            #     "metrics": [
+            #       {
+            #         "uniqueId": "metric.tpch.total_revenue",
+            #         "name": "total_revenue",
+            #         "packageName": "tpch",
+            #         "tags": [],
+            #         "label": "Total Revenue ($)",
+            #         "runId": 108952046,
+            #         "description": "",
+            #         "type": "sum",
+            #         "sql": "net_item_sales_amount",
+            #         "timestamp": "order_date",
+            #         "timeGrains": ["day", "week", "month"],
+            #         "dimensions": ["status_code", "priority_code"],
+            #         "meta": {},
+            #         "resourceType": "metric",
+            #         "filters": [],
+            #         "model": { "name": "fct_orders" }
+            #       }
+            #     ]
+            #   }
+            # }
+            ```
+
+        Returns:
+            An authenticated dbt Cloud metadata API client.
+        """
+        return DbtCloudMetadataClient(
+            api_key=self.api_key.get_secret_value(),
+            domain=f"metadata.{self.domain}",
+        )
+
+    def get_client(
+        self, client_type: Literal["administrative", "metadata"]
+    ) -> Union[DbtCloudAdministrativeClient, DbtCloudMetadataClient]:
+        """
+        Returns a newly instantiated client for working with the dbt Cloud API.
+
+        Args:
+            client_type: Type of client to return. Accepts either 'administrative'
+                or 'metadata'.
+
+        Returns:
+            The authenticated client of the requested type.
+        """
+        get_client_method = getattr(self, f"get_{client_type}_client", None)
+        if get_client_method is None:
+            raise ValueError(f"'{client_type}' is not a supported client type.")
+        return get_client_method()
