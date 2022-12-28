@@ -4,7 +4,7 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel, Field, SecretBytes, SecretStr
+from pydantic import BaseModel, Field, SecretField
 
 
 class DbtConfigs(Block, abc.ABC):
@@ -55,7 +55,7 @@ class DbtConfigs(Block, abc.ABC):
                         f"The keyword, {field_name}, has already been provided in "
                         f"TargetConfigs; remove duplicated keywords to continue"
                     )
-                if isinstance(field_value, (SecretStr, SecretBytes)):
+                if isinstance(field_value, SecretField):
                     field_value = field_value.get_secret_value()
                 configs_json[field_name] = field_value
 
