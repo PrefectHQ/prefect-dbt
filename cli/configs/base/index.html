@@ -871,7 +871,7 @@ an error will be raised.</p></td>
                         <span class="sa">f</span><span class="s2">&quot;The keyword, </span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">, has already been provided in &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;TargetConfigs; remove duplicated keywords to continue&quot;</span>
                     <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="p">(</span><span class="n">SecretStr</span><span class="p">,</span> <span class="n">SecretBytes</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="n">SecretField</span><span class="p">):</span>
                     <span class="n">field_value</span> <span class="o">=</span> <span class="n">field_value</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
                 <span class="n">configs_json</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_value</span>
 

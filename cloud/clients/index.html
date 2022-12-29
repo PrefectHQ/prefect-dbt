@@ -407,6 +407,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient" class="md-nav__link">
+    DbtCloudMetadataClient
+  </a>
+  
+    <nav class="md-nav" aria-label="DbtCloudMetadataClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient-functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient.query" class="md-nav__link">
+    query()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -708,6 +741,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient" class="md-nav__link">
+    DbtCloudMetadataClient
+  </a>
+  
+    <nav class="md-nav" aria-label="DbtCloudMetadataClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient-functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cloud.clients.DbtCloudMetadataClient.query" class="md-nav__link">
+    query()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -812,7 +878,7 @@
           </td>
           <td><p>Domain at which the dbt Cloud API is hosted.</p></td>
           <td>
-              <em>required</em>
+                <code>&#39;cloud.getdbt.com&#39;</code>
           </td>
         </tr>
     </tbody>
@@ -821,8 +887,7 @@
 
         <details class="quote">
           <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 11</span>
-<span class="normal"> 12</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -1000,7 +1065,8 @@
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
-<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudAdministrativeClient</span><span class="p">:</span>
+<span class="normal">190</span>
+<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudAdministrativeClient</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Client for interacting with the dbt cloud Administrative API.</span>
 
@@ -1010,7 +1076,7 @@
 <span class="sd">        domain: Domain at which the dbt Cloud API is hosted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">account_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">account_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cloud.getdbt.com&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -1288,8 +1354,7 @@ onto the base URL as determined by the client configuration.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -1314,7 +1379,8 @@ onto the base URL as determined by the client configuration.</p></td>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
-<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">call_endpoint</span><span class="p">(</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">call_endpoint</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">http_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1419,8 +1485,7 @@ onto the base URL as determined by the client configuration.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
@@ -1437,7 +1502,8 @@ onto the base URL as determined by the client configuration.</p></td>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
-<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_job</span><span class="p">(</span>
+<span class="normal">79</span>
+<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_job</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">job_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">order_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1538,8 +1604,7 @@ logs will be truncated to the last 1,000 lines of the debug log output file.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">104</span>
-<span class="normal">105</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
@@ -1562,7 +1627,8 @@ logs will be truncated to the last 1,000 lines of the debug log output file.</p>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_run</span><span class="p">(</span>
+<span class="normal">128</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_run</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">include_related</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -1680,8 +1746,7 @@ for the last step in the run.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
-<span class="normal">153</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
@@ -1702,7 +1767,8 @@ for the last step in the run.</p></td>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_run_artifact</span><span class="p">(</span>
+<span class="normal">174</span>
+<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">get_run_artifact</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1807,8 +1873,7 @@ for the last step in the run.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
-<span class="normal">131</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
@@ -1827,7 +1892,8 @@ for the last step in the run.</p></td>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">list_run_artifacts</span><span class="p">(</span>
+<span class="normal">150</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">list_run_artifacts</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1927,8 +1993,7 @@ to initiate a job run.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
-<span class="normal"> 82</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
 <span class="normal"> 83</span>
 <span class="normal"> 84</span>
 <span class="normal"> 85</span>
@@ -1948,7 +2013,8 @@ to initiate a job run.</p>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
-<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">trigger_job_run</span><span class="p">(</span>
+<span class="normal">102</span>
+<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">trigger_job_run</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TriggerJobRunOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1969,6 +2035,298 @@ to initiate a job run.</p>
         <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;/jobs/</span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">/run/&quot;</span><span class="p">,</span>
         <span class="n">http_method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
         <span class="n">json</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="prefect_dbt.cloud.clients.DbtCloudMetadataClient" class="doc doc-heading">
+        <code>DbtCloudMetadataClient</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Client for interacting with the dbt cloud Administrative API.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>api_key</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>API key to authenticate with the dbt Cloud administrative API.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>account_id</code></td>
+          <td>
+          </td>
+          <td><p>ID of dbt Cloud account with which to interact.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>domain</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>Domain at which the dbt Cloud API is hosted.</p></td>
+          <td>
+                <code>&#39;metadata.cloud.getdbt.com&#39;</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        <details class="quote">
+          <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudMetadataClient</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Client for interacting with the dbt cloud Administrative API.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        api_key: API key to authenticate with the dbt Cloud administrative API.</span>
+<span class="sd">        account_id: ID of dbt Cloud account with which to interact.</span>
+<span class="sd">        domain: Domain at which the dbt Cloud API is hosted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;metadata.cloud.getdbt.com&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_http_endpoint</span> <span class="o">=</span> <span class="n">HTTPEndpoint</span><span class="p">(</span>
+            <span class="n">base_headers</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;prefect-</span><span class="si">{</span><span class="n">prefect</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">/graphql&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">operation_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a GraphQL query against the dbt Cloud metadata API.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query: The GraphQL query to run.</span>
+<span class="sd">            variables: The values of any variables defined in the GraphQL query.</span>
+<span class="sd">            operation_name: The name of the operation to run if multiple operations</span>
+<span class="sd">                are defined in the provided query.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The result of the GraphQL query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http_endpoint</span><span class="p">(</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span>
+        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<h4 id="prefect_dbt.cloud.clients.DbtCloudMetadataClient-functions">Functions</h4>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="prefect_dbt.cloud.clients.DbtCloudMetadataClient.query" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">query</span></code>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Run a GraphQL query against the dbt Cloud metadata API.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>query</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>The GraphQL query to run.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+          </td>
+          <td><p>The values of any variables defined in the GraphQL query.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>operation_name</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td><p>The name of the operation to run if multiple operations
+are defined in the provided query.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+          </td>
+          <td><p>The result of the GraphQL query.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>prefect_dbt/cloud/clients.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">query</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">operation_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run a GraphQL query against the dbt Cloud metadata API.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        query: The GraphQL query to run.</span>
+<span class="sd">        variables: The values of any variables defined in the GraphQL query.</span>
+<span class="sd">        operation_name: The name of the operation to run if multiple operations</span>
+<span class="sd">            are defined in the provided query.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The result of the GraphQL query.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http_endpoint</span><span class="p">(</span>
+        <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
