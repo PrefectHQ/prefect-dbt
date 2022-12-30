@@ -8,8 +8,6 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from prefect.utilities.asyncutils import sync_compatible
-
 from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
 
 try:
@@ -88,8 +86,7 @@ class BigQueryTargetConfigs(TargetConfigs):
     project: Optional[str] = None
     credentials: GcpCredentials
 
-    @sync_compatible
-    async def get_configs(self) -> Dict[str, Any]:
+    def get_configs(self) -> Dict[str, Any]:
         """
         Returns the dbt configs specific to BigQuery profile.
 
