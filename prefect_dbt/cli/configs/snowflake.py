@@ -56,7 +56,8 @@ class SnowflakeTargetConfigs(TargetConfigs):
             credentials=credentials,
         )
         target_configs = SnowflakeTargetConfigs(
-            connector=connector
+            connector=connector,
+            extras={"retry_on_database_errors": True},
         )
         ```
     """

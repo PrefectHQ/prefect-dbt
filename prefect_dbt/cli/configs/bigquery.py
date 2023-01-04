@@ -74,6 +74,7 @@ class BigQueryTargetConfigs(TargetConfigs):
             schema="schema",
             project="project",
             credentials=credentials,
+            extras={"execution_project": "my_exe_project"},
         )
         ```
     """
