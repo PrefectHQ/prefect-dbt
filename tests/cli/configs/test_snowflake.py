@@ -1,18 +1,8 @@
-from unittest.mock import MagicMock
-
-import pytest
 from prefect_snowflake.credentials import SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector
 from pydantic import SecretBytes, SecretStr
 
 from prefect_dbt.cli.configs import SnowflakeTargetConfigs
-
-
-@pytest.fixture(autouse=True)
-def snowflake_connect_mock(monkeypatch):
-    connect_mock = MagicMock()
-    monkeypatch.setattr("snowflake.connector.connect", connect_mock)
-    return connect_mock
 
 
 def test_snowflake_target_configs_get_configs():
@@ -21,17 +11,14 @@ def test_snowflake_target_configs_get_configs():
         user="user",
         password="password",
     )
-    connector_kwargs = dict(
+    snowflake_connector = SnowflakeConnector(
         schema="schema",
         database="database",
         warehouse="warehouse",
         credentials=credentials,
     )
+    configs = SnowflakeTargetConfigs(connector=snowflake_connector)
 
-    snowflake_connector = SnowflakeConnector(**connector_kwargs)
-    configs_kwargs = {"connector": snowflake_connector}
-
-    configs = SnowflakeTargetConfigs(**configs_kwargs)
     actual = configs.get_configs()
     expected = dict(
         account="account",
@@ -42,6 +29,7 @@ def test_snowflake_target_configs_get_configs():
         database="database",
         warehouse="warehouse",
         authenticator="snowflake",
+        retry_on_database_errors=True,
         threads=4,
     )
     for k, v in actual.items():
