@@ -145,6 +145,7 @@ class BigQueryTargetConfigs(TargetConfigs):
             configs_json["method"] = "service-account-json"
         elif "keyfile" in configs_json:
             configs_json["method"] = "service-account"
+            configs_json["keyfile"] = str(configs_json["keyfile"])
         else:
             configs_json["method"] = "oauth-secrets"
             # through gcloud application-default login
