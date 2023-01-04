@@ -76,24 +76,29 @@ class SnowflakeTargetConfigs(TargetConfigs):
             A configs JSON.
         """
         all_configs_json = super().get_configs()
-        print(all_configs_json)
 
         # decouple prefect-snowflake from prefect-dbt
         # by mapping all the keys dbt snowflake accepts
         # https://docs.getdbt.com/reference/warehouse-setups/snowflake-setup
         rename_keys = {
-            "account": "account",
-            "user": "user",
-            "password": "password",
-            "role": "role",
-            "private_key_path": "private_key_path",
-            "private_key_passphrase": "private_key_passphrase",
-            "authenticator": "authenticator",
-            "database": "database",
-            "warehouse": "warehouse",
+            # dbt
+            "type": "type",
             "schema": "schema",
             "threads": "threads",
-            "type": "type",
+            # general
+            "account": "account",
+            "user": "user",
+            "role": "role",
+            "database": "database",
+            "warehouse": "warehouse",
+            # user and password
+            "password": "password",
+            # duo mfa / sso
+            "authenticator": "authenticator",
+            # key pair
+            "private_key_path": "private_key_path",
+            "private_key_passphrase": "private_key_passphrase",
+            # optional
             "client_session_keep_alive": "client_session_keep_alive",
             "query_tag": "query_tag",
             "connect_retries": "connect_retries",
