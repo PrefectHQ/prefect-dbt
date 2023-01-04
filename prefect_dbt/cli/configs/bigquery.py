@@ -107,9 +107,10 @@ class BigQueryTargetConfigs(TargetConfigs):
         rename_keys = {
             # dbt
             "type": "type",
-            "dataset": "schema",
+            "schema": "schema",
             "threads": "threads",
             # general
+            "dataset": "schema",
             "method": "method",
             "project": "project",
             # service-account
