@@ -17,7 +17,9 @@ def test_snowflake_target_configs_get_configs():
         warehouse="warehouse",
         credentials=credentials,
     )
-    configs = SnowflakeTargetConfigs(connector=snowflake_connector)
+    configs = SnowflakeTargetConfigs(
+        connector=snowflake_connector, extras={"retry_on_database_errors": True}
+    )
 
     actual = configs.get_configs()
     expected = dict(
