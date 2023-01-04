@@ -14,7 +14,7 @@ with open("README.md") as readme_file:
 extras_require = {
     "cli": ["dbt_core>=1.1.1"],
     "snowflake": ["prefect-snowflake>=0.2.4"],
-    "bigquery": ['prefect-gcp["bigquery"]>=0.1.8'],
+    "bigquery": ["prefect-gcp>=0.1.8", "google.cloud.bigquery"],
     "postgres": ["prefect-sqlalchemy>=0.2.1"],
 }
 extras_require["all_extras"] = sorted(
