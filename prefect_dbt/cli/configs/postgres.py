@@ -11,7 +11,7 @@ from pydantic import Field
 from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
 
 try:
-    from prefect_sqlalchemy.database import DatabaseCredentials
+    from prefect_sqlalchemy.credentials import DatabaseCredentials
 except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Postgres") from e
 
