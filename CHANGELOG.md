@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `DbtCliProfile` dropping subclasses of `TargetConfigs` upon loading - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
+
 ### Security
 
 ## 0.2.7
