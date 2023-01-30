@@ -81,7 +81,7 @@ from prefect_dbt.cli.commands import trigger_dbt_cli_command
 @flow
 def trigger_dbt_cli_command_flow() -> str:
     result = trigger_dbt_cli_command("dbt debug")
-    return result # Returns the last line the in CLI output
+    return result # Returns the last line in the CLI output
 
 trigger_dbt_cli_command_flow()
 ```
