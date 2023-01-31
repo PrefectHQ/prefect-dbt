@@ -2,6 +2,7 @@
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
+from pydantic import Field
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 
@@ -91,11 +92,29 @@ class DbtCliProfile(Block):
 
     _block_type_name = "dbt CLI Profile"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/credentials/#prefect_dbt.cli.credentials.DbtCliProfile"  # noqa
 
-    name: str
-    target: str
-    target_configs: TargetConfigs
-    global_configs: Optional[GlobalConfigs] = None
+    name: str = Field(
+        default=..., description="Profile name used for populating profiles.yml."
+    )
+    target: str = Field(
+        default=..., description="The default target your dbt project will use."
+    )
+    target_configs: TargetConfigs = Field(
+        default=...,
+        description=(
+            "Target configs contain credentials and settings, specific to the "
+            "warehouse you're connecting to."
+        ),
+    )
+    global_configs: Optional[GlobalConfigs] = Field(
+        default=None,
+        description=(
+            "Global configs control things like the visual output of logs, the manner "
+            "in which dbt parses your project, and what to do when dbt finds a version "
+            "mismatch or a failing model."
+        ),
+    )
 
     def get_profile(self) -> Dict[str, Any]:
         """
