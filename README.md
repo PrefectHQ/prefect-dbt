@@ -1,7 +1,7 @@
 # prefect-dbt
 
 <p align="center">
-    <!--- Insert a cover image here -->
+    <img src="https://user-images.githubusercontent.com/15331990/215649781-be317381-9ff0-4f45-85d4-a30e80514554.png" width=40% height=40%>
     <br>
     <a href="https://pypi.python.org/pypi/prefect-dbt/" alt="PyPI version">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-dbt?color=0052FF&labelColor=090422"></a>
