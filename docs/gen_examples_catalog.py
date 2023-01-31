@@ -2,6 +2,7 @@
 Locates all the examples in the Collection and puts them in a single page.
 """
 
+import itertools
 import re
 from collections import defaultdict
 from inspect import getmembers, isclass, isfunction, ismodule
@@ -69,30 +70,43 @@ def get_code_examples(obj: Union[ModuleType, Callable]) -> Set[str]:
     return code_examples
 
 
-code_examples_grouping = defaultdict(set)
-for module_name, module_obj in getmembers(prefect_dbt, ismodule):
+nested = True
+if nested:
+    module_tuples = getmembers(prefect_dbt, ismodule)
+    module_tuples = [
+        (module_name, module_obj)
+        for module_name, module_obj in itertools.chain(
+            *[getmembers(module_tuple[1], ismodule) for module_tuple in module_tuples]
+        )
+        if module_obj.__name__.startswith(COLLECTION_SLUG)
+    ]
+else:
+    module_tuples = getmembers(prefect_dbt, ismodule)
 
-    module_nesting = f"{COLLECTION_SLUG}.{module_name}"
+code_examples_grouping = defaultdict(set)
+for module_name, module_obj in module_tuples:
+
+    module_nesting = module_obj.__name__
     # find all module examples
     if skip_parsing(module_name, module_obj, module_nesting):
         continue
-    code_examples_grouping[module_name] |= get_code_examples(module_obj)
+    code_examples_grouping[module_obj.__name__] |= get_code_examples(module_obj)
 
     # find all class and method examples
     for class_name, class_obj in getmembers(module_obj, isclass):
         if skip_parsing(class_name, class_obj, module_nesting):
             continue
-        code_examples_grouping[module_name] |= get_code_examples(class_obj)
+        code_examples_grouping[module_obj.__name__] |= get_code_examples(class_obj)
         for method_name, method_obj in getmembers(class_obj, isfunction):
             if skip_parsing(method_name, method_obj, module_nesting):
                 continue
-            code_examples_grouping[module_name] |= get_code_examples(method_obj)
+            code_examples_grouping[module_obj.__name__] |= get_code_examples(method_obj)
 
     # find all function examples
     for function_name, function_obj in getmembers(module_obj, isfunction):
         if skip_parsing(function_name, function_obj, module_nesting):
             continue
-        code_examples_grouping[module_name] |= get_code_examples(function_obj)
+        code_examples_grouping[module_obj.__name__] |= get_code_examples(function_obj)
 
 
 examples_catalog_path = Path("examples_catalog.md")
@@ -109,9 +123,7 @@ with mkdocs_gen_files.open(examples_catalog_path, "w") as generated_file:
     for module_name, code_examples in code_examples_grouping.items():
         if len(code_examples) == 0:
             continue
-        module_title = module_name.replace("_", " ").title()
-        generated_file.write(
-            f"## [{module_title} Module][{COLLECTION_SLUG}.{module_name}]\n"
-        )
+        module_title = ".".join(module_name.split(".")[1:]).replace("_", " ").title()
+        generated_file.write(f"## [{module_title} Module][{module_name}]\n")
         for code_example in code_examples:
             generated_file.write(code_example + "\n")
