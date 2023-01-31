@@ -82,6 +82,26 @@ class TestBigQueryTargetConfigs:
         }
         assert actual == expected
 
+    def test_get_configs_service_account_info_extras(self, service_account_info_dict):
+        gcp_credentials = GcpCredentials(service_account_info=service_account_info_dict)
+        configs = BigQueryTargetConfigs(
+            credentials=gcp_credentials,
+            project="my_project",
+            schema="my_schema",
+            extras={"execution_project": "my_exe_project"},
+        )
+        actual = configs.get_configs()
+        expected = {
+            "type": "bigquery",
+            "schema": "my_schema",
+            "threads": 4,
+            "project": "my_project",
+            "execution_project": "my_exe_project",
+            "method": "service-account-json",
+            "keyfile_json": service_account_info_dict,
+        }
+        assert actual == expected
+
     def test_get_configs_gcloud_cli_refresh_token(self, google_auth):
         gcp_credentials = GcpCredentials()
         configs = BigQueryTargetConfigs(
