@@ -11,17 +11,16 @@ def test_snowflake_target_configs_get_configs():
         user="user",
         password="password",
     )
-    connector_kwargs = dict(
+    snowflake_connector = SnowflakeConnector(
         schema="schema",
         database="database",
         warehouse="warehouse",
         credentials=credentials,
     )
+    configs = SnowflakeTargetConfigs(
+        connector=snowflake_connector, extras={"retry_on_database_errors": True}
+    )
 
-    snowflake_connector = SnowflakeConnector(**connector_kwargs)
-    configs_kwargs = {"connector": snowflake_connector}
-
-    configs = SnowflakeTargetConfigs(**configs_kwargs)
     actual = configs.get_configs()
     expected = dict(
         account="account",
@@ -32,6 +31,7 @@ def test_snowflake_target_configs_get_configs():
         database="database",
         warehouse="warehouse",
         authenticator="snowflake",
+        retry_on_database_errors=True,
         threads=4,
     )
     for k, v in actual.items():
