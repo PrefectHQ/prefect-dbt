@@ -72,21 +72,24 @@ watch:
 
 nav:
     - Home: index.md
-    - Cloud:
-      - Credentials: cloud/credentials.md
-      - Jobs: cloud/jobs.md
-      - Runs: cloud/runs.md
-      - Clients: cloud/clients.md
-      - Models: cloud/models.md
-      - Utils: cloud/utils.md
-    - CLI:
-      - Credentials: cli/credentials.md
-      - Commands: cli/commands.md
-      - Configs:
-        - Base: cli/configs/base.md
-        - BigQuery: cli/configs/bigquery.md
-        - Postgres: cli/configs/postgres.md
-        - Snowflake: cli/configs/snowflake.md]
+    - Blocks Catalog: blocks_catalog.md
+    - Examples Catalog: examples_catalog.md
+    - API Reference:
+      - Cloud:
+        - Credentials: cloud/credentials.md
+        - Jobs: cloud/jobs.md
+        - Runs: cloud/runs.md
+        - Clients: cloud/clients.md
+        - Models: cloud/models.md
+        - Utils: cloud/utils.md
+      - CLI:
+        - Credentials: cli/credentials.md
+        - Commands: cli/commands.md
+        - Configs:
+          - Base: cli/configs/base.md
+          - BigQuery: cli/configs/bigquery.md
+          - Postgres: cli/configs/postgres.md
+          - Snowflake: cli/configs/snowflake.md
 
 extra:
     social:

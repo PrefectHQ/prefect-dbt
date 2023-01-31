@@ -23,7 +23,7 @@ def find_module_blocks():
     ]
     module_blocks = {}
     for block in collection_blocks:
-        block_name = block.__name__
+        block_name = block.__name__.replace(" ", ".")
         module_nesting = tuple(to_qualified_name(block).split(".")[1:-1])
         if module_nesting not in module_blocks:
             module_blocks[module_nesting] = []
@@ -56,7 +56,7 @@ def insert_blocks_catalog(generated_file):
         "or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).\n"
     )
     for module_nesting, block_names in module_blocks.items():
-        module_path = f"{COLLECTION_SLUG}." + " ".join(module_nesting)
+        module_path = f"{COLLECTION_SLUG}." + ".".join(module_nesting)
         module_title = (
             module_path.replace(COLLECTION_SLUG, "")
             .lstrip(".")
