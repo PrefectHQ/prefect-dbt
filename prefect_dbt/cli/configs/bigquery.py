@@ -1,6 +1,8 @@
 """Module containing models for BigQuery configs"""
 from typing import Any, Dict, Optional
 
+from google.auth.transport.requests import Request
+
 try:
     from typing import Literal
 except ImportError:
@@ -74,6 +76,7 @@ class BigQueryTargetConfigs(TargetConfigs):
             schema="schema",
             project="project",
             credentials=credentials,
+            extras={"execution_project": "my_exe_project"},
         )
         ```
     """
@@ -98,16 +101,55 @@ class BigQueryTargetConfigs(TargetConfigs):
         self_copy = self.copy()
         if self_copy.project is not None:
             self_copy.credentials.project = None
-        configs_json = self._populate_configs_json(
+        all_configs_json = self._populate_configs_json(
             {}, self_copy.__fields__, model=self_copy
         )
 
-        if "service_account_info" in configs_json:
+        # decouple prefect-gcp from prefect-dbt
+        # by mapping all the keys dbt gcp accepts
+        # https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup
+        rename_keys = {
+            # dbt
+            "type": "type",
+            "schema": "schema",
+            "threads": "threads",
+            # general
+            "dataset": "schema",
+            "method": "method",
+            "project": "project",
+            # service-account
+            "service_account_file": "keyfile",
+            # service-account json
+            "service_account_info": "keyfile_json",
+            # oauth secrets
+            "refresh_token": "refresh_token",
+            "client_id": "client_id",
+            "client_secret": "client_secret",
+            "token_uri": "token_uri",
+            # optional
+            "priority": "priority",
+            "timeout_seconds": "timeout_seconds",
+            "location": "location",
+            "maximum_bytes_billed": "maximum_bytes_billed",
+            "scopes": "scopes",
+            "impersonate_service_account": "impersonate_service_account",
+            "execution_project": "execution_project",
+        }
+        configs_json = {}
+        extras = self.extras or {}
+        for key in all_configs_json.keys():
+            if key not in rename_keys and key not in extras:
+                # skip invalid keys
+                continue
+            # rename key to something dbt profile expects
+            dbt_key = rename_keys.get(key) or key
+            configs_json[dbt_key] = all_configs_json[key]
+
+        if "keyfile_json" in configs_json:
             configs_json["method"] = "service-account-json"
-            configs_json["keyfile_json"] = configs_json.pop("service_account_info")
-        elif "service_account_file" in configs_json:
+        elif "keyfile" in configs_json:
             configs_json["method"] = "service-account"
-            configs_json["keyfile"] = str(configs_json.pop("service_account_file"))
+            configs_json["keyfile"] = str(configs_json["keyfile"])
         else:
             configs_json["method"] = "oauth-secrets"
             # through gcloud application-default login
@@ -115,7 +157,9 @@ class BigQueryTargetConfigs(TargetConfigs):
                 self_copy.credentials.get_credentials_from_service_account()
             )
             if hasattr(google_credentials, "token"):
-                configs_json["token"] = await self_copy.credentials.get_access_token()
+                request = Request()
+                google_credentials.refresh(request)
+                configs_json["token"] = google_credentials.token
             else:
                 for key in ("refresh_token", "client_id", "client_secret", "token_uri"):
                     configs_json[key] = getattr(google_credentials, key)

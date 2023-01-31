@@ -56,7 +56,8 @@ class SnowflakeTargetConfigs(TargetConfigs):
             credentials=credentials,
         )
         target_configs = SnowflakeTargetConfigs(
-            connector=connector
+            connector=connector,
+            extras={"retry_on_database_errors": True},
         )
         ```
     """
@@ -75,5 +76,44 @@ class SnowflakeTargetConfigs(TargetConfigs):
         Returns:
             A configs JSON.
         """
-        configs_json = super().get_configs()
+        all_configs_json = super().get_configs()
+
+        # decouple prefect-snowflake from prefect-dbt
+        # by mapping all the keys dbt snowflake accepts
+        # https://docs.getdbt.com/reference/warehouse-setups/snowflake-setup
+        rename_keys = {
+            # dbt
+            "type": "type",
+            "schema": "schema",
+            "threads": "threads",
+            # general
+            "account": "account",
+            "user": "user",
+            "role": "role",
+            "database": "database",
+            "warehouse": "warehouse",
+            # user and password
+            "password": "password",
+            # duo mfa / sso
+            "authenticator": "authenticator",
+            # key pair
+            "private_key_path": "private_key_path",
+            "private_key_passphrase": "private_key_passphrase",
+            # optional
+            "client_session_keep_alive": "client_session_keep_alive",
+            "query_tag": "query_tag",
+            "connect_retries": "connect_retries",
+            "connect_timeout": "connect_timeout",
+            "retry_on_database_errors": "retry_on_database_errors",
+            "retry_all": "retry_all",
+        }
+        configs_json = {}
+        extras = self.extras or {}
+        for key in all_configs_json.keys():
+            if key not in rename_keys and key not in extras:
+                # skip invalid keys, like fetch_size + poll_frequency_s
+                continue
+            # rename key to something dbt profile expects
+            dbt_key = rename_keys.get(key) or key
+            configs_json[dbt_key] = all_configs_json[key]
         return configs_json

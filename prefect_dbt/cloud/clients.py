@@ -197,7 +197,6 @@ class DbtCloudMetadataClient:
 
     Args:
         api_key: API key to authenticate with the dbt Cloud administrative API.
-        account_id: ID of dbt Cloud account with which to interact.
         domain: Domain at which the dbt Cloud API is hosted.
     """
 
