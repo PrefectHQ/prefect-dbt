@@ -8,7 +8,10 @@ except ImportError:
 
 from pydantic import Field
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from prefect_dbt.cli.configs.base import (
+    AbstractTargetConfigs,
+    MissingExtrasRequireError,
+)
 
 try:
     from prefect_sqlalchemy.database import DatabaseCredentials
@@ -16,7 +19,7 @@ except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Postgres") from e
 
 
-class PostgresTargetConfigs(TargetConfigs):
+class PostgresTargetConfigs(AbstractTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to Postgres.
@@ -63,7 +66,7 @@ class PostgresTargetConfigs(TargetConfigs):
         default="postgres", description="The type of the target."
     )
     credentials: DatabaseCredentials = Field(
-        default_factory=...,
+        default=...,
         description=(
             "The credentials to use to authenticate; if there are duplicate keys "
             "between credentials and TargetConfigs, e.g. schema, "

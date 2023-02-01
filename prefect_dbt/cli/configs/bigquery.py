@@ -11,7 +11,10 @@ except ImportError:
 from prefect.utilities.asyncutils import sync_compatible
 from pydantic import Field
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from prefect_dbt.cli.configs.base import (
+    AbstractTargetConfigs,
+    MissingExtrasRequireError,
+)
 
 try:
     from prefect_gcp.credentials import GcpCredentials
@@ -19,7 +22,7 @@ except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("BigQuery") from e
 
 
-class BigQueryTargetConfigs(TargetConfigs):
+class BigQueryTargetConfigs(AbstractTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to BigQuery.

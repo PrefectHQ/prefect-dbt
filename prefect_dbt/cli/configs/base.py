@@ -37,10 +37,12 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for field_name, field in fields.items():
-            print(field_name)
             if model is not None:
                 # get actual value from model
-                field_value = getattr(model, field_name)
+                try:
+                    field_value = getattr(model, field_name)
+                except AttributeError:
+                    field_value = getattr(model, field.alias)
                 # override the name with alias so dbt parser can recognize the keyword;
                 # e.g. schema_ -> schema, returns the original name if no alias is set
                 field_name = field.alias
@@ -79,7 +81,25 @@ class DbtConfigs(Block, abc.ABC):
         return self._populate_configs_json({}, self.__fields__, model=self)
 
 
-class TargetConfigs(DbtConfigs):
+class AbstractTargetConfigs(DbtConfigs, abc.ABC):
+    type: str = Field(default=..., description="The name of the database warehouse.")
+    schema_: str = Field(
+        alias="schema",
+        description=(
+            "The schema that dbt will build objects into; "
+            "in BigQuery, a schema is actually a dataset."
+        ),
+    )
+    threads: int = Field(
+        default=4,
+        description=(
+            "The number of threads representing the max number "
+            "of paths through the graph dbt may work on at once."
+        ),
+    )
+
+
+class TargetConfigs(AbstractTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
@@ -106,22 +126,6 @@ class TargetConfigs(DbtConfigs):
     _block_type_name = "dbt CLI Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.TargetConfigs"  # noqa
-
-    type: str = Field(default=..., description="The name of the database warehouse.")
-    schema_: str = Field(
-        alias="schema",
-        description=(
-            "The schema that dbt will build objects into; "
-            "in BigQuery, a schema is actually a dataset."
-        ),
-    )
-    threads: int = Field(
-        default=4,
-        description=(
-            "The number of threads representing the max number "
-            "of paths through the graph dbt may work on at once."
-        ),
-    )
 
 
 class GlobalConfigs(DbtConfigs):
