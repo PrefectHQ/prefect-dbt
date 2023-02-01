@@ -25,9 +25,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
     page.
 
     Attributes:
-        credentials: The credentials to use to authenticate; if there are
-            duplicate keys between credentials and TargetConfigs,
-            e.g. schema, an error will be raised.
+        connector: The connector to use.
 
     Examples:
         Load stored SnowflakeTargetConfigs:
@@ -64,10 +62,19 @@ class SnowflakeTargetConfigs(TargetConfigs):
 
     _block_type_name = "dbt CLI Snowflake Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/snowflake/#prefect_dbt.cli.configs.snowflake.SnowflakeTargetConfigs"  # noqa
 
-    type: Literal["snowflake"] = "snowflake"
-    schema_: Optional[str] = Field(default=None, alias="schema")
-    connector: SnowflakeConnector
+    type: Literal["snowflake"] = Field(
+        default="snowflake", description="The type of the target configs."
+    )
+    schema_: Optional[str] = Field(
+        default=None,
+        alias="schema",
+        description="The schema to use for the target configs.",
+    )
+    connector: SnowflakeConnector = Field(
+        default=None, description="The connector to use."
+    )
 
     def get_configs(self) -> Dict[str, Any]:
         """

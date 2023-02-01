@@ -9,6 +9,7 @@ except ImportError:
     from typing_extensions import Literal
 
 from prefect.utilities.asyncutils import sync_compatible
+from pydantic import Field
 
 from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
 
@@ -84,10 +85,16 @@ class BigQueryTargetConfigs(TargetConfigs):
     _block_type_name = "dbt CLI BigQuery Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings, specific to BigQuery."  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/bigquery/#prefect_dbt.cli.configs.bigquery.BigQueryTargetConfigs"  # noqa
 
-    type: Literal["bigquery"] = "bigquery"
-    project: Optional[str] = None
-    credentials: GcpCredentials
+    type: Literal["bigquery"] = Field(
+        default="bigquery", description="The type of target."
+    )
+    project: Optional[str] = Field(default=None, description="The project to use.")
+    credentials: GcpCredentials = Field(
+        default_factory=GcpCredentials,
+        description="The credentials to use to authenticate.",
+    )
 
     @sync_compatible
     async def get_configs(self) -> Dict[str, Any]:

@@ -66,3 +66,7 @@ jobs:
           DBT_CLOUD_API_KEY: ${{ secrets.DBT_CLOUD_API_KEY }}
         run: |
           pytest tests -vv -m integration
+
+      - name: Run mkdocs build
+        run: |
+          mkdocs build --verbose --clean
