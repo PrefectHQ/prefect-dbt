@@ -99,7 +99,7 @@ class BaseTargetConfigs(DbtConfigs, abc.ABC):
     )
 
 
-class TargetConfigs(AbstractTargetConfigs):
+class TargetConfigs(BaseTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
