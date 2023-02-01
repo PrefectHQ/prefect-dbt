@@ -81,7 +81,7 @@ class DbtConfigs(Block, abc.ABC):
         return self._populate_configs_json({}, self.__fields__, model=self)
 
 
-class AbstractTargetConfigs(DbtConfigs, abc.ABC):
+class BaseTargetConfigs(DbtConfigs, abc.ABC):
     type: str = Field(default=..., description="The name of the database warehouse.")
     schema_: str = Field(
         alias="schema",
