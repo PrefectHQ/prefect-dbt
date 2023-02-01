@@ -63,7 +63,7 @@ class PostgresTargetConfigs(TargetConfigs):
         default="postgres", description="The type of the target."
     )
     credentials: DatabaseCredentials = Field(
-        default_factory=DatabaseCredentials,
+        default_factory=...,
         description=(
             "The credentials to use to authenticate; if there are duplicate keys "
             "between credentials and TargetConfigs, e.g. schema, "
