@@ -47,6 +47,15 @@ def reset_object_registry():
         yield
 
 
+@pytest.fixture(autouse=True)
+def google_auth_mock(monkeypatch):
+    """
+    Mocks out the google.auth module.
+    """
+    google_auth_default_mock = MagicMock()
+    monkeypatch.setattr("google.auth.default", google_auth_default_mock)
+
+
 @pytest.fixture
 def dbt_cli_profile():
     target_configs = TargetConfigs(
