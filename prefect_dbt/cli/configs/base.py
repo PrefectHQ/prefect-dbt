@@ -37,6 +37,7 @@ class DbtConfigs(Block, abc.ABC):
         Recursively populate configs_json.
         """
         for field_name, field in fields.items():
+            print(field_name)
             if model is not None:
                 # get actual value from model
                 field_value = getattr(model, field_name)

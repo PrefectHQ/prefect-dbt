@@ -51,7 +51,7 @@ def reset_object_registry():
 def dbt_cli_profile():
     target_configs = TargetConfigs(
         type="snowflake",
-        schema="schema",
+        schema="my_schema",
         threads=4,
         extras=dict(
             account="account",
@@ -89,7 +89,7 @@ def dbt_cli_profile():
 @pytest.fixture
 def dbt_cli_profile_bare():
     target_configs = TargetConfigs(
-        type="custom", schema="schema", extras={"account": "fake"}
+        type="custom", schema="my_schema", extras={"account": "fake"}
     )
     return DbtCliProfile(
         name="prefecto",
@@ -168,7 +168,7 @@ def postgres_target_configs():
         host="host",
         port=8080,
     )
-    target_configs = PostgresTargetConfigs(schema="schema", credentials=credentials)
+    target_configs = PostgresTargetConfigs(schema="my_schema", credentials=credentials)
     return target_configs
 
 
@@ -181,24 +181,24 @@ def sqlalchemy_target_configs():
             password="prefect_password",
         )
     )
-    target_configs = PostgresTargetConfigs(schema="schema", credentials=credentials)
+    target_configs = PostgresTargetConfigs(schema="my_schema", credentials=credentials)
     return target_configs
 
 
 @pytest.fixture
 def bigquery_target_configs(service_account_info_dict):
     credentials = GcpCredentials(service_account_info=service_account_info_dict)
-    target_configs = BigQueryTargetConfigs(credentials=credentials, schema="schema")
+    target_configs = BigQueryTargetConfigs(credentials=credentials, schema="my_schema")
     return target_configs
 
 
 @pytest.fixture
 def class_target_configs():
-    target_configs = TargetConfigs(type="type", schema="schema", threads=4)
+    target_configs = TargetConfigs(type="type", schema="my_schema", threads=4)
     return target_configs
 
 
 @pytest.fixture
 def dict_target_configs():
-    target_configs = dict(type="type", schema="schema", threads=4)
+    target_configs = dict(type="type", schema="my_schema", threads=4)
     return target_configs

@@ -2,7 +2,7 @@
 from typing import Any, Dict, Optional, Union
 
 from prefect.blocks.core import Block
-from pydantic import Field, validator
+from pydantic import Field
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 
@@ -135,18 +135,6 @@ class DbtCliProfile(Block):
             "mismatch or a failing model."
         ),
     )
-
-    @validator("target_configs", pre=True)
-    def _serialize_target_configs_from_dict(
-        cls, value: Union[dict, TargetConfigs]
-    ) -> TargetConfigs:
-        """
-        Explicitly serialize a dict into TargetConfigs. Without this, pydantic tries to
-        serialize into the first Union type, which is SnowflakeTargetConfigs.
-        """
-        if isinstance(value, dict):
-            return TargetConfigs(**value)
-        return value
 
     def get_profile(self) -> Dict[str, Any]:
         """
