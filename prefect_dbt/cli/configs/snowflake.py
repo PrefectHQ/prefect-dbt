@@ -8,7 +8,7 @@ except ImportError:
 
 from pydantic import Field
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from prefect_dbt.cli.configs.base import BaseTargetConfigs, MissingExtrasRequireError
 
 try:
     from prefect_snowflake.database import SnowflakeConnector
@@ -16,7 +16,7 @@ except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Snowflake") from e
 
 
-class SnowflakeTargetConfigs(TargetConfigs):
+class SnowflakeTargetConfigs(BaseTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to Snowflake.
@@ -73,7 +73,7 @@ class SnowflakeTargetConfigs(TargetConfigs):
         description="The schema to use for the target configs.",
     )
     connector: SnowflakeConnector = Field(
-        default=None, description="The connector to use."
+        default=..., description="The connector to use."
     )
 
     def get_configs(self) -> Dict[str, Any]:

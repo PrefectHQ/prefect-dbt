@@ -12,12 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
 - Decoupled fields of blocks from external Collections from the created dbt profile - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
+- `DbtCliProfile` is now accepts a `Union` of `SnowflakeTargetConfigs`, `BigQueryTargetConfigs`, and `PostgresTargetConfigs` for creation on UI - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Preventing `TargetConfigs` from being dropped upon loading a `DbtCliProfile` - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
 
 ### Security
 

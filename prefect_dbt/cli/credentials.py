@@ -1,10 +1,25 @@
 """Module containing credentials for interacting with dbt CLI"""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from prefect.blocks.core import Block
 from pydantic import Field
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
+
+try:
+    from prefect_dbt.cli.configs.bigquery import BigQueryTargetConfigs
+except ImportError:
+    BigQueryTargetConfigs = None
+
+try:
+    from prefect_dbt.cli.configs.snowflake import SnowflakeTargetConfigs
+except ImportError:
+    SnowflakeTargetConfigs = None
+
+try:
+    from prefect_dbt.cli.configs.postgres import PostgresTargetConfigs
+except ImportError:
+    PostgresTargetConfigs = None
 
 
 class DbtCliProfile(Block):
@@ -100,7 +115,12 @@ class DbtCliProfile(Block):
     target: str = Field(
         default=..., description="The default target your dbt project will use."
     )
-    target_configs: TargetConfigs = Field(
+    target_configs: Union[
+        SnowflakeTargetConfigs,
+        BigQueryTargetConfigs,
+        PostgresTargetConfigs,
+        TargetConfigs,
+    ] = Field(
         default=...,
         description=(
             "Target configs contain credentials and settings, specific to the "

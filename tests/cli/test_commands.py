@@ -73,7 +73,7 @@ def test_trigger_dbt_cli_command_run_twice_overwrite(
             "outputs": {
                 "testing": {
                     "type": "custom",
-                    "schema": "schema",
+                    "schema": "my_schema",
                     "threads": 4,
                     "account": "fake",
                 }

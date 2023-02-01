@@ -18,12 +18,14 @@ def test_dbt_cli_profile_init(configs_type):
         target_configs=target_configs,
         global_configs=global_configs,
     )
+    assert isinstance(dbt_cli_profile.target_configs, TargetConfigs)
     assert dbt_cli_profile.name == "test_name"
     assert dbt_cli_profile.target == "dev"
 
 
 def test_dbt_cli_profile_init_validation_failed():
-    with pytest.raises(ValidationError, match="2 validation errors for DbtCliProfile"):
+    # 6 instead of 2 now because it tries to validate each of the Union types
+    with pytest.raises(ValidationError, match="6 validation errors for DbtCliProfile"):
         DbtCliProfile(
             name="test_name", target="dev", target_configs={"extras": {"field": "abc"}}
         )
@@ -49,3 +51,24 @@ def test_dbt_cli_profile_get_profile():
         },
     }
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "target_configs_request",
+    [
+        "snowflake_target_configs",
+        "dict_target_configs",
+        "class_target_configs",
+    ],
+)
+def test_dbt_cli_profile_save_load_roundtrip(target_configs_request, request):
+    target_configs = request.getfixturevalue(target_configs_request)
+    dbt_cli_profile = DbtCliProfile(
+        name="my_name",
+        target="dev",
+        target_configs=target_configs,
+    )
+    block_name = target_configs_request.replace("_", "-")
+    dbt_cli_profile.save(block_name)
+    dbt_cli_profile_loaded = DbtCliProfile.load(block_name)
+    assert dbt_cli_profile_loaded.get_profile()
