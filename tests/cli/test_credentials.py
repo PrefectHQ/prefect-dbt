@@ -49,3 +49,27 @@ def test_dbt_cli_profile_get_profile():
         },
     }
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "target_configs_name",
+    [
+        "snowflake_target_configs",
+        "bigquery_target_configs",
+        "postgres_target_configs",
+        "dict_target_configs",
+        "class_target_configs",
+    ],
+)
+def test_dbt_cli_profile_save_load_roundtrip(target_configs_name, request):
+    target_configs = request.getfixturevalue(target_configs_name)
+    dbt_cli_profile = DbtCliProfile(
+        name="my_name",
+        target="dev",
+        target_configs=target_configs,
+    )
+    block_name = target_configs_name.replace("_", "-")
+    dbt_cli_profile.save(block_name)
+    dbt_cli_profile_loaded = dbt_cli_profile.load(block_name)
+    assert dbt_cli_profile_loaded == dbt_cli_profile
+    assert dbt_cli_profile_loaded.get_profile() == dbt_cli_profile.get_profile()
