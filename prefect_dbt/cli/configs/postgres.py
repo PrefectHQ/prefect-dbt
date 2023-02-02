@@ -6,15 +6,17 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from prefect_dbt.cli.configs.base import MissingExtrasRequireError, TargetConfigs
+from pydantic import Field
+
+from prefect_dbt.cli.configs.base import BaseTargetConfigs, MissingExtrasRequireError
 
 try:
-    from prefect_sqlalchemy.credentials import DatabaseCredentials
+    from prefect_sqlalchemy.database import DatabaseCredentials
 except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Postgres") from e
 
 
-class PostgresTargetConfigs(TargetConfigs):
+class PostgresTargetConfigs(BaseTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to Postgres.
@@ -55,9 +57,19 @@ class PostgresTargetConfigs(TargetConfigs):
     _block_type_name = "dbt CLI Postgres Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
     _description = "dbt CLI target configs containing credentials and settings specific to Postgres."  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/postgres/#prefect_dbt.cli.configs.postgres.PostgresTargetConfigs"  # noqa
 
-    type: Literal["postgres"] = "postgres"
-    credentials: DatabaseCredentials
+    type: Literal["postgres"] = Field(
+        default="postgres", description="The type of the target."
+    )
+    credentials: DatabaseCredentials = Field(
+        default=...,
+        description=(
+            "The credentials to use to authenticate; if there are duplicate keys "
+            "between credentials and TargetConfigs, e.g. schema, "
+            "an error will be raised."
+        ),
+    )  # noqa
 
     def get_configs(self) -> Dict[str, Any]:
         """

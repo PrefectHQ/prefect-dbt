@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import prefect
 from httpx import AsyncClient, Response
+from sgqlc.endpoint.http import HTTPEndpoint
 from typing_extensions import Literal
 
 from prefect_dbt.cloud.models import TriggerJobRunOptions
@@ -18,7 +19,7 @@ class DbtCloudAdministrativeClient:
         domain: Domain at which the dbt Cloud API is hosted.
     """
 
-    def __init__(self, api_key: str, account_id: int, domain: str):
+    def __init__(self, api_key: str, account_id: int, domain: str = "cloud.getdbt.com"):
         self._closed = False
         self._started = False
 
@@ -188,3 +189,45 @@ class DbtCloudAdministrativeClient:
     async def __aexit__(self, *exc):
         self._closed = True
         await self._admin_client.__aexit__()
+
+
+class DbtCloudMetadataClient:
+    """
+    Client for interacting with the dbt cloud Administrative API.
+
+    Args:
+        api_key: API key to authenticate with the dbt Cloud administrative API.
+        domain: Domain at which the dbt Cloud API is hosted.
+    """
+
+    def __init__(self, api_key: str, domain: str = "metadata.cloud.getdbt.com"):
+        self._http_endpoint = HTTPEndpoint(
+            base_headers={
+                "Authorization": f"Bearer {api_key}",
+                "user-agent": f"prefect-{prefect.__version__}",
+                "content-type": "application/json",
+            },
+            url=f"https://{domain}/graphql",
+        )
+
+    def query(
+        self,
+        query: str,
+        variables: Optional[Dict] = None,
+        operation_name: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Run a GraphQL query against the dbt Cloud metadata API.
+
+        Args:
+            query: The GraphQL query to run.
+            variables: The values of any variables defined in the GraphQL query.
+            operation_name: The name of the operation to run if multiple operations
+                are defined in the provided query.
+
+        Returns:
+            The result of the GraphQL query.
+        """
+        return self._http_endpoint(
+            query=query, variables=variables, operation_name=operation_name
+        )

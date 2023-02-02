@@ -6,8 +6,24 @@ theme:
   name: material
   favicon: img/favicon.ico
   palette:
-    primary: blue
-    accent: blue
+    - media: "(prefers-color-scheme)"
+      toggle:
+          icon: material/brightness-auto
+          name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      accent: blue
+      primary: blue
+      scheme: default
+      toggle:
+          icon: material/weather-sunny
+          name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      accent: blue
+      primary: blue
+      scheme: slate
+      toggle:
+          icon: material/weather-night
+          name: Switch to light mode
   icon:
     repo: fontawesome/brands/github
   logo:
@@ -15,6 +31,9 @@ theme:
   font:
     text: Inter
     code: Source Code Pro
+  features:
+    - content.code.copy
+    - content.code.annotate
 extra_css:
     - stylesheets/extra.css
 markdown_extensions:
@@ -27,11 +46,16 @@ markdown_extensions:
         use_pygments: true
     - pymdownx.superfences
     - pymdownx.tabbed
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+
 plugins:
   - search
   - gen-files:
       scripts:
-        - docs/gen_ref_pages.py
+        - docs/gen_home_page.py
+        - docs/gen_examples_catalog.py
+        - docs/gen_blocks_catalog.py
   - mkdocstrings:
       handlers:
         python:
@@ -48,18 +72,45 @@ watch:
 
 nav:
     - Home: index.md
-    - Cloud:
-      - Credentials: cloud/credentials.md
-      - Jobs: cloud/jobs.md
-      - Runs: cloud/runs.md
-      - Clients: cloud/clients.md
-      - Models: cloud/models.md
-      - Utils: cloud/utils.md
-    - CLI:
-      - Credentials: cli/credentials.md
-      - Commands: cli/commands.md
-      - Configs:
-        - Base: cli/configs/base.md
-        - BigQuery: cli/configs/bigquery.md
-        - Postgres: cli/configs/postgres.md
-        - Snowflake: cli/configs/snowflake.md
+    - Blocks Catalog: blocks_catalog.md
+    - Examples Catalog: examples_catalog.md
+    - API Reference:
+      - Cloud:
+        - Credentials: cloud/credentials.md
+        - Jobs: cloud/jobs.md
+        - Runs: cloud/runs.md
+        - Clients: cloud/clients.md
+        - Models: cloud/models.md
+        - Utils: cloud/utils.md
+      - CLI:
+        - Credentials: cli/credentials.md
+        - Commands: cli/commands.md
+        - Configs:
+          - Base: cli/configs/base.md
+          - BigQuery: cli/configs/bigquery.md
+          - Postgres: cli/configs/postgres.md
+          - Snowflake: cli/configs/snowflake.md
+
+extra:
+    social:
+        - icon: fontawesome/brands/slack
+          link: https://www.prefect.io/slack/
+        - icon: fontawesome/brands/discourse
+          link: https://discourse.prefect.io/
+        - icon: fontawesome/brands/youtube
+          link: https://www.youtube.com/c/PrefectIO/videos
+        - icon: fontawesome/regular/newspaper
+          link: https://prefect.io/guide/
+        - icon: fontawesome/brands/twitter
+          link: https://twitter.com/PrefectIO
+        - icon: fontawesome/brands/linkedin
+          link: https://www.linkedin.com/company/prefect/
+        - icon: fontawesome/brands/github
+          link: https://github.com/PrefectHQ/prefect
+        - icon: fontawesome/brands/docker
+          link: https://hub.docker.com/r/prefecthq/prefect/
+        - icon: fontawesome/brands/python
+          link: https://pypi.org/project/prefect/
+    analytics:
+        provider: google
+        property: G-8CSMBCQDKN

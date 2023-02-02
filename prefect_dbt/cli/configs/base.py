@@ -4,7 +4,7 @@ import abc
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel, Field, SecretBytes, SecretStr
+from pydantic import BaseModel, Field, SecretField
 
 
 class DbtConfigs(Block, abc.ABC):
@@ -12,13 +12,20 @@ class DbtConfigs(Block, abc.ABC):
     Abstract class for other dbt Configs.
 
     Attributes:
-        extras: Extra target configs' keywords, not yet added
-            to prefect-dbt, but available in dbt; if there are
+        extras: Extra target configs' keywords, not yet exposed
+            in prefect-dbt, but available in dbt; if there are
             duplicate keys between extras and TargetConfigs,
             an error will be raised.
     """
 
-    extras: Optional[Dict[str, Any]] = None
+    extras: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description=(
+            "Extra target configs' keywords, not yet exposed in prefect-dbt, "
+            "but available in dbt."
+        ),
+    )
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
 
     def _populate_configs_json(
         self,
@@ -32,7 +39,10 @@ class DbtConfigs(Block, abc.ABC):
         for field_name, field in fields.items():
             if model is not None:
                 # get actual value from model
-                field_value = getattr(model, field_name)
+                try:
+                    field_value = getattr(model, field_name)
+                except AttributeError:
+                    field_value = getattr(model, field.alias)
                 # override the name with alias so dbt parser can recognize the keyword;
                 # e.g. schema_ -> schema, returns the original name if no alias is set
                 field_name = field.alias
@@ -55,7 +65,7 @@ class DbtConfigs(Block, abc.ABC):
                         f"The keyword, {field_name}, has already been provided in "
                         f"TargetConfigs; remove duplicated keywords to continue"
                     )
-                if isinstance(field_value, (SecretStr, SecretBytes)):
+                if isinstance(field_value, SecretField):
                     field_value = field_value.get_secret_value()
                 configs_json[field_name] = field_value
 
@@ -71,7 +81,25 @@ class DbtConfigs(Block, abc.ABC):
         return self._populate_configs_json({}, self.__fields__, model=self)
 
 
-class TargetConfigs(DbtConfigs):
+class BaseTargetConfigs(DbtConfigs, abc.ABC):
+    type: str = Field(default=..., description="The name of the database warehouse.")
+    schema_: str = Field(
+        alias="schema",
+        description=(
+            "The schema that dbt will build objects into; "
+            "in BigQuery, a schema is actually a dataset."
+        ),
+    )
+    threads: int = Field(
+        default=4,
+        description=(
+            "The number of threads representing the max number "
+            "of paths through the graph dbt may work on at once."
+        ),
+    )
+
+
+class TargetConfigs(BaseTargetConfigs):
     """
     Target configs contain credentials and
     settings, specific to the warehouse you're connecting to.
@@ -80,7 +108,7 @@ class TargetConfigs(DbtConfigs):
     click the desired adapter's "Profile Setup" hyperlink.
 
     Attributes:
-        type: The name of the database warehouse
+        type: The name of the database warehouse.
         schema: The schema that dbt will build objects into;
             in BigQuery, a schema is actually a dataset.
         threads: The number of threads representing the max number
@@ -97,10 +125,7 @@ class TargetConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Target Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
-
-    type: str
-    schema_: str = Field(alias="schema")
-    threads: int = 4
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.TargetConfigs"  # noqa
 
 
 class GlobalConfigs(DbtConfigs):
@@ -144,19 +169,73 @@ class GlobalConfigs(DbtConfigs):
 
     _block_type_name = "dbt CLI Global Configs"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.GlobalConfigs"  # noqa
 
-    send_anonymous_usage_stats: Optional[bool] = None
-    use_colors: Optional[bool] = None
-    partial_parse: Optional[bool] = None
-    printer_width: Optional[int] = None
-    write_json: Optional[bool] = None
-    warn_error: Optional[bool] = None
-    log_format: Optional[bool] = None
-    debug: Optional[bool] = None
-    version_check: Optional[bool] = None
-    fail_fast: Optional[bool] = None
-    use_experimental_parser: Optional[bool] = None
-    static_parser: Optional[bool] = None
+    send_anonymous_usage_stats: Optional[bool] = Field(
+        default=None,
+        description="Whether usage stats are sent to dbt.",
+    )
+    use_colors: Optional[bool] = Field(
+        default=None,
+        description="Colorize the output it prints in your terminal.",
+    )
+    partial_parse: Optional[bool] = Field(
+        default=None,
+        description=(
+            "When partial parsing is enabled, dbt will use an "
+            "stored internal manifest to determine which files have been changed "
+            "(if any) since it last parsed the project."
+        ),
+    )
+    printer_width: Optional[int] = Field(
+        default=None,
+        description="Length of characters before starting a new line.",
+    )
+    write_json: Optional[bool] = Field(
+        default=None,
+        description=(
+            "Determines whether dbt writes JSON artifacts to " "the target/ directory."
+        ),
+    )
+    warn_error: Optional[bool] = Field(
+        default=None,
+        description="Whether to convert dbt warnings into errors.",
+    )
+    log_format: Optional[bool] = Field(
+        default=None,
+        description=(
+            "The LOG_FORMAT config specifies how dbt's logs should "
+            "be formatted. If the value of this config is json, dbt will "
+            "output fully structured logs in JSON format."
+        ),
+    )
+    debug: Optional[bool] = Field(
+        default=None,
+        description="Whether to redirect dbt's debug logs to standard out.",
+    )
+    version_check: Optional[bool] = Field(
+        default=None,
+        description=(
+            "Whether to raise an error if a project's version "
+            "is used with an incompatible dbt version."
+        ),
+    )
+    fail_fast: Optional[bool] = Field(
+        default=None,
+        description=("Make dbt exit immediately if a single resource fails to build."),
+    )
+    use_experimental_parser: Optional[bool] = Field(
+        default=None,
+        description=(
+            "Opt into the latest experimental version " "of the static parser."
+        ),
+    )
+    static_parser: Optional[bool] = Field(
+        default=None,
+        description=(
+            "Whether to use the [static parser](https://docs.getdbt.com/reference/parsing#static-parser)."  # noqa
+        ),
+    )
 
 
 class MissingExtrasRequireError(ImportError):
