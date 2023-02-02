@@ -1,6 +1,4 @@
 """Module containing tasks and flows for interacting with dbt Cloud jobs"""
-from __future__ import annotations
-
 import asyncio
 import shlex
 import time
