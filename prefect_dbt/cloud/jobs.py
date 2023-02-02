@@ -2,7 +2,6 @@
 import asyncio
 import shlex
 import time
-from contextlib import asynccontextmanager
 from json import JSONDecodeError
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 
@@ -13,7 +12,6 @@ from prefect.context import FlowRunContext
 from prefect.utilities.asyncutils import sync_compatible
 from typing_extensions import Literal
 
-from prefect_dbt.cloud.clients import DbtCloudAdministrativeClient
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 from prefect_dbt.cloud.exceptions import (
     DbtCloudGetJobFailed,
@@ -21,10 +19,10 @@ from prefect_dbt.cloud.exceptions import (
     DbtCloudGetRunFailed,
     DbtCloudJobRunCancelled,
     DbtCloudJobRunFailed,
+    DbtCloudJobRunIncomplete,
     DbtCloudJobRunTimedOut,
     DbtCloudJobRunTriggerFailed,
     DbtCloudListRunArtifactsFailed,
-    DbtCloudJobRunIncomplete,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 from prefect_dbt.cloud.runs import (
@@ -677,7 +675,7 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
         start_time = time.time()
         last_state = run_state = None
         while not in_final_state_fn(run_state):
-            run_state = await get_state_fn(self.run_id)
+            run_state = await get_state_fn()
             if run_state != last_state:
                 if self.logger is not None:
                     self.logger.info(
@@ -695,11 +693,6 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
                 )
             await asyncio.sleep(interval_seconds)
 
-    @asynccontextmanager
-    def _get_client(self) -> DbtCloudAdministrativeClient:
-        """Helper method to reduce the line length."""
-        yield self._dbt_cloud_credentials.get_administrative_client()
-
     @sync_compatible
     async def get_run(self) -> Dict[str, Any]:
         """
@@ -709,7 +702,8 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
             The run data.
         """
         try:
-            async with self._get_client as client:
+            dbt_cloud_credentials = self._dbt_cloud_credentials
+            async with dbt_cloud_credentials.get_administrative_client() as client:
                 response = await client.get_run(self.run_id)
         except HTTPStatusError as ex:
             raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
@@ -724,7 +718,7 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
         Returns:
             The run status code.
         """
-        run_data = await self.get_run(self.run_id)
+        run_data = await self.get_run()
         run_status_code = run_data.get("status")
         return run_status_code
 
@@ -742,7 +736,7 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
         )
 
     @sync_compatible
-    async def fetch_results(self, step: Optional[int] = None) -> Dict[str, Any]:
+    async def fetch_result(self, step: Optional[int] = None) -> Dict[str, Any]:
         """
         Gets the results from the job run. Since the results
         may not be ready, use wait_for_completion before calling this method.
@@ -753,20 +747,18 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
                 omitted, then this method will return the artifacts compiled
                 for the last step in the run.
         """
-        run_data = await self.get_run(self.run_id)
+        run_data = await self.get_run()
         run_status = DbtCloudJobRunStatus(run_data.get("status"))
         if run_status == DbtCloudJobRunStatus.SUCCESS:
             try:
-                async with self._get_client() as client:  # noqa
+                async with self._dbt_cloud_credentials.get_administrative_client() as client:  # noqa
                     response = await client.list_run_artifacts(
                         run_id=self.run_id, step=step
                     )
                 run_data["artifact_paths"] = response.json()["data"]
                 self.logger.info("%s completed successfully!", self._log_prefix)
             except HTTPStatusError as ex:
-                raise DbtCloudListRunArtifactsFailed(
-                    extract_user_message(ex)
-                ) from ex
+                raise DbtCloudListRunArtifactsFailed(extract_user_message(ex)) from ex
             return run_data
         elif run_status == DbtCloudJobRunStatus.CANCELLED:
             raise DbtCloudJobRunCancelled(f"{self._log_prefix} was cancelled.")
@@ -953,17 +945,15 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
             A representation of the dbt Cloud job run.
         """
         job = await self._dbt_cloud_job.get_job()
-        run = await self.get_run(run_id=self.run_id)
+        run = await self.get_run()
 
-        trigger_job_run_options_override = (
-            await self._build_trigger_job_run_options(job=job, run=run)
+        trigger_job_run_options_override = await self._build_trigger_job_run_options(
+            job=job, run=run
         )
 
         num_steps = len(trigger_job_run_options_override.steps_override)
         if num_steps == 0:
-            self.logger.info(
-                f"{self._log_prefix} does not have any steps to retry."
-            )
+            self.logger.info(f"{self._log_prefix} does not have any steps to retry.")
         else:
             self.logger.info(f"{self._log_prefix} has {num_steps} steps to retry.")
             run = await self.trigger(
@@ -991,7 +981,7 @@ class DbtCloudJob(JobBlock):
             )
             dbt_cloud_job_run = dbt_cloud_job.trigger()
             dbt_cloud_job_run.wait_for_completion()
-            dbt_cloud_job_run.fetch_results()
+            dbt_cloud_job_run.fetch_result()
             return dbt_cloud_job_run
 
         dbt_cloud_job_flow()
@@ -1043,7 +1033,7 @@ class DbtCloudJob(JobBlock):
 
         run_data = response.json()["data"]
         run_id = run_data.get("id")
-        run = self.DbtCloudJobRun(
+        run = DbtCloudJobRun(
             dbt_cloud_job=self,
             run_id=run_id,
         )
@@ -1090,11 +1080,11 @@ async def trigger_wait_retry_dbt_cloud_job_run(
     """
     logger = get_run_logger()
 
-    run = await task(dbt_cloud_job.trigger.aio)()
+    run = await task(dbt_cloud_job.trigger.aio)(dbt_cloud_job)
     while targeted_retries > 0:
         try:
-            await task(run.wait_for_completion.aio)()
-            result = await task(run.fetch_results.aio)()
+            await task(run.wait_for_completion.aio)(run)
+            result = await task(run.fetch_result.aio)(run)
             return result
         except DbtCloudJobRunFailed:
             logger.info(
@@ -1102,5 +1092,5 @@ async def trigger_wait_retry_dbt_cloud_job_run(
                 f"{targeted_retries} more times"
             )
             run_id = run.run_id
-            run = await task(dbt_cloud_job.trigger_retry.aio)(run_id=run_id)
+            run = await task(run.retry_failed_steps.aio)(run, run_id=run_id)
             targeted_retries -= 1
