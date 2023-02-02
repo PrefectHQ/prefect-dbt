@@ -1098,17 +1098,17 @@ async def trigger_wait_retry_dbt_cloud_job_run(
     """
     logger = get_run_logger()
 
-    run = await dbt_cloud_job.trigger()
+    run = await task(dbt_cloud_job.trigger.aio)()
     while targeted_retries > 0:
         try:
-            await run.wait_for_completion()
-            result = await run.fetch_results()
+            await task(run.wait_for_completion.aio)()
+            result = await task(run.fetch_results.aio)()
             return result
         except DbtCloudJobRunFailed:
             logger.info(
-                f"Retrying job {dbt_cloud_job.job_id} run "
-                f"{run.run_id} {targeted_retries} more times"
+                f"Retrying job run with ID: {run.run_id} "
+                f"{targeted_retries} more times"
             )
             run_id = run.run_id
-            run = await dbt_cloud_job.retry_failed_steps(run_id=run_id)
+            run = await task(dbt_cloud_job.trigger_retry)(run_id=run_id)
             targeted_retries -= 1
