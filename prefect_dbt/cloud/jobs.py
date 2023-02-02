@@ -10,6 +10,7 @@ from prefect import flow, get_run_logger, task
 from prefect.blocks.abstract import JobBlock, JobRun
 from prefect.context import FlowRunContext
 from prefect.utilities.asyncutils import sync_compatible
+from pydantic import Field
 from typing_extensions import Literal
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
@@ -791,7 +792,8 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
                 requested artifact is a JSON file and a `str` otherwise.
         """
         try:
-            async with self._get_client() as client:
+            dbt_cloud_credentials = self._dbt_cloud_credentials
+            async with dbt_cloud_credentials.get_administrative_client() as client:
                 response = await client.get_run_artifact(
                     run_id=self.run_id, path=path, step=step
                 )
@@ -805,6 +807,7 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
         return artifact_contents
 
     def _select_unsuccessful_commands(
+        self,
         run_results: List[Dict[str, Any]],
         command_components: List[str],
         command: str,
@@ -956,7 +959,7 @@ class DbtCloudJobRun(JobRun):  # NOT A BLOCK
             self.logger.info(f"{self._log_prefix} does not have any steps to retry.")
         else:
             self.logger.info(f"{self._log_prefix} has {num_steps} steps to retry.")
-            run = await self.trigger(
+            run = await self._dbt_cloud_job.trigger(
                 trigger_job_run_options=trigger_job_run_options_override,
             )
         return run
@@ -966,7 +969,22 @@ class DbtCloudJob(JobBlock):
     """
     Block that holds the information and methods to interact with a dbt Cloud job.
 
-    Example:
+    Attributes:
+        dbt_cloud_credentials: The credentials to use to authenticate with dbt Cloud.
+        job_id: The id of the dbt Cloud job.
+        timeout_seconds: The number of seconds to wait for the job to complete.
+        interval_seconds:
+            The number of seconds to wait between polling for job completion.
+        trigger_job_run_options: The options to use when triggering a job run.
+
+    Examples:
+        Load a configured dbt Cloud job block.
+        ```python
+        from prefect_dbt.cloud import DbtCloudJob
+
+        dbt_cloud_job = DbtCloudJob.load("BLOCK_NAME")
+        ```
+
         Triggers a dbt Cloud job, waits for completion, and fetches the results.
         ```python
         from prefect import flow
@@ -975,7 +993,7 @@ class DbtCloudJob(JobBlock):
         @flow
         def dbt_cloud_job_flow():
             dbt_cloud_credentials = DbtCloudCredentials.load("dbt-token")
-            dbt_cloud_job = DbtCloudJob(
+            dbt_cloud_job = DbtCloudJob.load(
                 dbt_cloud_credentials=dbt_cloud_credentials,
                 job_id=154217
             )
@@ -988,11 +1006,29 @@ class DbtCloudJob(JobBlock):
         ```
     """
 
-    dbt_cloud_credentials: DbtCloudCredentials
-    job_id: int
-    timeout_seconds: int = 900
-    interval_seconds: int = 10
-    trigger_job_run_options: Optional[TriggerJobRunOptions] = None
+    _block_type_name = "dbt Cloud Job"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cloud/jobs/#prefect_dbt.cloud.jobs.DbtCloudJob"  # noqa
+
+    dbt_cloud_credentials: DbtCloudCredentials = Field(
+        default=...,
+        description="The dbt Cloud credentials to use to authenticate with dbt Cloud.",
+    )  # noqa: E501
+    job_id: int = Field(
+        default=..., description="The id of the dbt Cloud job.", title="Job ID"
+    )
+    timeout_seconds: int = Field(
+        default=900,
+        description="The number of seconds to wait for the job to complete.",
+    )
+    interval_seconds: int = Field(
+        default=10,
+        description="The number of seconds to wait between polling for job completion.",
+    )
+    trigger_job_run_options: TriggerJobRunOptions = Field(
+        default_factory=TriggerJobRunOptions,
+        description="The options to use when triggering a job run.",
+    )
 
     @sync_compatible
     async def get_job(self, order_by: Optional[str] = None) -> Dict[str, Any]:
@@ -1016,7 +1052,9 @@ class DbtCloudJob(JobBlock):
         return response.json()["data"]
 
     @sync_compatible
-    async def trigger(self) -> DbtCloudJobRun:
+    async def trigger(
+        self, trigger_job_run_options: Optional[TriggerJobRunOptions] = None
+    ) -> DbtCloudJobRun:
         """
         Triggers a dbt Cloud job.
 
@@ -1024,9 +1062,12 @@ class DbtCloudJob(JobBlock):
             A representation of the dbt Cloud job run.
         """
         try:
+            trigger_job_run_options = (
+                trigger_job_run_options or self.trigger_job_run_options
+            )
             async with self.dbt_cloud_credentials.get_administrative_client() as client:
                 response = await client.trigger_job_run(
-                    job_id=self.job_id, options=self.trigger_job_run_options
+                    job_id=self.job_id, options=trigger_job_run_options
                 )
         except HTTPStatusError as ex:
             raise DbtCloudJobRunTriggerFailed(extract_user_message(ex)) from ex
@@ -1091,6 +1132,5 @@ async def trigger_wait_retry_dbt_cloud_job_run(
                 f"Retrying job run with ID: {run.run_id} "
                 f"{targeted_retries} more times"
             )
-            run_id = run.run_id
-            run = await task(run.retry_failed_steps.aio)(run, run_id=run_id)
+            run = await task(run.retry_failed_steps.aio)(run)
             targeted_retries -= 1

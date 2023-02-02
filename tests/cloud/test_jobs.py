@@ -644,8 +644,20 @@ class TestTriggerWaitRetryDbtCloudJobRun:
         with pytest.raises(DbtCloudJobRunTimedOut, match="Max wait time of 1"):
             await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
 
-    @pytest.mark.respx(assert_all_called=True)
-    async def test_fail(self, respx_mock, dbt_cloud_job):
+    @pytest.mark.parametrize(
+        "exe_command",
+        ["run", "run-operation"],
+    )
+    async def test_fail(self, respx_mock, dbt_cloud_job, exe_command):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={"data": {"id": 10000, "project_id": 12345, "run_steps": [""]}},
+            )
+        )
         respx_mock.post(
             "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/10000/run/",
             headers={"Authorization": "Bearer my_api_key"},
@@ -659,7 +671,100 @@ class TestTriggerWaitRetryDbtCloudJobRun:
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": {"id": 10000, "status": 20}}))
 
-        with pytest.raises(DbtCloudJobRunFailed, match="Triggered job run with ID"):
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/jobs/100000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "data": {
+                        "id": 10000,
+                        "generate_docs": False,
+                        "generate_sources": False,
+                    }
+                },
+            )
+        )
+
+        # mock get_dbt_cloud_run_info
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "data": {
+                        "id": 10000,
+                        "status": 20,  # failed status
+                        "run_steps": [
+                            {
+                                "id": 432100123,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 1,
+                                "name": "Clone Git Repository",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "id": 432100124,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 2,
+                                "name": "Create Profile from Connection Snowflake ",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "id": 432100125,
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 3,
+                                "name": "Invoke dbt with `dbt deps`",
+                                "status_humanized": "Success",
+                            },
+                            {
+                                "run_id": 10000,
+                                "account_id": 123456789,
+                                "index": 4,
+                                "name": f"Invoke dbt with `dbt {exe_command}`",
+                                "status_humanized": "Error",
+                            },
+                        ],
+                        "job_id": "1",
+                    }
+                },
+            )
+        )
+
+        # mock list_dbt_cloud_run_artifacts
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/",
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(return_value=Response(200, json={"data": ["run_results.json"]}))
+
+        # mock get_dbt_cloud_run_artifact
+        respx_mock.get(
+            "https://cloud.getdbt.com/api/v2/accounts/123456789/runs/10000/artifacts/run_results.json",  # noqa
+            headers={"Authorization": "Bearer my_api_key"},
+        ).mock(
+            return_value=Response(
+                200,
+                json={
+                    "metadata": {"env": {"DBT_CLOUD_JOB_ID": "1"}},
+                    "results": [
+                        {
+                            "status": "fail",
+                            "message": "FAIL 1",
+                            "failures": None,
+                            "unique_id": "model.jaffle_shop.stg_customers",
+                        },
+                    ],
+                },
+            )
+        )
+
+        with pytest.raises(DbtCloudJobRunFailed, match="dbt Cloud job 10000"):
             await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
 
     @pytest.mark.respx(assert_all_called=True)
@@ -708,7 +813,9 @@ class TestTriggerWaitRetryDbtCloudJobRun:
             return_value=Response(404, json={"status": {"user_message": "Not found"}})
         )
         with pytest.raises(DbtCloudJobRunTriggerFailed, match="Not found"):
-            await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+            await trigger_wait_retry_dbt_cloud_job_run(
+                dbt_cloud_job=dbt_cloud_job, targeted_retries=0
+            )
 
 
 def test_get_job(respx_mock, dbt_cloud_job):
