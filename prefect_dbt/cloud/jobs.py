@@ -12,7 +12,6 @@ from httpx import HTTPStatusError
 from prefect import flow, get_run_logger, task
 from prefect.blocks.abstract import JobBlock, JobRun
 from prefect.context import FlowRunContext
-from prefect.exceptions import JobRunIsRunning
 from prefect.utilities.asyncutils import sync_compatible
 from typing_extensions import Literal
 
@@ -27,6 +26,7 @@ from prefect_dbt.cloud.exceptions import (
     DbtCloudJobRunTimedOut,
     DbtCloudJobRunTriggerFailed,
     DbtCloudListRunArtifactsFailed,
+    DbtCloudJobRunIncomplete,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 from prefect_dbt.cloud.runs import (
@@ -637,6 +637,343 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
     return run_data
 
 
+class DbtCloudJobRun(JobRun):  # NOT A BLOCK
+    """
+    Class that holds the information and methods to interact
+    with the resulting run of a dbt Cloud job.
+    """
+
+    def __init__(self, run_id: int, dbt_cloud_job: "DbtCloudJob"):
+        self.run_id = run_id
+        self._dbt_cloud_job = dbt_cloud_job
+        self._dbt_cloud_credentials = dbt_cloud_job.dbt_cloud_credentials
+
+    @property
+    def _log_prefix(self):
+        return f"dbt Cloud job {self._dbt_cloud_job.job_id} run {self.run_id}."
+
+    async def _wait_until_state(
+        self,
+        in_final_state_fn: Awaitable[Callable],
+        get_state_fn: Awaitable[Callable],
+        log_state_fn: Callable = None,
+        timeout_seconds: int = 60,
+        interval_seconds: int = 1,
+    ):
+        """
+        Wait until the job run reaches a specific state.
+
+        Args:
+            in_final_state_fn: An async function that accepts a run state
+                and returns a boolean indicating whether the job run is
+                in a final state.
+            get_state_fn: An async function that returns
+                the current state of the job run.
+            log_state_fn: A callable that accepts a run
+                state and makes it human readable.
+            timeout_seconds: The maximum amount of time, in seconds, to wait
+                for the job run to reach the final state.
+            interval_seconds: The number of seconds to wait between checks of
+                the job run's state.
+        """
+        start_time = time.time()
+        last_state = run_state = None
+        while not in_final_state_fn(run_state):
+            run_state = await get_state_fn(self.run_id)
+            if run_state != last_state:
+                if self.logger is not None:
+                    self.logger.info(
+                        "%s has new state: %s",
+                        self._log_prefix,
+                        log_state_fn(run_state),
+                    )
+                last_state = run_state
+
+            elapsed_time_seconds = time.time() - start_time
+            if elapsed_time_seconds > timeout_seconds:
+                raise DbtCloudJobRunTimedOut(
+                    f"Max wait time of {timeout_seconds} "
+                    "seconds exceeded while waiting"
+                )
+            await asyncio.sleep(interval_seconds)
+
+    @asynccontextmanager
+    def _get_client(self) -> DbtCloudAdministrativeClient:
+        """Helper method to reduce the line length."""
+        yield self._dbt_cloud_credentials.get_administrative_client()
+
+    @sync_compatible
+    async def get_run(self) -> Dict[str, Any]:
+        """
+        Makes a request to the dbt Cloud API to get the run data.
+
+        Returns:
+            The run data.
+        """
+        try:
+            async with self._get_client as client:
+                response = await client.get_run(self.run_id)
+        except HTTPStatusError as ex:
+            raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
+        run_data = response.json()["data"]
+        return run_data
+
+    @sync_compatible
+    async def get_status_code(self) -> int:
+        """
+        Makes a request to the dbt Cloud API to get the run status.
+
+        Returns:
+            The run status code.
+        """
+        run_data = await self.get_run(self.run_id)
+        run_status_code = run_data.get("status")
+        return run_status_code
+
+    @sync_compatible
+    async def wait_for_completion(self) -> None:
+        """
+        Waits for the job run to reach a terminal state.
+        """
+        await self._wait_until_state(
+            in_final_state_fn=DbtCloudJobRunStatus.is_terminal_status_code,
+            get_state_fn=self.get_status_code,
+            log_state_fn=DbtCloudJobRunStatus,
+            timeout_seconds=self._dbt_cloud_job.timeout_seconds,
+            interval_seconds=self._dbt_cloud_job.interval_seconds,
+        )
+
+    @sync_compatible
+    async def fetch_results(self, step: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Gets the results from the job run. Since the results
+        may not be ready, use wait_for_completion before calling this method.
+
+        Args:
+            step: The index of the step in the run to query for artifacts. The
+                first step in the run has the index 1. If the step parameter is
+                omitted, then this method will return the artifacts compiled
+                for the last step in the run.
+        """
+        run_data = await self.get_run(self.run_id)
+        run_status = DbtCloudJobRunStatus(run_data.get("status"))
+        if run_status == DbtCloudJobRunStatus.SUCCESS:
+            try:
+                async with self._get_client() as client:  # noqa
+                    response = await client.list_run_artifacts(
+                        run_id=self.run_id, step=step
+                    )
+                run_data["artifact_paths"] = response.json()["data"]
+                self.logger.info("%s completed successfully!", self._log_prefix)
+            except HTTPStatusError as ex:
+                raise DbtCloudListRunArtifactsFailed(
+                    extract_user_message(ex)
+                ) from ex
+            return run_data
+        elif run_status == DbtCloudJobRunStatus.CANCELLED:
+            raise DbtCloudJobRunCancelled(f"{self._log_prefix} was cancelled.")
+        elif run_status == DbtCloudJobRunStatus.FAILED:
+            raise DbtCloudJobRunFailed(f"{self._log_prefix} has failed.")
+        else:
+            raise DbtCloudJobRunIncomplete(
+                f"{self._log_prefix} is still running; "
+                "use wait_for_completion() to wait until results are ready."
+            )
+
+    @sync_compatible
+    async def get_run_artifacts(
+        self,
+        path: Literal["manifest.json", "catalog.json", "run_results.json"],
+        step: Optional[int] = None,
+    ) -> Union[Dict[str, Any], str]:
+        """
+        Get an artifact generated for a completed run.
+
+        Args:
+            path: The relative path to the run artifact.
+            step: The index of the step in the run to query for artifacts. The
+                first step in the run has the index 1. If the step parameter is
+                omitted, then this method will return the artifacts compiled
+                for the last step in the run.
+
+        Returns:
+            The contents of the requested manifest. Returns a `Dict` if the
+                requested artifact is a JSON file and a `str` otherwise.
+        """
+        try:
+            async with self._get_client() as client:
+                response = await client.get_run_artifact(
+                    run_id=self.run_id, path=path, step=step
+                )
+        except HTTPStatusError as ex:
+            raise DbtCloudGetRunArtifactFailed(extract_user_message(ex)) from ex
+
+        if path.endswith(".json"):
+            artifact_contents = response.json()
+        else:
+            artifact_contents = response.text
+        return artifact_contents
+
+    def _select_unsuccessful_commands(
+        run_results: List[Dict[str, Any]],
+        command_components: List[str],
+        command: str,
+        exe_command: str,
+    ) -> List[str]:
+        """
+        Select nodes that were not successful and rebuild a command.
+        """
+        # note "fail" here instead of "cancelled" because
+        # nodes do not have a cancelled state
+        run_nodes = " ".join(
+            run_result["unique_id"].split(".")[2]
+            for run_result in run_results
+            if run_result["status"] in ("error", "skipped", "fail")
+        )
+
+        select_arg = None
+        if "-s" in command_components:
+            select_arg = "-s"
+        elif "--select" in command_components:
+            select_arg = "--select"
+
+        # prevent duplicate --select/-s statements
+        if select_arg is not None:
+            # dbt --fail-fast run, -s, bad_mod --vars '{"env": "prod"}' to:
+            # dbt --fail-fast run -s other_mod bad_mod --vars '{"env": "prod"}'
+            command_start, select_arg, command_end = command.partition(select_arg)
+            modified_command = (
+                f"{command_start} {select_arg} {run_nodes} {command_end}"  # noqa
+            )
+        else:
+            # dbt --fail-fast, build, --vars '{"env": "prod"}' to:
+            # dbt --fail-fast build --select bad_model --vars '{"env": "prod"}'
+            dbt_global_args, exe_command, exe_args = command.partition(exe_command)
+            modified_command = (
+                f"{dbt_global_args} {exe_command} -s {run_nodes} {exe_args}"
+            )
+        return modified_command
+
+    async def _build_trigger_job_run_options(
+        self,
+        job: Dict[str, Any],
+        run: Dict[str, Any],
+    ) -> TriggerJobRunOptions:
+        """
+        Compiles a list of steps (commands) to retry, then either build trigger job
+        run options from scratch if it does not exist, else overrides the existing.
+        """
+        generate_docs = job.get("generate_docs", False)
+        generate_sources = job.get("generate_sources", False)
+
+        steps_override = []
+        for run_step in run["run_steps"]:
+            status = run_step["status_humanized"].lower()
+            # Skipping cloning, profile setup, and dbt deps - always the first three
+            # steps in any run, and note, index starts at 1 instead of 0
+            if run_step["index"] <= 3 or status == "success":
+                continue
+            # get dbt build from "Invoke dbt with `dbt build`"
+            command = run_step["name"].partition("`")[2].partition("`")[0]
+
+            # These steps will be re-run regardless if
+            # generate_docs or generate_sources are enabled for a given job
+            # so if we don't skip, it'll run twice
+            freshness_in_command = (
+                "dbt source snapshot-freshness" in command
+                or "dbt source freshness" in command
+            )
+            if "dbt docs generate" in command and generate_docs:
+                continue
+            elif freshness_in_command and generate_sources:
+                continue
+
+            # find an executable command like `build` or `run`
+            # search in a list so that there aren't false positives, like
+            # `"run" in "dbt run-operation"`, which is True; we actually want
+            # `"run" in ["dbt", "run-operation"]` which is False
+            command_components = shlex.split(command)
+            for exe_command in EXE_COMMANDS:
+                if exe_command in command_components:
+                    break
+            else:
+                exe_command = ""
+
+            is_exe_command = exe_command in EXE_COMMANDS
+            is_not_success = status in ("error", "skipped", "cancelled")
+            is_skipped = status == "skipped"
+            if (not is_exe_command and is_not_success) or (
+                is_exe_command and is_skipped
+            ):
+                # if no matches like `run-operation`, we will be rerunning entirely
+                # or if it's one of the expected commands and is skipped
+                steps_override.append(command)
+            else:
+                # errors and failures are when we need to inspect to figure
+                # out the point of failure
+                try:
+                    run_artifact = await self.get_run_artifacts(
+                        "run_results.json", run_step["index"]
+                    )
+                except JSONDecodeError:
+                    # get the run results scoped to the step which had an error
+                    # an error here indicates that either:
+                    # 1) the fail-fast flag was set, in which case
+                    #    the run_results.json file was never created; or
+                    # 2) there was a problem on dbt Cloud's side saving
+                    #    this artifact
+                    steps_override.append(command)
+                else:
+                    # we only need to find the individual nodes
+                    # for those run commands
+                    run_results = run_artifact["results"]
+                    modified_command = self._select_unsuccessful_commands(
+                        run_results=run_results,
+                        command_components=command_components,
+                        command=command,
+                        exe_command=exe_command,
+                    )
+                    steps_override.append(modified_command)
+
+        if self._dbt_cloud_job.trigger_job_run_options is None:
+            trigger_job_run_options_override = TriggerJobRunOptions(
+                steps_override=steps_override
+            )
+        else:
+            trigger_job_run_options_override = (
+                self._dbt_cloud_job.trigger_job_run_options.copy()
+            )
+            trigger_job_run_options_override.steps_override = steps_override
+        return trigger_job_run_options_override
+
+    @sync_compatible
+    async def retry_failed_steps(self) -> "DbtCloudJobRun":  # noqa: F821
+        """
+        Retries steps that did not complete successfully in a run.
+
+        Returns:
+            A representation of the dbt Cloud job run.
+        """
+        job = await self._dbt_cloud_job.get_job()
+        run = await self.get_run(run_id=self.run_id)
+
+        trigger_job_run_options_override = (
+            await self._build_trigger_job_run_options(job=job, run=run)
+        )
+
+        num_steps = len(trigger_job_run_options_override.steps_override)
+        if num_steps == 0:
+            self.logger.info(
+                f"{self._log_prefix} does not have any steps to retry."
+            )
+        else:
+            self.logger.info(f"{self._log_prefix} has {num_steps} steps to retry.")
+            run = await self.trigger(
+                trigger_job_run_options=trigger_job_run_options_override,
+            )
+        return run
+
+
 class DbtCloudJob(JobBlock):
     """
     Block that holds the information and methods to interact with a dbt Cloud job.
@@ -669,349 +1006,6 @@ class DbtCloudJob(JobBlock):
     interval_seconds: int = 10
     trigger_job_run_options: Optional[TriggerJobRunOptions] = None
 
-    class DbtCloudJobRun(JobRun):  # NOT A BLOCK
-        """
-        Class that holds the information and methods to interact
-        with the resulting run of a dbt Cloud job.
-        """
-
-        def __init__(self, run_id: int, dbt_cloud_job: "DbtCloudJob"):
-            self.run_id = run_id
-            self._dbt_cloud_job = dbt_cloud_job
-            self._dbt_cloud_credentials = dbt_cloud_job.dbt_cloud_credentials
-
-        @property
-        def _log_prefix(self):
-            return f"dbt Cloud job {self._dbt_cloud_job.job_id} run {self.run_id}."
-
-        async def _wait_until_state(
-            self,
-            in_final_state_fn: Awaitable[Callable],
-            get_state_fn: Awaitable[Callable],
-            log_state_fn: Callable = None,
-            timeout_seconds: int = 60,
-            interval_seconds: int = 1,
-        ):
-            """
-            Wait until the job run reaches a specific state.
-
-            Args:
-                in_final_state_fn: An async function that accepts a run state
-                    and returns a boolean indicating whether the job run is
-                    in a final state.
-                get_state_fn: An async function that returns
-                    the current state of the job run.
-                log_state_fn: A callable that accepts a run
-                    state and makes it human readable.
-                timeout_seconds: The maximum amount of time, in seconds, to wait
-                    for the job run to reach the final state.
-                interval_seconds: The number of seconds to wait between checks of
-                    the job run's state.
-            """
-            start_time = time.time()
-            last_state = run_state = None
-            while not in_final_state_fn(run_state):
-                run_state = await get_state_fn(self.run_id)
-                if run_state != last_state:
-                    if self.logger is not None:
-                        self.logger.info(
-                            "%s has new state: %s",
-                            self._log_prefix,
-                            log_state_fn(run_state),
-                        )
-                    last_state = run_state
-
-                elapsed_time_seconds = time.time() - start_time
-                if elapsed_time_seconds > timeout_seconds:
-                    raise DbtCloudJobRunTimedOut(
-                        f"Max wait time of {timeout_seconds} "
-                        "seconds exceeded while waiting"
-                    )
-                await asyncio.sleep(interval_seconds)
-
-        @asynccontextmanager
-        def _get_client(self) -> DbtCloudAdministrativeClient:
-            """Helper method to reduce the line length."""
-            yield self._dbt_cloud_credentials.get_administrative_client()
-
-        @sync_compatible
-        async def get_run(self, run_id) -> Dict[str, Any]:
-            """
-            Makes a request to the dbt Cloud API to get the run data.
-
-            Args:
-                run_id: The id of the run to get.
-
-            Returns:
-                The run data.
-            """
-            try:
-                async with self._get_client as client:
-                    response = await client.get_run(run_id=run_id)
-            except HTTPStatusError as ex:
-                raise DbtCloudGetRunFailed(extract_user_message(ex)) from ex
-            run_data = response.json()["data"]
-            return run_data
-
-        @sync_compatible
-        async def get_status_code(self, run_id) -> int:
-            """
-            Makes a request to the dbt Cloud API to get the run status.
-
-            Args:
-                run_id: The id of the run to get.
-
-            Returns:
-                The run status code.
-            """
-            run_data = await self.get_run(run_id)
-            run_status_code = run_data.get("status")
-            return run_status_code
-
-        @sync_compatible
-        async def wait_for_completion(self) -> None:
-            """
-            Waits for the job run to reach a terminal state.
-            """
-            await self._wait_until_state(
-                in_final_state_fn=DbtCloudJobRunStatus.is_terminal_status_code,
-                get_state_fn=self.get_status_code,
-                log_state_fn=DbtCloudJobRunStatus,
-                timeout_seconds=self._dbt_cloud_job.timeout_seconds,
-                interval_seconds=self._dbt_cloud_job.interval_seconds,
-            )
-
-        @sync_compatible
-        async def fetch_results(self, step: Optional[int] = None) -> Dict[str, Any]:
-            """
-            Gets the results from the job run. Since the results
-            may not be ready, use wait_for_completion before calling this method.
-
-            Args:
-                step: The index of the step in the run to query for artifacts. The
-                    first step in the run has the index 1. If the step parameter is
-                    omitted, then this method will return the artifacts compiled
-                    for the last step in the run.
-            """
-            run_data = await self.get_run(self.run_id)
-            run_status = DbtCloudJobRunStatus(run_data.get("status"))
-            if run_status == DbtCloudJobRunStatus.SUCCESS:
-                try:
-                    async with self._get_client() as client:  # noqa
-                        response = await client.list_run_artifacts(
-                            run_id=self.run_id, step=step
-                        )
-                    run_data["artifact_paths"] = response.json()["data"]
-                    self.logger.info("%s completed successfully!", self._log_prefix)
-                except HTTPStatusError as ex:
-                    raise DbtCloudListRunArtifactsFailed(
-                        extract_user_message(ex)
-                    ) from ex
-                return run_data
-            elif run_status == DbtCloudJobRunStatus.CANCELLED:
-                raise DbtCloudJobRunCancelled(f"{self._log_prefix} was cancelled.")
-            elif run_status == DbtCloudJobRunStatus.FAILED:
-                raise DbtCloudJobRunFailed(f"{self._log_prefix} has failed.")
-            else:
-                raise JobRunIsRunning(
-                    f"{self._log_prefix} is still running; "
-                    "use wait_for_completion() to wait until results are ready."
-                )
-
-        @sync_compatible
-        async def get_run_artifacts(
-            self,
-            path: Literal["manifest.json", "catalog.json", "run_results.json"],
-            step: Optional[int] = None,
-        ) -> Union[Dict[str, Any], str]:
-            """
-            Get an artifact generated for a completed run.
-
-            Args:
-                path: The relative path to the run artifact.
-                step: The index of the step in the run to query for artifacts. The
-                    first step in the run has the index 1. If the step parameter is
-                    omitted, then this method will return the artifacts compiled
-                    for the last step in the run.
-
-            Returns:
-                The contents of the requested manifest. Returns a `Dict` if the
-                    requested artifact is a JSON file and a `str` otherwise.
-            """
-            try:
-                async with self._get_client() as client:
-                    response = await client.get_run_artifact(
-                        run_id=self.run_id, path=path, step=step
-                    )
-            except HTTPStatusError as ex:
-                raise DbtCloudGetRunArtifactFailed(extract_user_message(ex)) from ex
-
-            if path.endswith(".json"):
-                artifact_contents = response.json()
-            else:
-                artifact_contents = response.text
-            return artifact_contents
-
-        def _select_unsuccessful_commands(
-            run_results: List[Dict[str, Any]],
-            command_components: List[str],
-            command: str,
-            exe_command: str,
-        ) -> List[str]:
-            """
-            Select nodes that were not successful and rebuild a command.
-            """
-            # note "fail" here instead of "cancelled" because
-            # nodes do not have a cancelled state
-            run_nodes = " ".join(
-                run_result["unique_id"].split(".")[2]
-                for run_result in run_results
-                if run_result["status"] in ("error", "skipped", "fail")
-            )
-
-            select_arg = None
-            if "-s" in command_components:
-                select_arg = "-s"
-            elif "--select" in command_components:
-                select_arg = "--select"
-
-            # prevent duplicate --select/-s statements
-            if select_arg is not None:
-                # dbt --fail-fast run, -s, bad_mod --vars '{"env": "prod"}' to:
-                # dbt --fail-fast run -s other_mod bad_mod --vars '{"env": "prod"}'
-                command_start, select_arg, command_end = command.partition(select_arg)
-                modified_command = (
-                    f"{command_start} {select_arg} {run_nodes} {command_end}"  # noqa
-                )
-            else:
-                # dbt --fail-fast, build, --vars '{"env": "prod"}' to:
-                # dbt --fail-fast build --select bad_model --vars '{"env": "prod"}'
-                dbt_global_args, exe_command, exe_args = command.partition(exe_command)
-                modified_command = (
-                    f"{dbt_global_args} {exe_command} -s {run_nodes} {exe_args}"
-                )
-            return modified_command
-
-        async def _build_trigger_job_run_options(
-            self,
-            job: Dict[str, Any],
-            run: Dict[str, Any],
-        ) -> TriggerJobRunOptions:
-            """
-            Compiles a list of steps (commands) to retry, then either build trigger job
-            run options from scratch if it does not exist, else overrides the existing.
-            """
-            generate_docs = job.get("generate_docs", False)
-            generate_sources = job.get("generate_sources", False)
-
-            steps_override = []
-            for run_step in run["run_steps"]:
-                status = run_step["status_humanized"].lower()
-                # Skipping cloning, profile setup, and dbt deps - always the first three
-                # steps in any run, and note, index starts at 1 instead of 0
-                if run_step["index"] <= 3 or status == "success":
-                    continue
-                # get dbt build from "Invoke dbt with `dbt build`"
-                command = run_step["name"].partition("`")[2].partition("`")[0]
-
-                # These steps will be re-run regardless if
-                # generate_docs or generate_sources are enabled for a given job
-                # so if we don't skip, it'll run twice
-                freshness_in_command = (
-                    "dbt source snapshot-freshness" in command
-                    or "dbt source freshness" in command
-                )
-                if "dbt docs generate" in command and generate_docs:
-                    continue
-                elif freshness_in_command and generate_sources:
-                    continue
-
-                # find an executable command like `build` or `run`
-                # search in a list so that there aren't false positives, like
-                # `"run" in "dbt run-operation"`, which is True; we actually want
-                # `"run" in ["dbt", "run-operation"]` which is False
-                command_components = shlex.split(command)
-                for exe_command in EXE_COMMANDS:
-                    if exe_command in command_components:
-                        break
-                else:
-                    exe_command = ""
-
-                is_exe_command = exe_command in EXE_COMMANDS
-                is_not_success = status in ("error", "skipped", "cancelled")
-                is_skipped = status == "skipped"
-                if (not is_exe_command and is_not_success) or (
-                    is_exe_command and is_skipped
-                ):
-                    # if no matches like `run-operation`, we will be rerunning entirely
-                    # or if it's one of the expected commands and is skipped
-                    steps_override.append(command)
-                else:
-                    # errors and failures are when we need to inspect to figure
-                    # out the point of failure
-                    try:
-                        run_artifact = await self.get_run_artifacts(
-                            "run_results.json", run_step["index"]
-                        )
-                    except JSONDecodeError:
-                        # get the run results scoped to the step which had an error
-                        # an error here indicates that either:
-                        # 1) the fail-fast flag was set, in which case
-                        #    the run_results.json file was never created; or
-                        # 2) there was a problem on dbt Cloud's side saving
-                        #    this artifact
-                        steps_override.append(command)
-                    else:
-                        # we only need to find the individual nodes
-                        # for those run commands
-                        run_results = run_artifact["results"]
-                        modified_command = self._select_unsuccessful_commands(
-                            run_results=run_results,
-                            command_components=command_components,
-                            command=command,
-                            exe_command=exe_command,
-                        )
-                        steps_override.append(modified_command)
-
-            if self._dbt_cloud_job.trigger_job_run_options is None:
-                trigger_job_run_options_override = TriggerJobRunOptions(
-                    steps_override=steps_override
-                )
-            else:
-                trigger_job_run_options_override = (
-                    self._dbt_cloud_job.trigger_job_run_options.copy()
-                )
-                trigger_job_run_options_override.steps_override = steps_override
-            return trigger_job_run_options_override
-
-        @sync_compatible
-        async def retry_failed_steps(self) -> "DbtCloudJobRun":  # noqa: F821
-            """
-            Retries steps that did not complete successfully in a run.
-
-            Returns:
-                A representation of the dbt Cloud job run.
-            """
-            job = await self._dbt_cloud_job.get_job()
-            run = await self.get_run(run_id=self.run_id)
-
-            trigger_job_run_options_override = (
-                await self._build_trigger_job_run_options(job=job, run=run)
-            )
-
-            num_steps = len(trigger_job_run_options_override.steps_override)
-            if num_steps == 0:
-                self.logger.info(
-                    f"{self._log_prefix} does not have any steps to retry."
-                )
-            else:
-                self.logger.info(f"{self._log_prefix} has {num_steps} steps to retry.")
-                run = await self.trigger(
-                    trigger_job_run_options=trigger_job_run_options_override,
-                )
-            return run
-
-    # beginning of DbtCloudJob methods
     @sync_compatible
     async def get_job(self, order_by: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -1110,5 +1104,5 @@ async def trigger_wait_retry_dbt_cloud_job_run(
                 f"{targeted_retries} more times"
             )
             run_id = run.run_id
-            run = await task(dbt_cloud_job.trigger_retry)(run_id=run_id)
+            run = await task(dbt_cloud_job.trigger_retry.aio)(run_id=run_id)
             targeted_retries -= 1
