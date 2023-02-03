@@ -192,6 +192,38 @@ class DbtCoreOperation(ShellOperation):
         dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
             Note! This is optional and will raise an error if profiles.yml already
             exists under profile_dir and overwrite_profiles is set to False.
+
+    Examples:
+        Execute short-lasting dbt debug and list with a custom DbtCliProfile.
+        ```python
+        from prefect_dbt import DbtCoreOperation, DbtCliProfile
+        from prefect_dbt.cli.configs import SnowflakeTargetConfigs
+        from prefect_snowflake import SnowflakeConnector
+
+        snowflake_connector = await SnowflakeConnector.load("snowflake-connector")
+        target_configs = SnowflakeTargetConfigs(connector=snowflake_connector)
+        dbt_cli_profile = DbtCliProfile(
+            name="jaffle_shop",
+            target="dev",
+            target_configs=target_configs,
+        )
+        profile = dbt_cli_profile.get_profile()
+        dbt_init = DbtCoreOperation(
+            commands=["dbt debug", "dbt list"],
+            dbt_cli_profile=dbt_cli_profile,
+            overwrite_profiles=True
+        )
+        dbt_init.run()
+        ```
+
+        Execute a longer-lasting dbt run as a context manager.
+        ```python
+        with DbtCoreOperation(commands=["dbt run"]) as dbt_run:
+            dbt_process = dbt_run.trigger()
+            # do other things
+            dbt_process.wait_for_completion()
+            dbt_output = dbt_process.fetch_result()
+        ```
     """
 
     _block_type_name = "dbt Core Operation"
@@ -256,6 +288,7 @@ class DbtCoreOperation(ShellOperation):
                 profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
         profiles_dir = Path(profiles_dir).expanduser()
         values["profiles_dir"] = profiles_dir
+        print(profiles_dir)
 
         # https://docs.getdbt.com/dbt-cli/configure-your-profile
         # Note that the file always needs to be called profiles.yml,
