@@ -194,6 +194,13 @@ class DbtCoreOperation(ShellOperation):
             exists under profile_dir and overwrite_profiles is set to False.
 
     Examples:
+        Load a configured block.
+        ```python
+        from prefect_dbt import DbtCoreOperation
+
+        dbt_op = DbtCoreOperation.load("BLOCK_NAME")
+        ```
+
         Execute short-lasting dbt debug and list with a custom DbtCliProfile.
         ```python
         from prefect_dbt import DbtCoreOperation, DbtCliProfile
