@@ -6,7 +6,8 @@ import pytest
 import yaml
 from prefect import flow
 
-from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation, trigger_dbt_cli_command
+from prefect_dbt.cli.credentials import DbtCliProfile
 
 
 async def mock_shell_run_command_fn(**kwargs):
@@ -174,3 +175,65 @@ def test_trigger_dbt_cli_command_shell_kwargs(profiles_dir, dbt_cli_profile_bare
         "command": f"dbt ls --profiles-dir {profiles_dir}",
         "return_all": True,
     }
+
+
+class TestDbtCoreOperation:
+    @pytest.fixture
+    def dbt_cli_profile(self):
+        return DbtCliProfile(
+            name="my_name",
+            target="my_target",
+            target_configs={"type": "my_type", "threads": 4, "schema": "my_schema"},
+        )
+
+    def test_check_profiles_default_env(self, tmp_path):
+        os.environ["DBT_PROFILES_DIR"] = str(tmp_path)
+        (tmp_path / "profiles.yml").write_text("test")
+        actual = DbtCoreOperation(commands=["dbt debug"]).profiles_dir
+        assert actual == tmp_path
+
+    def test_check_profiles_input_env(self, tmp_path):
+        (tmp_path / "profiles.yml").write_text("test")
+        actual = DbtCoreOperation(
+            commands=["dbt debug"], env={"DBT_PROFILES_DIR": str(tmp_path)}
+        ).profiles_dir
+        assert actual == tmp_path
+
+    def test_check_profiles_overwrite_without_profile(self):
+        with pytest.raises(ValueError, match="Since overwrite_profiles is True"):
+            DbtCoreOperation(commands=["dbt debug"], overwrite_profiles=True)
+
+    def test_check_profiles_overwrite_with_profile(self, tmp_path, dbt_cli_profile):
+        DbtCoreOperation(
+            commands=["dbt debug"],
+            profiles_dir=tmp_path,
+            overwrite_profiles=True,
+            dbt_cli_profile=dbt_cli_profile,
+        )
+        assert (tmp_path / "profiles.yml").exists()
+
+    def test_check_profiles_not_overwrite_with_profile(self, tmp_path, dbt_cli_profile):
+        (tmp_path / "profiles.yml").write_text("test")
+        with pytest.raises(ValueError, match="Since overwrite_profiles is False"):
+            DbtCoreOperation(
+                commands=["dbt debug"],
+                profiles_dir=tmp_path,
+                overwrite_profiles=False,
+                dbt_cli_profile=dbt_cli_profile,
+            )
+
+    def test_check_profiles_path_without_profile(self):
+        with pytest.raises(ValueError, match="Since overwrite_profiles is True"):
+            DbtCoreOperation(commands=["dbt debug"], profiles_dir=Path("fake"))
+
+    def test_process_commands_not_dbt(self):
+        with pytest.raises(ValueError, match="None of the commands"):
+            assert DbtCoreOperation(commands=["ls"])
+
+    def test_process_commands_dbt(self, tmp_path, dbt_cli_profile):
+        assert DbtCoreOperation(
+            commands=["dbt debug"],
+            profiles_dir=tmp_path,
+            project_dir=tmp_path,
+            dbt_cli_profile=dbt_cli_profile,
+        ).commands == [f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}"]

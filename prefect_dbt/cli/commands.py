@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from prefect import get_run_logger, task
-from prefect_shell.commands import ShellOperation, ShellProcess, shell_run_command
-from pydantic import root_validator, validator
+from prefect_shell.commands import ShellOperation, shell_run_command
+from pydantic import Field, root_validator
 
 from prefect_dbt.cli.credentials import DbtCliProfile
 
@@ -192,13 +192,44 @@ class DbtCoreOperation(ShellOperation):
         dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
             Note! This is optional and will raise an error if profiles.yml already
             exists under profile_dir and overwrite_profiles is set to False.
-
     """
 
-    profiles_dir: Optional[Union[Path, str]] = None
-    project_dir: Optional[Union[Path, str]] = None
-    overwrite_profiles: bool = False
-    dbt_cli_profile: Optional[DbtCliProfile] = None
+    _block_type_name = "dbt Core Operation"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/commands/#prefect_dbt.cli.commands.DbtCoreOperation"  # noqa
+
+    profiles_dir: Optional[Path] = Field(
+        default=None,
+        description=(
+            "The directory to search for the profiles.yml file. "
+            "Setting this appends the `--profiles-dir` option to the dbt commands "
+            "provided. If this is not set, will try using the DBT_PROFILES_DIR "
+            "environment variable, but if that's also not "
+            "set, will use the default directory `$HOME/.dbt/`."
+        ),
+    )
+    project_dir: Optional[Path] = Field(
+        default=None,
+        description=(
+            "The directory to search for the dbt_project.yml file. "
+            "Default is the current working directory and its parents."
+        ),
+    )
+    overwrite_profiles: bool = Field(
+        default=False,
+        description=(
+            "Whether the existing profiles.yml file under profiles_dir "
+            "should be overwritten with a new profile."
+        ),
+    )
+    dbt_cli_profile: Optional[DbtCliProfile] = Field(
+        default=None,
+        description=(
+            "Profiles class containing the profile written to profiles.yml. "
+            "Note! This is optional and will raise an error if profiles.yml already "
+            "exists under profile_dir and overwrite_profiles is set to False."
+        ),
+    )
 
     @root_validator(pre=True)
     def _check_installation(cls, values):
@@ -210,64 +241,70 @@ class DbtCoreOperation(ShellOperation):
                 "dbt-core needs to be installed to use this task; run "
                 '`pip install "prefect-dbt[cli]"'
             )
+        return values
 
-    @validator("commands")
-    def _check_commands(cls, commands):
+    @root_validator
+    def _check_profiles(cls, values):
         """
-        Check that there is at least one valid dbt command.
+        Check that the profiles_dir and dbt_cli_profile are valid.
         """
-        for command in commands:
-            if command.startswith("dbt"):
-                return commands
-        raise ValueError(
-            "None of the commands are a valid dbt sub-command; see dbt --help,"
-            "or use prefect_shell.ShellOperation for non-dbt related "
-            "commands instead"
-        )
-
-    def trigger(self, **open_kwargs: Dict[str, Any]) -> ShellProcess:
-        # TODO: ensure this works on Windows; see how Prefect core handles this...
-        # move to block initialization?
-        if self.profiles_dir is None:
-            profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
-        else:
-            profiles_dir = self.profiles_dir
+        profiles_dir = values.get("profiles_dir")
+        if profiles_dir is None:
+            if values.get("env", {}).get("DBT_PROFILES_DIR") is not None:
+                profiles_dir = values["env"]["DBT_PROFILES_DIR"]
+            else:
+                profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
         profiles_dir = Path(profiles_dir).expanduser()
+        values["profiles_dir"] = profiles_dir
 
         # https://docs.getdbt.com/dbt-cli/configure-your-profile
         # Note that the file always needs to be called profiles.yml,
         # regardless of which directory it is in.
         profiles_path = profiles_dir / "profiles.yml"
-        self.logger.debug(f"Using this profiles path: {profiles_path}")
-
-        # write the profile if overwrite or no profiles exist
-        # TODO: move this to validator
-        if self.overwrite_profiles or not profiles_path.exists():
-            if self.dbt_cli_profile is None:
+        overwrite_profiles = values.get("overwrite_profiles")
+        dbt_cli_profile = values.get("dbt_cli_profile")
+        if not profiles_path.exists() or overwrite_profiles:
+            if dbt_cli_profile is None:
                 raise ValueError(
-                    "Provide `dbt_cli_profile` keyword for writing profiles"
+                    "Since overwrite_profiles is True or profiles_path is empty, "
+                    "need `dbt_cli_profile` to write a profile"
                 )
-            profile = self.dbt_cli_profile.get_profile()
+            profile = dbt_cli_profile.get_profile()
             profiles_dir.mkdir(exist_ok=True)
             with open(profiles_path, "w+") as f:
                 yaml.dump(profile, f, default_flow_style=False)
-            self.logger.info(f"Wrote profile to {profiles_path}")
-        elif self.dbt_cli_profile is not None:
+        elif dbt_cli_profile is not None:
             raise ValueError(
                 f"Since overwrite_profiles is False and profiles_path {profiles_path} "
                 f"already exists, the profile within dbt_cli_profile couldn't be used; "
-                f"if the existing profile is satisfactory, do not pass dbt_cli_profile"
+                f"if the existing profile is satisfactory, do not set dbt_cli_profile"
             )
+        return values
 
-        # append the options
+    @root_validator
+    def _process_commands(cls, values):
+        """
+        Append profiles-dir and project-dir options to dbt commands, and ensures
+        that at least one command is a valid dbt sub-command.
+        """
+        project_dir = values.get("project_dir")
+        profiles_dir = values.get("profiles_dir")
+
         commands = []
-        for command in commands:
-            if not command.startswith("dbt "):
-                continue
-            command += f" --profiles-dir {profiles_dir}"
-            if self.project_dir is not None:
-                project_dir = Path(self.project_dir).expanduser()
-                command += f" --project-dir {project_dir}"
-
-        self.logger.info(f"Running dbt command: {command}")
-        return super().trigger(commands=commands, **open_kwargs)
+        has_dbt_command = False
+        for command in values.get("commands"):
+            if command.startswith("dbt "):
+                has_dbt_command = True
+                command += f" --profiles-dir {profiles_dir}"
+                if project_dir is not None:
+                    project_dir = Path(project_dir).expanduser()
+                    command += f" --project-dir {project_dir}"
+            commands.append(command)
+        if not has_dbt_command:
+            raise ValueError(
+                "None of the commands are a valid dbt sub-command; see dbt --help, "
+                "or use prefect_shell.ShellOperation for non-dbt related "
+                "commands instead"
+            )
+        values["commands"] = commands
+        return values
