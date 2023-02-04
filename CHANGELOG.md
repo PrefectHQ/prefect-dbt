@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `DbtCloudJob` block and `trigger_wait_retry_dbt_cloud_job_run` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 ### Changed
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
@@ -15,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `DbtCliProfile` is now accepts a `Union` of `SnowflakeTargetConfigs`, `BigQueryTargetConfigs`, and `PostgresTargetConfigs` for creation on UI - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
 
 ### Deprecated
+- `trigger_dbt_cloud_job_run_and_wait_for_completion` and `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flows in favor of `DbtCloudJob` block and `trigger_wait_retry_dbt_cloud_job_run` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 ### Removed
 

@@ -28,17 +28,13 @@ Visit the full docs [here](https://PrefectHQ.github.io/prefect-dbt) to see addit
 ```python
 from prefect import flow
 
-from prefect_dbt.cloud import DbtCloudCredentials
-from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+from prefect_dbt.cloud import DbtCloudJob
+from prefect_dbt.cloud.jobs import trigger_wait_retry_dbt_cloud_job_run
 
 @flow
 def run_dbt_job_flow():
-    run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
-        dbt_cloud_credentials=DbtCloudCredentials(
-            api_key="my_api_key",
-            account_id=123456789
-        ),
-        job_id=1
+    run_result = trigger_wait_retry_dbt_cloud_job_run(
+        dbt_cloud_job=DbtCloudJob.load("my-block-name"),
     )
 
 run_dbt_job_flow()

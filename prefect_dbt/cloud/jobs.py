@@ -2,6 +2,7 @@
 import asyncio
 import shlex
 import time
+import warnings
 from json import JSONDecodeError
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 
@@ -344,6 +345,11 @@ async def trigger_dbt_cloud_job_run_and_wait_for_completion(
         )
         ```
     """  # noqa
+    warnings.warn(
+        "The flow trigger_dbt_cloud_job_run_and_wait_for_completion is "
+        "deprecated and will be removed in May 3rd. Please use either the block "
+        "DbtCloudJob or the flow trigger_wait_retry_dbt_cloud_job_run instead.",
+    )
     logger = get_run_logger()
 
     triggered_run_data_future = await trigger_dbt_cloud_job_run.submit(
@@ -589,6 +595,12 @@ async def retry_dbt_cloud_job_run_subset_and_wait_for_completion(
         retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow()
         ```
     """  # noqa
+    warnings.warn(
+        "The flow retry_dbt_cloud_job_run_subset_and_wait_for_completion is "
+        "deprecated and will be removed in May 3rd. Please use the DbtCloudRun "
+        "retry_failed_steps method or the flow trigger_wait_retry_dbt_cloud_job_run "
+        "instead.",
+    )
     if trigger_job_run_options and trigger_job_run_options.steps_override is not None:
         raise ValueError(
             "Do not set `steps_override` in `trigger_job_run_options` "
