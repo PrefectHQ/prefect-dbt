@@ -1,6 +1,6 @@
 import pytest
 
-from prefect_dbt.cli.configs.base import TargetConfigs
+from prefect_dbt.cli.configs.base import GlobalConfigs, TargetConfigs
 
 
 def test_target_configs_get_configs():
@@ -26,3 +26,9 @@ def test_target_configs_get_configs_duplicate_keys():
             extras={"extra_input": 1, "schema": "something else"},
         )
         target_configs.get_configs()
+
+
+def test_global_configs():
+    global_configs = GlobalConfigs(log_format="json", send_anonymous_usage_stats=False)
+    assert global_configs.log_format == "json"
+    assert global_configs.send_anonymous_usage_stats is False

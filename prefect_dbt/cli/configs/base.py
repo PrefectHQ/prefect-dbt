@@ -201,7 +201,7 @@ class GlobalConfigs(DbtConfigs):
         default=None,
         description="Whether to convert dbt warnings into errors.",
     )
-    log_format: Optional[bool] = Field(
+    log_format: Optional[str] = Field(
         default=None,
         description=(
             "The LOG_FORMAT config specifies how dbt's logs should "
