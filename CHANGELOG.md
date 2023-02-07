@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
 - Decoupled fields of blocks from external Collections from the created dbt profile - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
 - `DbtCliProfile` is now accepts a `Union` of `SnowflakeTargetConfigs`, `BigQueryTargetConfigs`, and `PostgresTargetConfigs` for creation on UI - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
+- Breaking: Made `BigQueryTargetConfigs.get_configs` synchronous - [#120](https://github.com/PrefectHQ/prefect-dbt/pull/120)
 
 ### Deprecated
 - `trigger_dbt_cloud_job_run_and_wait_for_completion` and `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flows in favor of `DbtCloudJob` block and `trigger_wait_retry_dbt_cloud_job_run` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Preventing `TargetConfigs` from being dropped upon loading a `DbtCliProfile` - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
+- The input type of `GlobalConfigs.log_format` [#118](https://github.com/PrefectHQ/prefect-dbt/pull/118)
 
 ### Security
 
