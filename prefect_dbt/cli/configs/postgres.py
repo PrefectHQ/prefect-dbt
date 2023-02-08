@@ -1,12 +1,9 @@
 """Module containing models for Postgres configs"""
-from typing import Any, Dict
-
-try:
-    from typing import Literal, Union
-except ImportError:
-    from typing_extensions import Literal
+import warnings
+from typing import Any, Dict, Union
 
 from pydantic import Field
+from typing_extensions import Literal
 
 from prefect_dbt.cli.configs.base import BaseTargetConfigs, MissingExtrasRequireError
 
@@ -78,6 +75,11 @@ class PostgresTargetConfigs(BaseTargetConfigs):
         Returns:
             A configs JSON.
         """
+        if isinstance(self.credentials, DatabaseCredentials):
+            warnings.warn(
+                "Using DatabaseCredentials is deprecated and will be removed "
+                "on May 7th, 2023, use SqlAlchemyConnector instead."
+            )
         all_configs_json = super().get_configs()
 
         rename_keys = {

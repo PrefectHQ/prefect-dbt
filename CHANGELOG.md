@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `DbtCoreOperation` block - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
-- `SqlAlchemyConnector` support for use for `PostgresTargetConfigs` - [#120](https://github.com/PrefectHQ/prefect-dbt/pull/120)
+- `SqlAlchemyConnector` support for use for `PostgresTargetConfigs` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
 
 ### Changed
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - `trigger_dbt_cli_command` in favor of `DbtCoreOperation` - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
+- `DatabaseCredentials` used in `PostgresTargetConfigs` in favor of `SqlAlchemyConnector` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
 
 ### Removed
 
