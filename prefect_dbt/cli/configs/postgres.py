@@ -78,7 +78,8 @@ class PostgresTargetConfigs(BaseTargetConfigs):
         if isinstance(self.credentials, DatabaseCredentials):
             warnings.warn(
                 "Using DatabaseCredentials is deprecated and will be removed "
-                "on May 7th, 2023, use SqlAlchemyConnector instead."
+                "on May 7th, 2023, use SqlAlchemyConnector instead.",
+                DeprecationWarning,
             )
         all_configs_json = super().get_configs()
 
