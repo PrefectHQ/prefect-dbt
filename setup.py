@@ -12,7 +12,6 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 extras_require = {
-    "cli": ["dbt_core>=1.1.1"],
     "snowflake": ["prefect-snowflake>=0.2.4", "dbt-snowflake"],
     "bigquery": ["prefect-gcp[bigquery]>=0.1.8", "dbt-bigquery"],
     "postgres": ["prefect-sqlalchemy>=0.2.1", "dbt-postgres"],
