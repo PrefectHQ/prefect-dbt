@@ -1,0 +1,52 @@
+diff a/README.md b/README.md	(rejected hunks)
+@@ -47,8 +47,6 @@ Install `prefect-dbt` with `pip`:
+ pip install prefect-dbt
+ ```
+ 
+-A list of available blocks in `prefect-dbt` and their setup instructions can be found [here](https://PrefectHQ.github.io/prefect-dbt/blocks-catalog).
+-
+ Requires an installation of Python 3.7+.
+ 
+ We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.
+@@ -57,13 +55,15 @@ These tasks are designed to work with Prefect 2.0. For more information about ho
+ 
+ <!--- ### Saving credentials to block
+ 
+-Replace this with actual instructions on how to get API key or token.
++Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
++
++Below is a walkthrough on saving block documents through code.
+ 
+-1. Head over to 
+-2. Login to your SERVICE account
+-3. Click "+ Create new secret key"
+-4. Copy the generated API key
+-5. Create a short script, replacing the placeholders (or do so in the UI)
++1. Head over to <SERVICE_URL>.
++2. Login to your <SERVICE> account.
++3. Click "+ Create new secret key".
++4. Copy the generated API key.
++5. Create a short script, replacing the placeholders (or do so in the UI).
+ 
+ ```python
+ from prefect_dbt import Block`
+@@ -76,6 +76,19 @@ Congrats! You can now easily load the saved block, which holds your credentials:
+ from prefect_dbt import Block
+ Block.load("BLOCK_NAME_PLACEHOLDER")
+ ```
++
++!!! info Registering blocks
++
++Register blocks in this module to
++[view and edit them](https://orion-docs.prefect.io/ui/blocks/)
++on Prefect Cloud:
++
++```bash
++prefect block register -m prefect_dbt
++```
++
++A list of available blocks in `prefect-dbt` and their setup instructions can be found [here](https://PrefectHQ.github.io/prefect-dbt/blocks_catalog).
++
+ --->
+ 
+ ### Feedback
