@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -272,8 +273,11 @@ class TestDbtCoreOperation:
             dbt_cli_profile=dbt_cli_profile,
         ) as op:
             op.run()
-        tmp_script = mock_open_process.call_args_list[0][1]["command"][1]
-        with open(tmp_script, "r") as f:
-            actual = f.read()
-            expected = f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}"
-            assert actual == expected
+            tmp_script = mock_open_process.call_args_list[0][1]["command"][1]
+            new_script = tmp_path / "input_script"
+            shutil.copy(tmp_script, new_script)
+
+        # fix Windows permission error by copying over the script
+        actual = new_script.read_text()
+        expected = f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}"
+        assert actual == expected
