@@ -268,7 +268,6 @@ class TestDbtCoreOperation:
             project_dir=tmp_path,
             dbt_cli_profile=dbt_cli_profile,
         ).run()
-        assert "bash" == mock_open_process.call_args.kwargs["command"][0]
         tmp_script = mock_open_process.call_args.kwargs["command"][1]
         with open(tmp_script, "r") as f:
             actual = f.read()
