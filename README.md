@@ -1,4 +1,4 @@
-# prefect-dbt
+# Coordinate and use dbt in your dataflow with prefect-dbt
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/15331990/215649781-be317381-9ff0-4f45-85d4-a30e80514554.png" width=40% height=40%>
@@ -20,9 +20,11 @@
 
 Visit the full docs [here](https://PrefectHQ.github.io/prefect-dbt) to see additional examples and the API reference.
 
-`prefect-dbt` is a collection of Prefect integrations for working with dbt with your Prefect flows.
+The prefect-dbt collection makes it easy to use dbt in your Prefect flows. Check out the examples below to get started!
 
 ## Getting Started
+
+Be sure to install [prefect-dbt](#installation) to run the examples below!
 
 ### Trigger a dbt Cloud job and wait for completion
 ```python
@@ -132,17 +134,45 @@ If you need help getting started with or using dbt, please consult the [dbt docu
 
 ### Installation
 
-Install `prefect-dbt` with `pip`:
+To use `prefect-dbt` with dbt Cloud:
 
 ```bash
 pip install prefect-dbt
 ```
 
-Some dbt CLI profiles require additional installation; for example Databricks:
+To use dbt Core (CLI):
 
 ```bash
-pip install dbt-databricks
+pip install "prefect-dbt[cli]"
 ```
+
+To use dbt Core with Snowflake profiles:
+
+```bash
+pip install "prefect-dbt[snowflake]"
+```
+
+To use dbt Core with BigQuery profiles:
+
+```bash
+pip install "prefect-dbt[bigquery]"
+```
+
+To use dbt Core with Postgres profiles:
+
+```bash
+pip install "prefect-dbt[postgres]"
+```
+
+!!! warning "Some dbt Core profiles require additional installation"
+
+    According to dbt's [Databricks setup page](https://docs.getdbt.com/reference/warehouse-setups/databricks-setup), users must first install the adapter:
+
+    ```bash
+    pip install dbt-databricks
+    ```
+
+    Check out the [desired profile setup page](https://docs.getdbt.com/reference/profiles.yml) on the sidebar for others.
 
 Requires an installation of Python 3.7+.
 
@@ -150,7 +180,7 @@ We recommend using a Python virtual environment manager such as pipenv, conda or
 
 These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the [Prefect documentation](https://orion-docs.prefect.io/).
 
-### Saving dbt Cloud credentials to block
+### Saving credentials to block
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
@@ -175,11 +205,17 @@ from prefect_dbt.cloud import DbtCloudCredentials
 DbtCloudCredentials.load("BLOCK_NAME_PLACEHOLDER")
 ```
 
-To [view and edit the blocks](https://orion-docs.prefect.io/ui/blocks/) on Prefect UI:
+!!! info "Registering blocks"
 
-```bash
-prefect block register -m prefect_dbt
-```
+    Register blocks in this module to
+    [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
+    on Prefect Cloud:
+
+    ```bash
+    prefect block register -m prefect_dbt
+    ```
+
+A list of available blocks in `prefect-dbt` and their setup instructions can be found [here](https://PrefectHQ.github.io/prefect-dbt/blocks_catalog).
 
 ### Feedback
 
