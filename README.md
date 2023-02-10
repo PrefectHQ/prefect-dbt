@@ -29,11 +29,11 @@ Visit the full docs [here](https://PrefectHQ.github.io/prefect-dbt) to see addit
 from prefect import flow
 
 from prefect_dbt.cloud import DbtCloudJob
-from prefect_dbt.cloud.jobs import trigger_wait_retry_dbt_cloud_job_run
+from prefect_dbt.cloud.jobs import run_dbt_cloud_job
 
 @flow
 def run_dbt_job_flow():
-    run_result = trigger_wait_retry_dbt_cloud_job_run(
+    run_result = run_dbt_cloud_job(
         dbt_cloud_job=DbtCloudJob.load("my-block-name"),
     )
 

@@ -1089,7 +1089,7 @@ class DbtCloudJob(JobBlock):
 
 
 @flow
-async def trigger_wait_retry_dbt_cloud_job_run(
+async def run_dbt_cloud_job(
     dbt_cloud_job: DbtCloudJob,
     targeted_retries: int = 3,
 ) -> Dict[str, Any]:
@@ -1106,17 +1106,17 @@ async def trigger_wait_retry_dbt_cloud_job_run(
         ```python
         from prefect import flow
         from prefect_dbt.cloud import DbtCloudCredentials, DbtCloudJob
-        from prefect_dbt.cloud.jobs import trigger_wait_retry_dbt_cloud_job_run
+        from prefect_dbt.cloud.jobs import run_dbt_cloud_job
 
         @flow
-        def trigger_wait_retry_dbt_cloud_job_run_flow():
+        def run_dbt_cloud_job_flow():
             dbt_cloud_credentials = DbtCloudCredentials.load("dbt-token")
             dbt_cloud_job = DbtCloudJob(
                 dbt_cloud_credentials=dbt_cloud_credentials, job_id=154217
             )
-            return trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+            return run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job)
 
-        trigger_wait_retry_dbt_cloud_job_run_flow()
+        run_dbt_cloud_job_flow()
         ```
     """
     logger = get_run_logger()

@@ -18,9 +18,9 @@ from prefect_dbt.cloud.jobs import (
     get_dbt_cloud_job_info,
     get_run_id,
     retry_dbt_cloud_job_run_subset_and_wait_for_completion,
+    run_dbt_cloud_job,
     trigger_dbt_cloud_job_run,
     trigger_dbt_cloud_job_run_and_wait_for_completion,
-    trigger_wait_retry_dbt_cloud_job_run,
 )
 from prefect_dbt.cloud.models import TriggerJobRunOptions
 
@@ -618,7 +618,7 @@ class TestTriggerWaitRetryDbtCloudJobRun:
             headers={"Authorization": "Bearer my_api_key"},
         ).mock(return_value=Response(200, json={"data": ["manifest.json"]}))
 
-        result = await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+        result = await run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job)
         assert result == {
             "id": 10000,
             "status": 10,
@@ -642,7 +642,7 @@ class TestTriggerWaitRetryDbtCloudJobRun:
 
         dbt_cloud_job.timeout_seconds = 1
         with pytest.raises(DbtCloudJobRunTimedOut, match="Max wait time of 1"):
-            await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+            await run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job)
 
     @pytest.mark.parametrize(
         "exe_command",
@@ -765,7 +765,7 @@ class TestTriggerWaitRetryDbtCloudJobRun:
         )
 
         with pytest.raises(DbtCloudJobRunFailed, match="dbt Cloud job 10000"):
-            await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+            await run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job)
 
     @pytest.mark.respx(assert_all_called=True)
     async def test_cancel(self, respx_mock, dbt_cloud_job):
@@ -783,7 +783,7 @@ class TestTriggerWaitRetryDbtCloudJobRun:
         ).mock(return_value=Response(200, json={"data": {"id": 10000, "status": 30}}))
 
         with pytest.raises(DbtCloudJobRunCancelled, match="dbt Cloud job 10000"):
-            await trigger_wait_retry_dbt_cloud_job_run(dbt_cloud_job=dbt_cloud_job)
+            await run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job)
 
     @pytest.mark.respx(assert_all_called=True)
     async def test_fetch_result_running(self, respx_mock, dbt_cloud_job):
@@ -813,9 +813,7 @@ class TestTriggerWaitRetryDbtCloudJobRun:
             return_value=Response(404, json={"status": {"user_message": "Not found"}})
         )
         with pytest.raises(DbtCloudJobRunTriggerFailed, match="Not found"):
-            await trigger_wait_retry_dbt_cloud_job_run(
-                dbt_cloud_job=dbt_cloud_job, targeted_retries=0
-            )
+            await run_dbt_cloud_job(dbt_cloud_job=dbt_cloud_job, targeted_retries=0)
 
 
 def test_get_job(respx_mock, dbt_cloud_job):
