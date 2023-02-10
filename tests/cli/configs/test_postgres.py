@@ -46,9 +46,9 @@ def test_postgres_target_configs_get_configs_for_sqlalchemy_connector():
                 password="prefect_password",
                 host="host",
                 port=8080,
-                query={"a": "query"}
+                query={"a": "query"},
             ),
-            kwarg_that_shouldnt_show_up=True
+            kwarg_that_shouldnt_show_up=True,
         ),
         schema="schema",
         extras={"retries": 1},
