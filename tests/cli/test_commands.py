@@ -281,6 +281,7 @@ class TestDbtCoreOperation:
             op.run()
 
         mock_write = mock_named_temporary_file.return_value.__enter__.return_value.write
-        mock_write.assert_called_with(
-            f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}".encode()
+        assert (
+            mock_write.call_args_list[0][0][0]
+            == f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}".encode()
         )
