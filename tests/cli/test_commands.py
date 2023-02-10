@@ -182,6 +182,8 @@ class TestDbtCoreOperation:
     @pytest.fixture
     def mock_open_process(self, monkeypatch):
         open_process = MagicMock()
+        open_process.return_value.__aenter__.return_value = AsyncMock()
+        open_process.return_value.__aexit__.return_value = AsyncMock()
         monkeypatch.setattr("prefect_shell.commands.open_process", open_process)
         return open_process
 
