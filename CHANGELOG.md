@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `DbtCloudJob` block and `run_dbt_cloud_job` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 - `DbtCoreOperation` block - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
 - `SqlAlchemyConnector` support for use for `PostgresTargetConfigs` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
