@@ -295,7 +295,7 @@ class DbtCoreOperation(ShellOperation):
                 # get DBT_PROFILES_DIR from the user input env
                 profiles_dir = self.env["DBT_PROFILES_DIR"]
             else:
-                # get DBT_PROFILES_DIR from the system env
+                # get DBT_PROFILES_DIR from the system env, or default to ~/.dbt
                 profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
         profiles_dir = relative_path_to_current_platform(
             Path(profiles_dir).expanduser()
