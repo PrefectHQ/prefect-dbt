@@ -43,11 +43,13 @@ def insert_blocks_catalog(generated_file):
 
             To register blocks in this module to
             [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
-            on Prefect Cloud:
+            on Prefect Cloud, first [install the required packages](
+            https://PrefectHQ.github.io/prefect-dbt/#installation),
+            then
             ```bash
             prefect block register -m {COLLECTION_SLUG}
             ```
-            """
+            """  # noqa
         )
     )
     generated_file.write(
