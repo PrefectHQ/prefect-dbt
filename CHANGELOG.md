@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- `trigger_dbt_cli_command` in favor of `DbtCoreOperation` - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
 - `DatabaseCredentials` used in `PostgresTargetConfigs` in favor of `SqlAlchemyConnector` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
 
 ### Removed

@@ -1,14 +1,13 @@
 """Module containing tasks and flows for interacting with dbt CLI"""
 import os
-import warnings
-from pathlib import Path
-from shutil import which
+from pathlib import Path, PosixPath
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from prefect import get_run_logger, task
+from prefect.utilities.filesystem import relative_path_to_current_platform
 from prefect_shell.commands import ShellOperation, shell_run_command
-from pydantic import Field, root_validator
+from pydantic import Field, validator
 
 from prefect_dbt.cli.credentials import DbtCliProfile
 
@@ -106,19 +105,9 @@ async def trigger_dbt_cli_command(
         trigger_dbt_cli_command_flow()
         ```
     """  # noqa
-    warnings.warn(
-        "This task is deprecated and will be removed in May 3rd, 2023. "
-        "Please use `prefect_dbt.cli.commands.DbtCoreOperation` instead.",
-        DeprecationWarning,
-    )
     # check if variable is set, if not check env, if not use expected default
     logger = get_run_logger()
-    if not which("dbt"):
-        raise ImportError(
-            "dbt-core needs to be installed to use this task; run "
-            '`pip install "prefect-dbt[cli]"'
-        )
-    elif not command.startswith("dbt"):
+    if not command.startswith("dbt"):
         await shell_run_command.fn(command="dbt --help")
         raise ValueError(
             "Command is not a valid dbt sub-command; see dbt --help above,"
@@ -276,39 +265,41 @@ class DbtCoreOperation(ShellOperation):
         ),
     )
 
-    @root_validator(pre=True)
-    def _check_installation(cls, values):
+    @validator("commands", always=True)
+    def _has_a_dbt_command(cls, commands):
         """
-        Check that dbt is installed.
+        Check that the commands contain a dbt command.
         """
-        if not which("dbt"):
-            raise ImportError(
-                "dbt-core needs to be installed to use this task; run "
-                '`pip install "prefect-dbt[cli]"'
+        if not any("dbt " in command for command in commands):
+            raise ValueError(
+                "None of the commands are a valid dbt sub-command; see dbt --help, "
+                "or use prefect_shell.ShellOperation for non-dbt related "
+                "commands instead"
             )
-        return values
+        return commands
 
-    @root_validator
-    def _check_profiles(cls, values):
+    def _find_valid_profiles_dir(self) -> PosixPath:
         """
-        Check that the profiles_dir and dbt_cli_profile are valid.
+        Ensure that there is a profiles.yml available for use.
         """
-        profiles_dir = values.get("profiles_dir")
+        profiles_dir = self.profiles_dir
         if profiles_dir is None:
-            if values.get("env", {}).get("DBT_PROFILES_DIR") is not None:
-                profiles_dir = values["env"]["DBT_PROFILES_DIR"]
+            if self.env.get("DBT_PROFILES_DIR") is not None:
+                # get DBT_PROFILES_DIR from the user input env
+                profiles_dir = self.env["DBT_PROFILES_DIR"]
             else:
+                # get DBT_PROFILES_DIR from the system env, or default to ~/.dbt
                 profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
-        profiles_dir = Path(profiles_dir).expanduser()
-        values["profiles_dir"] = profiles_dir
-        print(profiles_dir)
+        profiles_dir = relative_path_to_current_platform(
+            Path(profiles_dir).expanduser()
+        )
 
         # https://docs.getdbt.com/dbt-cli/configure-your-profile
         # Note that the file always needs to be called profiles.yml,
         # regardless of which directory it is in.
         profiles_path = profiles_dir / "profiles.yml"
-        overwrite_profiles = values.get("overwrite_profiles")
-        dbt_cli_profile = values.get("dbt_cli_profile")
+        overwrite_profiles = self.overwrite_profiles
+        dbt_cli_profile = self.dbt_cli_profile
         if not profiles_path.exists() or overwrite_profiles:
             if dbt_cli_profile is None:
                 raise ValueError(
@@ -325,32 +316,35 @@ class DbtCoreOperation(ShellOperation):
                 f"already exists, the profile within dbt_cli_profile couldn't be used; "
                 f"if the existing profile is satisfactory, do not set dbt_cli_profile"
             )
-        return values
+        return profiles_dir
 
-    @root_validator
-    def _process_commands(cls, values):
+    def _append_dirs_to_commands(self, profiles_dir) -> List[str]:
         """
-        Append profiles-dir and project-dir options to dbt commands, and ensures
-        that at least one command is a valid dbt sub-command.
+        Append profiles_dir and project_dir options to dbt commands.
         """
-        project_dir = values.get("project_dir")
-        profiles_dir = values.get("profiles_dir")
+        project_dir = self.project_dir
 
         commands = []
-        has_dbt_command = False
-        for command in values.get("commands"):
-            if command.startswith("dbt "):
-                has_dbt_command = True
-                command += f" --profiles-dir {profiles_dir}"
-                if project_dir is not None:
-                    project_dir = Path(project_dir).expanduser()
-                    command += f" --project-dir {project_dir}"
+        for command in self.commands:
+            command += f" --profiles-dir {profiles_dir}"
+            if project_dir is not None:
+                project_dir = Path(project_dir).expanduser()
+                command += f" --project-dir {project_dir}"
             commands.append(command)
-        if not has_dbt_command:
-            raise ValueError(
-                "None of the commands are a valid dbt sub-command; see dbt --help, "
-                "or use prefect_shell.ShellOperation for non-dbt related "
-                "commands instead"
-            )
-        values["commands"] = commands
-        return values
+        return commands
+
+    def _compile_kwargs(self, **open_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Helper method to compile the kwargs for `open_process` so it's not repeated
+        across the run and trigger methods.
+        """
+        profiles_dir = self._find_valid_profiles_dir()
+        commands = self._append_dirs_to_commands(profiles_dir=profiles_dir)
+
+        # _compile_kwargs is called within trigger() and run(), prior to execution.
+        # However _compile_kwargs directly uses self.commands, but here we modified
+        # the commands without saving back to self.commands so we need to create a copy.
+        # was also thinking of using env vars but DBT_PROJECT_DIR is not supported yet.
+        modified_self = self.copy()
+        modified_self.commands = commands
+        return super(type(self), modified_self)._compile_kwargs(**open_kwargs)
