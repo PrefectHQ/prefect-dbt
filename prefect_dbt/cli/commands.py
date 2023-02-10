@@ -1,8 +1,6 @@
 """Module containing tasks and flows for interacting with dbt CLI"""
 import os
-import warnings
 from pathlib import Path, PosixPath
-from shutil import which
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
@@ -107,11 +105,6 @@ async def trigger_dbt_cli_command(
         trigger_dbt_cli_command_flow()
         ```
     """  # noqa
-    warnings.warn(
-        "This task is deprecated and will be removed in May 3rd, 2023. "
-        "Please use `prefect_dbt.cli.commands.DbtCoreOperation` instead.",
-        DeprecationWarning,
-    )
     # check if variable is set, if not check env, if not use expected default
     logger = get_run_logger()
     if not command.startswith("dbt"):
@@ -354,4 +347,4 @@ class DbtCoreOperation(ShellOperation):
         # was also thinking of using env vars but DBT_PROJECT_DIR is not supported yet.
         modified_self = self.copy()
         modified_self.commands = commands
-        return super(ShellOperation, modified_self)._compile_kwargs(**open_kwargs)
+        return super(type(self), modified_self)._compile_kwargs(**open_kwargs)
