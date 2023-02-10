@@ -354,4 +354,4 @@ class DbtCoreOperation(ShellOperation):
         # was also thinking of using env vars but DBT_PROJECT_DIR is not supported yet.
         modified_self = self.copy()
         modified_self.commands = commands
-        return super(type(self), modified_self)._compile_kwargs(**open_kwargs)
+        return super(ShellOperation, modified_self)._compile_kwargs(**open_kwargs)
