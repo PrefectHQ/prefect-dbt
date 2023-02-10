@@ -263,8 +263,15 @@ class TestDbtCoreOperation:
             assert DbtCoreOperation(commands=["ls"])
 
     def test_append_dirs_to_commands(
-        self, tmp_path, dbt_cli_profile, mock_open_process, mock_shell_process
+        self,
+        tmp_path,
+        dbt_cli_profile,
+        mock_open_process,
+        mock_shell_process,
+        monkeypatch,
     ):
+        mock_named_temporary_file = MagicMock(name="tempfile")
+        monkeypatch.setattr("tempfile.NamedTemporaryFile", mock_named_temporary_file)
         with DbtCoreOperation(
             commands=["dbt debug"],
             profiles_dir=tmp_path,
@@ -272,10 +279,8 @@ class TestDbtCoreOperation:
             dbt_cli_profile=dbt_cli_profile,
         ) as op:
             op.run()
-            tmp_script = mock_open_process.call_args_list[0][1]["command"][1]
-            os.chmod(tmp_script, 0o0777)
 
-            # fix Windows permission error by copying over the script
-            actual = Path(tmp_script).read_text()
-            expected = f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}"
-            assert actual == expected
+        mock_write = mock_named_temporary_file.return_value.__enter__.return_value.write
+        mock_write.assert_called_once_with(
+            f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}".encode()
+        )
