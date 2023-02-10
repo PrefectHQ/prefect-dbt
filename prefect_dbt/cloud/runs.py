@@ -8,34 +8,13 @@ from prefect import flow, get_run_logger, task
 from typing_extensions import Literal
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
+from prefect_dbt.cloud.exceptions import (
+    DbtCloudGetRunArtifactFailed,
+    DbtCloudGetRunFailed,
+    DbtCloudJobRunTimedOut,
+    DbtCloudListRunArtifactsFailed,
+)
 from prefect_dbt.cloud.utils import extract_user_message
-
-
-class DbtCloudGetRunFailed(Exception):
-    """Raised when unable to retrieve dbt Cloud run"""
-
-
-class DbtCloudListRunArtifactsFailed(Exception):
-    """Raised when unable to list dbt Cloud run artifacts"""
-
-
-class DbtCloudGetRunArtifactFailed(Exception):
-    """Raised when unable to get a dbt Cloud run artifact"""
-
-
-class DbtCloudJobRunFailed(Exception):
-    """Raised when a triggered job run fails"""
-
-
-class DbtCloudJobRunCancelled(Exception):
-    """Raised when a triggered job run is cancelled"""
-
-
-class DbtCloudJobRunTimedOut(Exception):
-    """
-    Raised when a triggered job run does not complete in the configured max
-    wait seconds
-    """
 
 
 class DbtCloudJobRunStatus(Enum):
