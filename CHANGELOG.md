@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Breaking: Made `BigQueryTargetConfigs.get_configs` synchronous - [#120](https://github.com/PrefectHQ/prefect-dbt/pull/120)
 
 ### Deprecated
-- `trigger_dbt_cloud_job_run_and_wait_for_completion` and `retry_dbt_cloud_job_run_subset_and_wait_for_completion` flows in favor of `DbtCloudJob` block and `trigger_wait_retry_dbt_cloud_job_run` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 ### Removed
 
