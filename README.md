@@ -209,7 +209,7 @@ from prefect_dbt.cloud import DbtCloudCredentials
 DbtCloudCredentials.load("BLOCK_NAME_PLACEHOLDER")
 ```
 
-!!! info Registering blocks
+!!! info "Registering blocks"
 
     Register blocks in this module to
     [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
