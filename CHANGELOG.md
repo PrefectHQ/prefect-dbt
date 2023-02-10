@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `DbtCloudJob` block and `run_dbt_cloud_job` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 ### Changed
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
