@@ -32,51 +32,22 @@ class BigQueryTargetConfigs(BaseTargetConfigs):
             e.g. schema, an error will be raised.
 
     Examples:
-        Load stored BigQueryTargetConfigs:
+        Load stored BigQueryTargetConfigs.
         ```python
         from prefect_dbt.cli.configs import BigQueryTargetConfigs
 
         bigquery_target_configs = BigQueryTargetConfigs.load("BLOCK_NAME")
         ```
 
-        Instantiate BigQueryTargetConfigs with service account file.
+        Instantiate BigQueryTargetConfigs.
         ```python
         from prefect_dbt.cli.configs import BigQueryTargetConfigs
         from prefect_gcp.credentials import GcpCredentials
 
-        credentials = GcpCredentials(service_account_file="~/.secrets/gcp")
+        credentials = GcpCredentials.load("BLOCK-NAME-PLACEHOLDER")
         target_configs = BigQueryTargetConfigs(
-            schema="schema",
-            project="project",
+            schema="schema",  # also known as dataset
             credentials=credentials,
-        )
-        ```
-
-        Instantiate BigQueryTargetConfigs with service account info.
-        ```python
-        import json
-        from prefect_dbt.cli.configs import BigQueryTargetConfigs
-        from prefect_gcp.credentials import GcpCredentials
-
-        credentials = GcpCredentials(
-            service_account_info=json.dumps({
-                "type": "service_account",
-                "project_id": "project_id",
-                "private_key_id": "private_key_id",
-                "private_key": "private_key",
-                "client_email": "client_email",
-                "client_id": "client_id",
-                "auth_uri": "auth_uri",
-                "token_uri": "token_uri",
-                "auth_provider_x509_cert_url": "auth_provider_x509_cert_url",
-                "client_x509_cert_url": "client_x509_cert_url"
-            })
-        )
-        target_configs = BigQueryTargetConfigs(
-            schema="schema",
-            project="project",
-            credentials=credentials,
-            extras={"execution_project": "my_exe_project"},
         )
         ```
     """
