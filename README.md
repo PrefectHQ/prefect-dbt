@@ -30,33 +30,29 @@ Be sure to install [prefect-dbt](#installation) to run the examples below!
 ```python
 from prefect import flow
 
-from prefect_dbt.cloud import DbtCloudCredentials
-from prefect_dbt.cloud.jobs import trigger_dbt_cloud_job_run_and_wait_for_completion
+from prefect_dbt.cloud import DbtCloudJob
+from prefect_dbt.cloud.jobs import run_dbt_cloud_job
 
 @flow
 def run_dbt_job_flow():
-    run_result = trigger_dbt_cloud_job_run_and_wait_for_completion(
-        dbt_cloud_credentials=DbtCloudCredentials(
-            api_key="my_api_key",
-            account_id=123456789
-        ),
-        job_id=1
+    run_result = run_dbt_cloud_job(
+        dbt_cloud_job=DbtCloudJob.load("my-block-name"),
     )
 
 run_dbt_job_flow()
 ```
 
-### Execute a dbt CLI command
+### Execute a dbt CLI command with a pre-poulated profiles.yml
 ```python
 from prefect import flow
-from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation
 
 @flow
-def trigger_dbt_cli_command_flow() -> str:
-    result = trigger_dbt_cli_command("dbt debug")
+def trigger_dbt_flow() -> str:
+    result = DbtCoreOperation(commands=["dbt debug"])
     return result # Returns the last line in the CLI output
 
-trigger_dbt_cli_command_flow()
+trigger_dbt_flow()
 ```
 
 ### Execute a dbt CLI command without a pre-populated profiles.yml
@@ -66,11 +62,11 @@ from prefect_snowflake.credentials import SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector
 
 from prefect_dbt.cli.credentials import DbtCliProfile
-from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation
 from prefect_dbt.cli.configs import SnowflakeTargetConfigs
 
 @flow
-def trigger_dbt_cli_command_flow():
+def trigger_dbt_flow():
     connector = SnowflakeConnector(
         schema="public",
         database="database",
@@ -90,14 +86,17 @@ def trigger_dbt_cli_command_flow():
         target="dev",
         target_configs=target_configs,
     )
-    result = trigger_dbt_cli_command(
-        "dbt debug",
+    with DbtCoreOperation(
+        commands=["dbt debug", "dbt run"],
         overwrite_profiles=True,
         dbt_cli_profile=dbt_cli_profile
-    )
+    ) as dbt_operation:
+        dbt_process = dbt_op.trigger()
+        dbt_process.wait_for_completion()
+        result = dbt_process.fetch_result()
     return result
 
-trigger_dbt_cli_command_flow()
+trigger_dbt_flow()
 ```
 
 ### Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml
@@ -105,32 +104,20 @@ trigger_dbt_cli_command_flow()
 from prefect import flow
 
 from prefect_dbt.cli.credentials import DbtCliProfile
-from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation
 
 @flow
-def trigger_dbt_cli_commands_flow():
-    dbt_cli_profile = DbtCliProfile.load("MY_BLOCK_NAME")
-    
-    trigger_kwargs = dict(
+def trigger_dbt_flow():
+    dbt_cli_profile = DbtCliProfile.load("my-block-name")
+    result = DbtCoreOperation(
+        commands=["dbt deps", "dbt debug"],
         profiles_dir=".",
         overwrite_profiles=True,
         dbt_cli_profile=dbt_cli_profile,
-    )
-    
-    trigger_dbt_cli_command(
-        "dbt deps",
-        **trigger_kwargs
-    )
-    
-    result = trigger_dbt_cli_command(
-        "dbt debug",
-        **trigger_kwargs
-    )
-    
+    ).run()
     return result
-    
 
-trigger_dbt_cli_commands_flow()
+trigger_dbt_flow()
 ```
 ## Resources
 

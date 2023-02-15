@@ -6,6 +6,7 @@ from .cli import (  # noqa
     GlobalConfigs,
     MissingExtrasRequireError,
     TargetConfigs,
+    DbtCoreOperation,
 )
 
 try:
