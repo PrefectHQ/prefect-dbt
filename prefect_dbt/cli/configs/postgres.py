@@ -1,17 +1,14 @@
 """Module containing models for Postgres configs"""
-from typing import Any, Dict
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+import warnings
+from typing import Any, Dict, Union
 
 from pydantic import Field
+from typing_extensions import Literal
 
 from prefect_dbt.cli.configs.base import BaseTargetConfigs, MissingExtrasRequireError
 
 try:
-    from prefect_sqlalchemy.database import DatabaseCredentials
+    from prefect_sqlalchemy import DatabaseCredentials, SqlAlchemyConnector
 except ModuleNotFoundError as e:
     raise MissingExtrasRequireError("Postgres") from e
 
@@ -62,7 +59,7 @@ class PostgresTargetConfigs(BaseTargetConfigs):
     type: Literal["postgres"] = Field(
         default="postgres", description="The type of the target."
     )
-    credentials: DatabaseCredentials = Field(
+    credentials: Union[SqlAlchemyConnector, DatabaseCredentials] = Field(
         default=...,
         description=(
             "The credentials to use to authenticate; if there are duplicate keys "
@@ -78,21 +75,41 @@ class PostgresTargetConfigs(BaseTargetConfigs):
         Returns:
             A configs JSON.
         """
-        configs_json = super().get_configs()
-        invalid_keys = ["driver", "query", "url", "connect_args", "_async_supported"]
+        if isinstance(self.credentials, DatabaseCredentials):
+            warnings.warn(
+                "Using DatabaseCredentials is deprecated and will be removed "
+                "on May 7th, 2023, use SqlAlchemyConnector instead.",
+                DeprecationWarning,
+            )
+        all_configs_json = super().get_configs()
+
         rename_keys = {
-            "database": "dbname",
+            # dbt
+            "type": "type",
+            "schema": "schema",
+            "threads": "threads",
+            # general
+            "host": "host",
             "username": "user",
             "password": "password",
-            "host": "host",
             "port": "port",
+            "database": "dbname",
+            # optional
+            "keepalives_idle": "keepalives_idle",
+            "connect_timeout": "connect_timeout",
+            "retries": "retries",
+            "search_path": "search_path",
+            "role": "role",
+            "sslmode": "sslmode",
         }
-        # get the keys from rendered url
-        for invalid_key in invalid_keys + list(rename_keys):
-            configs_json.pop(invalid_key, None)
 
-        rendered_url = self.credentials.rendered_url
-        for key in rename_keys:
-            renamed_key = rename_keys[key]
-            configs_json[renamed_key] = getattr(rendered_url, key)
+        configs_json = {}
+        extras = self.extras or {}
+        for key in all_configs_json.keys():
+            if key not in rename_keys and key not in extras:
+                # skip invalid keys, like fetch_size + poll_frequency_s
+                continue
+            # rename key to something dbt profile expects
+            dbt_key = rename_keys.get(key) or key
+            configs_json[dbt_key] = all_configs_json[key]
         return configs_json

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `DbtCloudJob` block and `run_dbt_cloud_job` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 
 - `DbtCoreOperation` block - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
+- `SqlAlchemyConnector` support for use for `PostgresTargetConfigs` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
 
 ### Changed
 - The minimum version of `prefect-snowflake` - [#112](https://github.com/PrefectHQ/prefect-dbt/pull/112)
@@ -20,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dbt_core` is now included in the requirements - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
 
 ### Deprecated
+
+- `DatabaseCredentials` used in `PostgresTargetConfigs` in favor of `SqlAlchemyConnector` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
 
 ### Removed
 
