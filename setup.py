@@ -12,10 +12,9 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 extras_require = {
-    "cli": ["dbt_core>=1.1.1"],
-    "snowflake": ["prefect-snowflake>=0.2.4"],
-    "bigquery": ["prefect-gcp[bigquery]>=0.1.8"],
-    "postgres": ["prefect-sqlalchemy>=0.2.1"],
+    "snowflake": ["prefect-snowflake>=0.2.4", "dbt-snowflake"],
+    "bigquery": ["prefect-gcp[bigquery]>=0.1.8", "dbt-bigquery"],
+    "postgres": ["prefect-sqlalchemy>=0.2.1", "dbt-postgres"],
 }
 extras_require["all_extras"] = sorted(
     {lib for key in extras_require.values() for lib in key}
