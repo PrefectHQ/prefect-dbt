@@ -53,7 +53,7 @@ def run_dbt_job_flow():
 run_dbt_job_flow()
 ```
 
-### Run dbt Core with Prefect flows
+### Integrate dbt Core CLI commands with Prefect flows
 
 `prefect-dbt` also supports execution of dbt Core CLI commands.
 
@@ -230,7 +230,15 @@ DbtCloudJob.load("BLOCK-NAME-PLACEHOLDER")
 
 #### dbt Core CLI
 
-Depending on which service you want to incorporate into your dbt run, the following may vary slightly.
+!!! info "Available `TargetConfigs` blocks"
+
+    The following may vary slightly depending on the service you want to incorporate.
+
+    Visit the [API Reference](cli/configs/base) to see other built-in `TargetConfigs` blocks.
+
+    If the desired service profile is not available, check out the
+    [Examples Catalog](examples_catalog/#clicredentials-module) to see how you can
+    build one from the generic `TargetConfigs` class.
 
 To create dbt Core target config and profile blocks for BigQuery:
 
