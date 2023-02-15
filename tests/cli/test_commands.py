@@ -5,8 +5,10 @@ from unittest.mock import MagicMock
 import pytest
 import yaml
 from prefect import flow
+from prefect.testing.utilities import AsyncMock
 
-from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation, trigger_dbt_cli_command
+from prefect_dbt.cli.credentials import DbtCliProfile
 
 
 async def mock_shell_run_command_fn(**kwargs):
@@ -174,3 +176,112 @@ def test_trigger_dbt_cli_command_shell_kwargs(profiles_dir, dbt_cli_profile_bare
         "command": f"dbt ls --profiles-dir {profiles_dir}",
         "return_all": True,
     }
+
+
+class TestDbtCoreOperation:
+    @pytest.fixture
+    def mock_open_process(self, monkeypatch):
+        open_process = MagicMock(name="open_process")
+        open_process.return_value = AsyncMock(name="returned open_process")
+        monkeypatch.setattr("prefect_shell.commands.open_process", open_process)
+        return open_process
+
+    @pytest.fixture
+    def mock_shell_process(self, monkeypatch):
+        shell_process = MagicMock()
+        opened_shell_process = AsyncMock()
+        shell_process.return_value = opened_shell_process
+        monkeypatch.setattr("prefect_shell.commands.ShellProcess", shell_process)
+        return shell_process
+
+    @pytest.fixture
+    def dbt_cli_profile(self):
+        return DbtCliProfile(
+            name="my_name",
+            target="my_target",
+            target_configs={"type": "my_type", "threads": 4, "schema": "my_schema"},
+        )
+
+    def test_find_valid_profiles_dir_default_env(
+        self, tmp_path, mock_open_process, mock_shell_process
+    ):
+        os.environ["DBT_PROFILES_DIR"] = str(tmp_path)
+        (tmp_path / "profiles.yml").write_text("test")
+        DbtCoreOperation(commands=["dbt debug"]).run()
+        actual = str(mock_open_process.call_args_list[0][1]["env"]["DBT_PROFILES_DIR"])
+        expected = str(tmp_path)
+        assert actual == expected
+
+    def test_find_valid_profiles_dir_input_env(
+        self, tmp_path, mock_open_process, mock_shell_process
+    ):
+        (tmp_path / "profiles.yml").write_text("test")
+        DbtCoreOperation(
+            commands=["dbt debug"], env={"DBT_PROFILES_DIR": str(tmp_path)}
+        ).run()
+        actual = str(mock_open_process.call_args_list[0][1]["env"]["DBT_PROFILES_DIR"])
+        expected = str(tmp_path)
+        assert actual == expected
+
+    def test_find_valid_profiles_dir_overwrite_without_profile(
+        self, tmp_path, mock_open_process, mock_shell_process
+    ):
+        with pytest.raises(ValueError, match="Since overwrite_profiles is True"):
+            DbtCoreOperation(
+                commands=["dbt debug"], profiles_dir=tmp_path, overwrite_profiles=True
+            ).run()
+
+    def test_find_valid_profiles_dir_overwrite_with_profile(
+        self, tmp_path, dbt_cli_profile, mock_open_process, mock_shell_process
+    ):
+        DbtCoreOperation(
+            commands=["dbt debug"],
+            profiles_dir=tmp_path,
+            overwrite_profiles=True,
+            dbt_cli_profile=dbt_cli_profile,
+        ).run()
+        assert (tmp_path / "profiles.yml").exists()
+
+    def test_find_valid_profiles_dir_not_overwrite_with_profile(
+        self, tmp_path, dbt_cli_profile, mock_open_process, mock_shell_process
+    ):
+        (tmp_path / "profiles.yml").write_text("test")
+        with pytest.raises(ValueError, match="Since overwrite_profiles is False"):
+            DbtCoreOperation(
+                commands=["dbt debug"],
+                profiles_dir=tmp_path,
+                overwrite_profiles=False,
+                dbt_cli_profile=dbt_cli_profile,
+            ).run()
+
+    def test_find_valid_profiles_dir_path_without_profile(self):
+        with pytest.raises(ValueError, match="Since overwrite_profiles is True"):
+            DbtCoreOperation(commands=["dbt debug"], profiles_dir=Path("fake")).run()
+
+    def test_process_commands_not_dbt(self):
+        with pytest.raises(ValueError, match="None of the commands"):
+            assert DbtCoreOperation(commands=["ls"])
+
+    def test_append_dirs_to_commands(
+        self,
+        tmp_path,
+        dbt_cli_profile,
+        mock_open_process,
+        mock_shell_process,
+        monkeypatch,
+    ):
+        mock_named_temporary_file = MagicMock(name="tempfile")
+        monkeypatch.setattr("tempfile.NamedTemporaryFile", mock_named_temporary_file)
+        with DbtCoreOperation(
+            commands=["dbt debug"],
+            profiles_dir=tmp_path,
+            project_dir=tmp_path,
+            dbt_cli_profile=dbt_cli_profile,
+        ) as op:
+            op.run()
+
+        mock_write = mock_named_temporary_file.return_value.__enter__.return_value.write
+        assert (
+            mock_write.call_args_list[0][0][0]
+            == f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}".encode()
+        )
