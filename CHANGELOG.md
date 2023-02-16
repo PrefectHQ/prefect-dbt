@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Preventing `TargetConfigs` from being dropped upon loading a `DbtCliProfile` - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
 - The input type of `GlobalConfigs.log_format` [#118](https://github.com/PrefectHQ/prefect-dbt/pull/118)
+- Properly casting `SnowflakeCredentials.private_key_path` to string before using `yaml.dump` - [#127](https://github.com/PrefectHQ/prefect-dbt/pull/127)
 
 ### Security
 
