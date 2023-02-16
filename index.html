@@ -15,7 +15,7 @@
         <link rel="next" href="blocks_catalog/">
       
       <link rel="icon" href="img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#prefect-dbt" class="md-skip">
+        <a href="#coordinate-and-use-dbt-in-your-dataflow-with-prefect-dbt" class="md-skip">
           Skip to content
         </a>
       
@@ -298,30 +298,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trigger-a-dbt-cloud-job-and-wait-for-completion" class="md-nav__link">
-    Trigger a dbt Cloud job and wait for completion
+  <a href="#integrate-dbt-cloud-jobs-with-prefect-flows" class="md-nav__link">
+    Integrate dbt Cloud jobs with Prefect flows
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#execute-a-dbt-cli-command" class="md-nav__link">
-    Execute a dbt CLI command
+  <a href="#integrate-dbt-core-cli-commands-with-prefect-flows" class="md-nav__link">
+    Integrate dbt Core CLI commands with Prefect flows
+  </a>
+  
+    <nav class="md-nav" aria-label="Integrate dbt Core CLI commands with Prefect flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-existing-profile" class="md-nav__link">
+    Using an existing profile
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#execute-a-dbt-cli-command-without-a-pre-populated-profilesyml" class="md-nav__link">
-    Execute a dbt CLI command without a pre-populated profiles.yml
+  <a href="#writing-a-new-profile" class="md-nav__link">
+    Writing a new profile
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#idempotent-way-to-execute-multiple-dbt-cli-commands-without-prepopulated-profilesyml" class="md-nav__link">
-    Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml
-  </a>
+      </ul>
+    </nav>
   
 </li>
         
@@ -346,9 +352,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#saving-dbt-cloud-credentials-to-block" class="md-nav__link">
-    Saving dbt Cloud credentials to block
+  <a href="#saving-credentials-to-block" class="md-nav__link">
+    Saving credentials to block
   </a>
+  
+    <nav class="md-nav" aria-label="Saving credentials to block">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dbt-cloud" class="md-nav__link">
+    dbt Cloud
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dbt-core-cli" class="md-nav__link">
+    dbt Core CLI
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -749,30 +775,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trigger-a-dbt-cloud-job-and-wait-for-completion" class="md-nav__link">
-    Trigger a dbt Cloud job and wait for completion
+  <a href="#integrate-dbt-cloud-jobs-with-prefect-flows" class="md-nav__link">
+    Integrate dbt Cloud jobs with Prefect flows
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#execute-a-dbt-cli-command" class="md-nav__link">
-    Execute a dbt CLI command
+  <a href="#integrate-dbt-core-cli-commands-with-prefect-flows" class="md-nav__link">
+    Integrate dbt Core CLI commands with Prefect flows
+  </a>
+  
+    <nav class="md-nav" aria-label="Integrate dbt Core CLI commands with Prefect flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-existing-profile" class="md-nav__link">
+    Using an existing profile
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#execute-a-dbt-cli-command-without-a-pre-populated-profilesyml" class="md-nav__link">
-    Execute a dbt CLI command without a pre-populated profiles.yml
+  <a href="#writing-a-new-profile" class="md-nav__link">
+    Writing a new profile
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#idempotent-way-to-execute-multiple-dbt-cli-commands-without-prepopulated-profilesyml" class="md-nav__link">
-    Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml
-  </a>
+      </ul>
+    </nav>
   
 </li>
         
@@ -797,9 +829,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#saving-dbt-cloud-credentials-to-block" class="md-nav__link">
-    Saving dbt Cloud credentials to block
+  <a href="#saving-credentials-to-block" class="md-nav__link">
+    Saving credentials to block
   </a>
+  
+    <nav class="md-nav" aria-label="Saving credentials to block">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dbt-cloud" class="md-nav__link">
+    dbt Cloud
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dbt-core-cli" class="md-nav__link">
+    dbt Core CLI
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -841,7 +893,7 @@
 
 
 
-<h1 id="prefect-dbt">prefect-dbt</h1>
+<h1 id="coordinate-and-use-dbt-in-your-dataflow-with-prefect-dbt">Coordinate and use dbt in your dataflow with prefect-dbt</h1>
 <p align="center">
     <img src="https://user-images.githubusercontent.com/15331990/215649781-be317381-9ff0-4f45-85d4-a30e80514554.png" width=40% height=40%>
     <br>
@@ -860,140 +912,204 @@
         <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
 </p>
 
-<p><code>prefect-dbt</code> is a collection of Prefect integrations for working with dbt with your Prefect flows.</p>
+<p>With prefect-dbt, you can easily trigger and monitor dbt Cloud jobs, execute dbt Core CLI commands, and incorporate other services, like Snowflake, into your dbt runs!</p>
+<p>Check out the examples below to get started!</p>
 <h2 id="getting-started">Getting Started</h2>
-<h3 id="trigger-a-dbt-cloud-job-and-wait-for-completion">Trigger a dbt Cloud job and wait for completion</h3>
+<p>Be sure to install <a href="#installation">prefect-dbt</a> and <a href="#saving-credentials-to-block">save a block</a> to run the examples below!</p>
+<h3 id="integrate-dbt-cloud-jobs-with-prefect-flows">Integrate dbt Cloud jobs with Prefect flows</h3>
+<p>If you have an existing dbt Cloud job, take advantage of the flow, <code>run_dbt_cloud_job</code>.</p>
+<p>This flow triggers the job and waits until the job run is finished.</p>
+<p>If certain nodes fail, <code>run_dbt_cloud_job</code> efficiently retries the specific, unsuccessful nodes.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">trigger_dbt_cloud_job_run_and_wait_for_completion</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudJob</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">run_dbt_cloud_job</span>
 
 <span class="nd">@flow</span>
 <span class="k">def</span> <span class="nf">run_dbt_job_flow</span><span class="p">():</span>
-    <span class="n">run_result</span> <span class="o">=</span> <span class="n">trigger_dbt_cloud_job_run_and_wait_for_completion</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">DbtCloudCredentials</span><span class="p">(</span>
-            <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span>
-            <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span>
-        <span class="p">),</span>
-        <span class="n">job_id</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">run_dbt_cloud_job</span><span class="p">(</span>
+        <span class="n">dbt_cloud_job</span><span class="o">=</span><span class="n">DbtCloudJob</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block-name&quot;</span><span class="p">),</span>
+        <span class="n">targeted_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
 
 <span class="n">run_dbt_job_flow</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="execute-a-dbt-cli-command">Execute a dbt CLI command</h3>
+<h3 id="integrate-dbt-core-cli-commands-with-prefect-flows">Integrate dbt Core CLI commands with Prefect flows</h3>
+<p><code>prefect-dbt</code> also supports execution of dbt Core CLI commands.</p>
+<p>To get started, if you don't have a <code>DbtCoreOperation</code> block already saved,
+set the commands that you want to run; it can include a mix of dbt and non-dbt commands.</p>
+<p>Then, optionally specify the <code>project_dir</code>.</p>
+<p>If <code>profiles_dir</code> is unset, it will try to use the <code>DBT_PROFILES_DIR</code> environment variable.
+If that's also not set, it will use the default directory <code>$HOME/.dbt/</code>.</p>
+<h4 id="using-an-existing-profile">Using an existing profile</h4>
+<p>If you already have an existing dbt profile, specify the <code>profiles_dir</code> where <code>profiles.yml</code> is located.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
 
 <span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span> <span class="c1"># Returns the last line in the CLI output</span>
-
-<span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="execute-a-dbt-cli-command-without-a-pre-populated-profilesyml">Execute a dbt CLI command without a pre-populated profiles.yml</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.credentials</span> <span class="kn">import</span> <span class="n">DbtCliProfile</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">trigger_dbt_cli_command_flow</span><span class="p">():</span>
-    <span class="n">connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
-        <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;public&quot;</span><span class="p">,</span>
-        <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
-        <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
-        <span class="n">credentials</span><span class="o">=</span><span class="n">SnowflakeCredentials</span><span class="p">(</span>
-            <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
-            <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
-            <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account.region.aws&quot;</span><span class="p">,</span>
-            <span class="n">role</span><span class="o">=</span><span class="s2">&quot;role&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span>
-        <span class="n">connector</span><span class="o">=</span><span class="n">connector</span>
-    <span class="p">)</span>
-    <span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jaffle_shop&quot;</span><span class="p">,</span>
-        <span class="n">target</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
-        <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span>
-        <span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span>
-        <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span>
-    <span class="p">)</span>
+<span class="k">def</span> <span class="nf">trigger_dbt_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
+        <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pwd&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt run&quot;</span><span class="p">],</span>
+        <span class="n">project_dir</span><span class="o">=</span><span class="s2">&quot;PROJECT-DIRECTORY-PLACEHOLDER&quot;</span><span class="p">,</span>
+        <span class="n">profiles_dir</span><span class="o">=</span><span class="s2">&quot;PROFILES-DIRECTORY-PLACEHOLDER&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">result</span>
 
-<span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
+<span class="n">trigger_dbt_flow</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="idempotent-way-to-execute-multiple-dbt-cli-commands-without-prepopulated-profilesyml">Idempotent way to execute multiple dbt CLI commands without prepopulated profiles.yml</h3>
+<h4 id="writing-a-new-profile">Writing a new profile</h4>
+<p>To setup a new profile, first <a href="#saving-credentials-to-block">save and load a DbtCliProfile block</a> and use it in <code>DbtCoreOperation</code>.</p>
+<p>Then, specify <code>profiles_dir</code> where <code>profiles.yml</code> will be written.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.credentials</span> <span class="kn">import</span> <span class="n">DbtCliProfile</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli</span> <span class="kn">import</span> <span class="n">DbtCliProfile</span><span class="p">,</span> <span class="n">DbtCoreOperation</span>
 
 <span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">trigger_dbt_cli_commands_flow</span><span class="p">():</span>
-    <span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
-
-    <span class="n">trigger_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">profiles_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
-        <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">trigger_dbt_flow</span><span class="p">():</span>
+    <span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;DBT-CORE-OPERATION-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
+        <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt run&quot;</span><span class="p">],</span>
+        <span class="n">project_dir</span><span class="o">=</span><span class="s2">&quot;PROJECT-DIRECTORY-PLACEHOLDER&quot;</span><span class="p">,</span>
+        <span class="n">profiles_dir</span><span class="o">=</span><span class="s2">&quot;PROFILES-DIRECTORY-PLACEHOLDER&quot;</span><span class="p">,</span>
         <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">trigger_dbt_cli_command</span><span class="p">(</span>
-        <span class="s2">&quot;dbt deps&quot;</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">trigger_kwargs</span>
-    <span class="p">)</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">trigger_dbt_cli_command</span><span class="p">(</span>
-        <span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">trigger_kwargs</span>
-    <span class="p">)</span>
-
+    <span class="p">)</span> <span class="k">as</span> <span class="n">dbt_operation</span><span class="p">:</span>
+        <span class="n">dbt_process</span> <span class="o">=</span> <span class="n">dbt_op</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+        <span class="c1"># do other things before waiting for completion</span>
+        <span class="n">dbt_process</span><span class="o">.</span><span class="n">wait_for_completion</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">dbt_process</span><span class="o">.</span><span class="n">fetch_result</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">result</span>
 
-
-<span class="n">trigger_dbt_cli_commands_flow</span><span class="p">()</span>
+<span class="n">trigger_dbt_flow</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="resources">Resources</h2>
 <p>If you need help getting started with or using dbt, please consult the <a href="https://docs.getdbt.com/docs/building-a-dbt-project/documentation">dbt documentation</a>.</p>
 <h3 id="installation">Installation</h3>
-<p>Install <code>prefect-dbt</code> with <code>pip</code>:</p>
+<p>To use <code>prefect-dbt</code> with dbt Cloud:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>prefect-dbt
 </code></pre></div>
-<p>Some dbt CLI profiles require additional installation; for example Databricks:</p>
+<p>To use dbt Core (CLI):</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;prefect-dbt[cli]&quot;</span>
+</code></pre></div>
+<p>To use dbt Core with Snowflake profiles:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;prefect-dbt[snowflake]&quot;</span>
+</code></pre></div>
+<p>To use dbt Core with BigQuery profiles:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;prefect-dbt[bigquery]&quot;</span>
+</code></pre></div>
+<p>To use dbt Core with Postgres profiles:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;prefect-dbt[postgres]&quot;</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Some dbt Core profiles require additional installation</p>
+<p>According to dbt's <a href="https://docs.getdbt.com/reference/warehouse-setups/databricks-setup">Databricks setup page</a>, users must first install the adapter:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>dbt-databricks
 </code></pre></div>
+<p>Check out the <a href="https://docs.getdbt.com/reference/profiles.yml">desired profile setup page</a> on the sidebar for others.</p>
+</div>
 <p>Requires an installation of Python 3.7+.</p>
 <p>We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.</p>
-<p>These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
-<h3 id="saving-dbt-cloud-credentials-to-block">Saving dbt Cloud credentials to block</h3>
+<p>These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
+<h3 id="saving-credentials-to-block">Saving credentials to block</h3>
 <p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Registering blocks</p>
+<p>Register blocks in this module to
+<a href="https://orion-docs.prefect.io/ui/blocks/">view and edit them</a>
+on Prefect Cloud:</p>
+<div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_dbt
+</code></pre></div>
+</div>
+<p>A list of available blocks in <code>prefect-dbt</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-dbt/blocks_catalog">here</a>.</p>
+<h4 id="dbt-cloud">dbt Cloud</h4>
+<p>To create a dbt Cloud credentials block:</p>
 <ol>
 <li>Head over to your <a href="https://cloud.getdbt.com/settings/profile">dbt Cloud profile</a>.</li>
 <li>Login to your dbt Cloud account.</li>
 <li>Scroll down to "API" or click "API Access" on the sidebar.</li>
 <li>Copy the API Key.</li>
-<li>Create a short script, replacing the placeholders (or do so in the UI).</li>
+<li>Click Projects on the sidebar.</li>
+<li>Copy the account ID from the URL: <code>https://cloud.getdbt.com/settings/accounts/&lt;ACCOUNT_ID&gt;</code>.</li>
+<li>Create a short script, replacing the placeholders.</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+
 <span class="n">DbtCloudCredentials</span><span class="p">(</span>
-    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;API_KEY_PLACEHOLDER&quot;</span><span class="p">,</span>
-    <span class="n">account_id</span><span class="o">=</span><span class="s2">&quot;ACCOUNT_ID_PLACEHOLDER&quot;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME_PLACEHOLDER&quot;</span><span class="p">)</span>
+    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;API-KEY-PLACEHOLDER&quot;</span><span class="p">,</span>
+    <span class="n">account_id</span><span class="o">=</span><span class="s2">&quot;ACCOUNT-ID-PLACEHOLDER&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Then, to create a dbt Cloud job block:</p>
+<ol>
+<li>Head over to your <a href="https://cloud.getdbt.com/">dbt home page</a>.</li>
+<li>On the top nav bar, click on Deploy -&gt; Jobs.</li>
+<li>Select a job.</li>
+<li>Copy the job ID from the URL: <code>https://cloud.getdbt.com/deploy/&lt;ACCOUNT_ID&gt;/projects/&lt;PROJECT_ID&gt;/jobs/&lt;JOB_ID&gt;</code></li>
+<li>Create a short script, replacing the placeholders.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span><span class="p">,</span> <span class="n">DbtCloudJob</span>
+
+<span class="n">dbt_cloud_credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+<span class="n">dbt_cloud_job</span> <span class="o">=</span> <span class="n">DbtCloudJob</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+    <span class="n">job_id</span><span class="o">=</span><span class="s2">&quot;JOB-ID-PLACEHOLDER&quot;</span>
+<span class="p">)</span>
 </code></pre></div>
 <p>Congrats! You can now easily load the saved block, which holds your credentials:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME_PLACEHOLDER&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudJob</span>
+
+<span class="n">DbtCloudJob</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>To <a href="https://orion-docs.prefect.io/ui/blocks/">view and edit the blocks</a> on Prefect UI:</p>
-<div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_dbt
+<h4 id="dbt-core-cli">dbt Core CLI</h4>
+<div class="admonition info">
+<p class="admonition-title">Available <code>TargetConfigs</code> blocks</p>
+<p>The following may vary slightly depending on the service you want to incorporate.</p>
+<p>Visit the <a href="cli/configs/base">API Reference</a> to see other built-in <code>TargetConfigs</code> blocks.</p>
+<p>If the desired service profile is not available, check out the
+<a href="examples_catalog/#clicredentials-module">Examples Catalog</a> to see how you can
+build one from the generic <code>TargetConfigs</code> class.</p>
+</div>
+<p>To create dbt Core target config and profile blocks for BigQuery:</p>
+<ol>
+<li>Save and load a <a href="https://prefecthq.github.io/prefect-gcp/#saving-credentials-to-a-block"><code>GcpCredentials</code> block</a>.</li>
+<li>Determine the schema / dataset you want to use in BigQuery.</li>
+<li>Create a short script, replacing the placeholders.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_gcp.credentials</span> <span class="kn">import</span> <span class="n">GcpCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli</span> <span class="kn">import</span> <span class="n">BigQueryTargetConfigs</span><span class="p">,</span> <span class="n">DbtCliProfile</span>
+
+<span class="n">credentials</span> <span class="o">=</span> <span class="n">GcpCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;CREDENTIALS-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+<span class="n">target_configs</span> <span class="o">=</span> <span class="n">BigQueryTargetConfigs</span><span class="p">(</span>
+    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;SCHEMA-NAME-PLACEHOLDER&quot;</span><span class="p">,</span>  <span class="c1"># also known as dataset</span>
+    <span class="n">credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">target_configs</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;TARGET-CONFIGS-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+
+<span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PROFILE-NAME-PLACEHOLDER&quot;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;TARGET-NAME-placeholder&quot;</span><span class="p">,</span>
+    <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dbt_cli_profile</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;DBT-CLI-PROFILE-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Then, to create a dbt Core operation block:</p>
+<ol>
+<li>Determine the dbt commands you want to run.</li>
+<li>Create a short script, replacing the placeholders.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cli</span> <span class="kn">import</span> <span class="n">DbtCliProfile</span><span class="p">,</span> <span class="n">DbtCoreOperation</span>
+
+<span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;DBT-CLI-PROFILE-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+<span class="n">dbt_core_operation</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
+    <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DBT-CLI-COMMANDS-PLACEHOLDER&quot;</span><span class="p">],</span>
+    <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span><span class="p">,</span>
+    <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dbt_core_operation</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;DBT-CORE-OPERATION-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Congrats! You can now easily load the saved block, which holds your credentials:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
+
+<span class="n">DbtCoreOperation</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;DBT-CORE-OPERATION-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="feedback">Feedback</h3>
 <p>If you encounter any bugs while using <code>prefect-dbt</code>, feel free to open an issue in the <a href="https://github.com/PrefectHQ/prefect-dbt">prefect-dbt</a> repository.</p>
@@ -1161,7 +1277,7 @@
     <script id="__config" type="application/json">{"base": ".", "features": ["content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>

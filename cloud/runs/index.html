@@ -17,7 +17,7 @@
         <link rel="next" href="../clients/">
       
       <link rel="icon" href="../../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -431,34 +431,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudGetRunArtifactFailed" class="md-nav__link">
-    DbtCloudGetRunArtifactFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudGetRunFailed" class="md-nav__link">
-    DbtCloudGetRunFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunCancelled" class="md-nav__link">
-    DbtCloudJobRunCancelled
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunFailed" class="md-nav__link">
-    DbtCloudJobRunFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunStatus" class="md-nav__link">
     DbtCloudJobRunStatus
   </a>
@@ -488,20 +460,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunTimedOut" class="md-nav__link">
-    DbtCloudJobRunTimedOut
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudListRunArtifactsFailed" class="md-nav__link">
-    DbtCloudListRunArtifactsFailed
-  </a>
   
 </li>
         
@@ -802,34 +760,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudGetRunArtifactFailed" class="md-nav__link">
-    DbtCloudGetRunArtifactFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudGetRunFailed" class="md-nav__link">
-    DbtCloudGetRunFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunCancelled" class="md-nav__link">
-    DbtCloudJobRunCancelled
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunFailed" class="md-nav__link">
-    DbtCloudJobRunFailed
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunStatus" class="md-nav__link">
     DbtCloudJobRunStatus
   </a>
@@ -859,20 +789,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudJobRunTimedOut" class="md-nav__link">
-    DbtCloudJobRunTimedOut
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefect_dbt.cloud.runs.DbtCloudListRunArtifactsFailed" class="md-nav__link">
-    DbtCloudListRunArtifactsFailed
-  </a>
   
 </li>
         
@@ -970,130 +886,6 @@
 
 
 
-<h3 id="prefect_dbt.cloud.runs.DbtCloudGetRunArtifactFailed" class="doc doc-heading">
-        <code>DbtCloudGetRunArtifactFailed</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when unable to get a dbt Cloud run artifact</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
-<span class="normal">23</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudGetRunArtifactFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when unable to get a dbt Cloud run artifact&quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="prefect_dbt.cloud.runs.DbtCloudGetRunFailed" class="doc doc-heading">
-        <code>DbtCloudGetRunFailed</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when unable to retrieve dbt Cloud run</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
-<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudGetRunFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when unable to retrieve dbt Cloud run&quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="prefect_dbt.cloud.runs.DbtCloudJobRunCancelled" class="doc doc-heading">
-        <code>DbtCloudJobRunCancelled</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when a triggered job run is cancelled</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunCancelled</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a triggered job run is cancelled&quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="prefect_dbt.cloud.runs.DbtCloudJobRunFailed" class="doc doc-heading">
-        <code>DbtCloudJobRunFailed</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when a triggered job run fails</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
-<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a triggered job run fails&quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h3 id="prefect_dbt.cloud.runs.DbtCloudJobRunStatus" class="doc doc-heading">
         <code>DbtCloudJobRunStatus</code>
 
@@ -1111,23 +903,23 @@
 
         <details class="quote">
           <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;dbt Cloud Job statuses.&quot;&quot;&quot;</span>
 
     <span class="n">QUEUED</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1180,13 +972,13 @@ Returns False otherwise.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">is_terminal_status_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">status_code</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns True if a status code is terminal for a job run.</span>
@@ -1202,75 +994,6 @@ Returns False otherwise.</p>
 
 
   </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="prefect_dbt.cloud.runs.DbtCloudJobRunTimedOut" class="doc doc-heading">
-        <code>DbtCloudJobRunTimedOut</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when a triggered job run does not complete in the configured max
-wait seconds</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudJobRunTimedOut</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Raised when a triggered job run does not complete in the configured max</span>
-<span class="sd">    wait seconds</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="prefect_dbt.cloud.runs.DbtCloudListRunArtifactsFailed" class="doc doc-heading">
-        <code>DbtCloudListRunArtifactsFailed</code>
-
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code>Exception</code></p>
-
-  
-      <p>Raised when unable to list dbt Cloud run artifacts</p>
-
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
-<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCloudListRunArtifactsFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when unable to list dbt Cloud run artifacts&quot;&quot;&quot;</span>
-</code></pre></div></td></tr></table></div>
-        </details>
 
   </div>
 
@@ -1418,7 +1141,28 @@ requested artifact is a JSON file and a <code>str</code> otherwise.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
@@ -1487,28 +1231,7 @@ requested artifact is a JSON file and a <code>str</code> otherwise.</p></td>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Get dbt Cloud job artifact&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Fetches an artifact from a completed run.&quot;</span><span class="p">,</span>
     <span class="n">retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
@@ -1710,62 +1433,62 @@ logs will be truncated to the last 1,000 lines of the debug log output file.</p>
 </details>
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Get dbt Cloud job run details&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Retrieves details of a dbt Cloud job run &quot;</span>
     <span class="s2">&quot;for the run with the given run_id.&quot;</span><span class="p">,</span>
@@ -1932,7 +1655,28 @@ for the last step in the run.</p></td>
 </details>
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
@@ -1959,28 +1703,7 @@ for the last step in the run.</p></td>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;List dbt Cloud job artifacts&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Fetches a list of artifact files generated for a completed run.&quot;</span><span class="p">,</span>
     <span class="n">retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
@@ -2119,7 +1842,7 @@ run completion.</p></td>
     <tbody>
         <tr>
           <td>
-                <code><a class="autorefs autorefs-internal" title="prefect_dbt.cloud.runs.DbtCloudJobRunTimedOut" href="#prefect_dbt.cloud.runs.DbtCloudJobRunTimedOut">DbtCloudJobRunTimedOut</a></code>
+                <code><span title="prefect_dbt.cloud.exceptions.DbtCloudJobRunTimedOut">DbtCloudJobRunTimedOut</span></code>
           </td>
           <td><p>When the elapsed wait time exceeds <code>max_wait_seconds</code>.</p></td>
         </tr>
@@ -2153,7 +1876,28 @@ run completion.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cloud/runs.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
 <span class="normal">265</span>
@@ -2192,28 +1936,7 @@ run completion.</p></td>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Wait for dbt Cloud job run&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Waits for a dbt Cloud job run to finish running.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -2432,7 +2155,7 @@ run completion.</p></td>
     <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>

@@ -17,7 +17,7 @@
         <link rel="next" href="../examples_catalog/">
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -310,6 +310,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cloudjobs-module" class="md-nav__link">
+    Cloud.Jobs Module
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cliconfigsbase-module" class="md-nav__link">
     Cli.Configs.Base Module
   </a>
@@ -340,6 +347,13 @@
         <li class="md-nav__item">
   <a href="#clicredentials-module" class="md-nav__link">
     Cli.Credentials Module
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clicommands-module" class="md-nav__link">
+    Cli.Commands Module
   </a>
   
 </li>
@@ -704,6 +718,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cloudjobs-module" class="md-nav__link">
+    Cloud.Jobs Module
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cliconfigsbase-module" class="md-nav__link">
     Cli.Configs.Base Module
   </a>
@@ -738,6 +759,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#clicommands-module" class="md-nav__link">
+    Cli.Commands Module
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -760,7 +788,8 @@
 <code>prefect-dbt</code>.</p>
 <p>To register blocks in this module to
 <a href="https://orion-docs.prefect.io/ui/blocks/">view and edit them</a>
-on Prefect Cloud:
+on Prefect Cloud, first <a href="https://PrefectHQ.github.io/prefect-dbt/#installation">install the required packages</a>,
+then
 <div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_dbt
 </code></pre></div>
 Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
@@ -778,6 +807,20 @@ Note, to use the <code>load</code> method on Blocks, you must already have a blo
 <span class="n">my_flow</span><span class="p">()</span>
 </code></pre></div>
 For additional examples, check out the <a href="../examples_catalog/#credentials-module">Cloud.Credentials Module</a> under Examples Catalog.</p>
+<h2 id="cloudjobs-module"><a class="autorefs autorefs-internal" href="../cloud/jobs/#prefect_dbt.cloud.jobs">Cloud.Jobs Module</a></h2>
+<p><a class="autorefs autorefs-internal" href="../cloud/jobs/#prefect_dbt.cloud.jobs.DbtCloudJob">DbtCloudJob</a></p>
+<p>Block that holds the information and methods to interact with a dbt Cloud job.</p>
+<p>To load the DbtCloudJob:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">DbtCloudJob</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
+    <span class="n">my_block</span> <span class="o">=</span> <span class="n">DbtCloudJob</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+
+<span class="n">my_flow</span><span class="p">()</span>
+</code></pre></div>
+For additional examples, check out the <a href="../examples_catalog/#jobs-module">Cloud.Jobs Module</a> under Examples Catalog.</p>
 <h2 id="cliconfigsbase-module"><a class="autorefs autorefs-internal" href="../cli/configs/base/#prefect_dbt.cli.configs.base">Cli.Configs.Base Module</a></h2>
 <p><a class="autorefs autorefs-internal" href="../cli/configs/base/#prefect_dbt.cli.configs.base.TargetConfigs">TargetConfigs</a></p>
 <p>Target configs contain credentials and
@@ -869,6 +912,25 @@ For additional examples, check out the <a href="../examples_catalog/#postgres-mo
 <span class="n">my_flow</span><span class="p">()</span>
 </code></pre></div>
 For additional examples, check out the <a href="../examples_catalog/#credentials-module">Cli.Credentials Module</a> under Examples Catalog.</p>
+<h2 id="clicommands-module"><a class="autorefs autorefs-internal" href="../cli/commands/#prefect_dbt.cli.commands">Cli.Commands Module</a></h2>
+<p><a class="autorefs autorefs-internal" href="../cli/commands/#prefect_dbt.cli.commands.DbtCoreOperation">DbtCoreOperation</a></p>
+<p>A block representing a dbt operation, containing multiple dbt and shell commands.</p>
+<p>For long-lasting operations, use the trigger method and utilize the block as a
+context manager for automatic closure of processes when context is exited.
+If not, manually call the close method to close processes.</p>
+<p>For short-lasting operations, use the run method. Context is automatically managed
+with this method.</p>
+<p>To load the DbtCoreOperation:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
+    <span class="n">my_block</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+
+<span class="n">my_flow</span><span class="p">()</span>
+</code></pre></div>
+For additional examples, check out the <a href="../examples_catalog/#commands-module">Cli.Commands Module</a> under Examples Catalog.</p>
 
 
   
@@ -1014,7 +1076,7 @@ For additional examples, check out the <a href="../examples_catalog/#credentials
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>

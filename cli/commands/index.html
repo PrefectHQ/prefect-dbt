@@ -17,7 +17,7 @@
         <link rel="next" href="../configs/base/">
       
       <link rel="icon" href="../../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -531,6 +531,19 @@
     Classes
   </a>
   
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cli.commands.DbtCoreOperation" class="md-nav__link">
+    DbtCoreOperation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -696,6 +709,19 @@
     Classes
   </a>
   
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_dbt.cli.commands.DbtCoreOperation" class="md-nav__link">
+    DbtCoreOperation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -761,6 +787,561 @@
 
 
 <h2 id="prefect_dbt.cli.commands-classes">Classes</h2>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="prefect_dbt.cli.commands.DbtCoreOperation" class="doc doc-heading">
+        <code>DbtCoreOperation</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="prefect_shell.commands.ShellOperation">ShellOperation</span></code></p>
+
+  
+      <p>A block representing a dbt operation, containing multiple dbt and shell commands.</p>
+<p>For long-lasting operations, use the trigger method and utilize the block as a
+context manager for automatic closure of processes when context is exited.
+If not, manually call the close method to close processes.</p>
+<p>For short-lasting operations, use the run method. Context is automatically managed
+with this method.</p>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>commands</code></td>
+          <td>
+          </td>
+          <td><p>A list of commands to execute sequentially.</p></td>
+        </tr>
+        <tr>
+          <td><code>stream_output</code></td>
+          <td>
+          </td>
+          <td><p>Whether to stream output.</p></td>
+        </tr>
+        <tr>
+          <td><code>env</code></td>
+          <td>
+          </td>
+          <td><p>A dictionary of environment variables to set for the shell operation.</p></td>
+        </tr>
+        <tr>
+          <td><code>working_directory</code></td>
+          <td>
+          </td>
+          <td><p>The working directory context the commands
+will be executed within.</p></td>
+        </tr>
+        <tr>
+          <td><code>shell</code></td>
+          <td>
+          </td>
+          <td><p>The shell to use to execute the commands.</p></td>
+        </tr>
+        <tr>
+          <td><code>extension</code></td>
+          <td>
+          </td>
+          <td><p>The extension to use for the temporary file.
+if unset defaults to <code>.ps1</code> on Windows and <code>.sh</code> on other platforms.</p></td>
+        </tr>
+        <tr>
+          <td><code>profiles_dir</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
+          </td>
+          <td><p>The directory to search for the profiles.yml file.
+Setting this appends the <code>--profiles-dir</code> option to the dbt commands
+provided. If this is not set, will try using the DBT_PROFILES_DIR
+environment variable, but if that's also not
+set, will use the default directory <code>$HOME/.dbt/</code>.</p></td>
+        </tr>
+        <tr>
+          <td><code>project_dir</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
+          </td>
+          <td><p>The directory to search for the dbt_project.yml file.
+Default is the current working directory and its parents.</p></td>
+        </tr>
+        <tr>
+          <td><code>overwrite_profiles</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>Whether the existing profiles.yml file under profiles_dir
+should be overwritten with a new profile.</p></td>
+        </tr>
+        <tr>
+          <td><code>dbt_cli_profile</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_dbt.cli.credentials.DbtCliProfile" href="../credentials/#prefect_dbt.cli.credentials.DbtCliProfile">DbtCliProfile</a>]</code>
+          </td>
+          <td><p>Profiles class containing the profile written to profiles.yml.
+Note! This is optional and will raise an error if profiles.yml already
+exists under profile_dir and overwrite_profiles is set to False.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+<p><strong>Examples:</strong></p>
+    <p>Load a configured block.
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
+
+<span class="n">dbt_op</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Execute short-lasting dbt debug and list with a custom DbtCliProfile.
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span><span class="p">,</span> <span class="n">DbtCliProfile</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="k">await</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;snowflake-connector&quot;</span><span class="p">)</span>
+<span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">snowflake_connector</span><span class="p">)</span>
+<span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jaffle_shop&quot;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
+    <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="n">dbt_cli_profile</span><span class="o">.</span><span class="n">get_profile</span><span class="p">()</span>
+<span class="n">dbt_init</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
+    <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt list&quot;</span><span class="p">],</span>
+    <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span><span class="p">,</span>
+    <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">dbt_init</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></p>
+<p>Execute a longer-lasting dbt run as a context manager.
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">DbtCoreOperation</span><span class="p">(</span><span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt run&quot;</span><span class="p">])</span> <span class="k">as</span> <span class="n">dbt_run</span><span class="p">:</span>
+    <span class="n">dbt_process</span> <span class="o">=</span> <span class="n">dbt_run</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+    <span class="c1"># do other things</span>
+    <span class="n">dbt_process</span><span class="o">.</span><span class="n">wait_for_completion</span><span class="p">()</span>
+    <span class="n">dbt_output</span> <span class="o">=</span> <span class="n">dbt_process</span><span class="o">.</span><span class="n">fetch_result</span><span class="p">()</span>
+</code></pre></div></p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>prefect_dbt/cli/commands.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DbtCoreOperation</span><span class="p">(</span><span class="n">ShellOperation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A block representing a dbt operation, containing multiple dbt and shell commands.</span>
+
+<span class="sd">    For long-lasting operations, use the trigger method and utilize the block as a</span>
+<span class="sd">    context manager for automatic closure of processes when context is exited.</span>
+<span class="sd">    If not, manually call the close method to close processes.</span>
+
+<span class="sd">    For short-lasting operations, use the run method. Context is automatically managed</span>
+<span class="sd">    with this method.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        commands: A list of commands to execute sequentially.</span>
+<span class="sd">        stream_output: Whether to stream output.</span>
+<span class="sd">        env: A dictionary of environment variables to set for the shell operation.</span>
+<span class="sd">        working_directory: The working directory context the commands</span>
+<span class="sd">            will be executed within.</span>
+<span class="sd">        shell: The shell to use to execute the commands.</span>
+<span class="sd">        extension: The extension to use for the temporary file.</span>
+<span class="sd">            if unset defaults to `.ps1` on Windows and `.sh` on other platforms.</span>
+<span class="sd">        profiles_dir: The directory to search for the profiles.yml file.</span>
+<span class="sd">            Setting this appends the `--profiles-dir` option to the dbt commands</span>
+<span class="sd">            provided. If this is not set, will try using the DBT_PROFILES_DIR</span>
+<span class="sd">            environment variable, but if that&#39;s also not</span>
+<span class="sd">            set, will use the default directory `$HOME/.dbt/`.</span>
+<span class="sd">        project_dir: The directory to search for the dbt_project.yml file.</span>
+<span class="sd">            Default is the current working directory and its parents.</span>
+<span class="sd">        overwrite_profiles: Whether the existing profiles.yml file under profiles_dir</span>
+<span class="sd">            should be overwritten with a new profile.</span>
+<span class="sd">        dbt_cli_profile: Profiles class containing the profile written to profiles.yml.</span>
+<span class="sd">            Note! This is optional and will raise an error if profiles.yml already</span>
+<span class="sd">            exists under profile_dir and overwrite_profiles is set to False.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Load a configured block.</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from prefect_dbt import DbtCoreOperation</span>
+
+<span class="sd">        dbt_op = DbtCoreOperation.load(&quot;BLOCK_NAME&quot;)</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        Execute short-lasting dbt debug and list with a custom DbtCliProfile.</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from prefect_dbt import DbtCoreOperation, DbtCliProfile</span>
+<span class="sd">        from prefect_dbt.cli.configs import SnowflakeTargetConfigs</span>
+<span class="sd">        from prefect_snowflake import SnowflakeConnector</span>
+
+<span class="sd">        snowflake_connector = await SnowflakeConnector.load(&quot;snowflake-connector&quot;)</span>
+<span class="sd">        target_configs = SnowflakeTargetConfigs(connector=snowflake_connector)</span>
+<span class="sd">        dbt_cli_profile = DbtCliProfile(</span>
+<span class="sd">            name=&quot;jaffle_shop&quot;,</span>
+<span class="sd">            target=&quot;dev&quot;,</span>
+<span class="sd">            target_configs=target_configs,</span>
+<span class="sd">        )</span>
+<span class="sd">        profile = dbt_cli_profile.get_profile()</span>
+<span class="sd">        dbt_init = DbtCoreOperation(</span>
+<span class="sd">            commands=[&quot;dbt debug&quot;, &quot;dbt list&quot;],</span>
+<span class="sd">            dbt_cli_profile=dbt_cli_profile,</span>
+<span class="sd">            overwrite_profiles=True</span>
+<span class="sd">        )</span>
+<span class="sd">        dbt_init.run()</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        Execute a longer-lasting dbt run as a context manager.</span>
+<span class="sd">        ```python</span>
+<span class="sd">        with DbtCoreOperation(commands=[&quot;dbt run&quot;]) as dbt_run:</span>
+<span class="sd">            dbt_process = dbt_run.trigger()</span>
+<span class="sd">            # do other things</span>
+<span class="sd">            dbt_process.wait_for_completion()</span>
+<span class="sd">            dbt_output = dbt_process.fetch_result()</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_block_type_name</span> <span class="o">=</span> <span class="s2">&quot;dbt Core Operation&quot;</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">_documentation_url</span> <span class="o">=</span> <span class="s2">&quot;https://prefecthq.github.io/prefect-dbt/cli/commands/#prefect_dbt.cli.commands.DbtCoreOperation&quot;</span>  <span class="c1"># noqa</span>
+
+    <span class="n">profiles_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;The directory to search for the profiles.yml file. &quot;</span>
+            <span class="s2">&quot;Setting this appends the `--profiles-dir` option to the dbt commands &quot;</span>
+            <span class="s2">&quot;provided. If this is not set, will try using the DBT_PROFILES_DIR &quot;</span>
+            <span class="s2">&quot;environment variable, but if that&#39;s also not &quot;</span>
+            <span class="s2">&quot;set, will use the default directory `$HOME/.dbt/`.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">project_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;The directory to search for the dbt_project.yml file. &quot;</span>
+            <span class="s2">&quot;Default is the current working directory and its parents.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">overwrite_profiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Whether the existing profiles.yml file under profiles_dir &quot;</span>
+            <span class="s2">&quot;should be overwritten with a new profile.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">dbt_cli_profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DbtCliProfile</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Profiles class containing the profile written to profiles.yml. &quot;</span>
+            <span class="s2">&quot;Note! This is optional and will raise an error if profiles.yml already &quot;</span>
+            <span class="s2">&quot;exists under profile_dir and overwrite_profiles is set to False.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;commands&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_has_a_dbt_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">commands</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the commands contain a dbt command.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;dbt &quot;</span> <span class="ow">in</span> <span class="n">command</span> <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;None of the commands are a valid dbt sub-command; see dbt --help, &quot;</span>
+                <span class="s2">&quot;or use prefect_shell.ShellOperation for non-dbt related &quot;</span>
+                <span class="s2">&quot;commands instead&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">commands</span>
+
+    <span class="k">def</span> <span class="nf">_find_valid_profiles_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PosixPath</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensure that there is a profiles.yml available for use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">profiles_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles_dir</span>
+        <span class="k">if</span> <span class="n">profiles_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DBT_PROFILES_DIR&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># get DBT_PROFILES_DIR from the user input env</span>
+                <span class="n">profiles_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s2">&quot;DBT_PROFILES_DIR&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># get DBT_PROFILES_DIR from the system env, or default to ~/.dbt</span>
+                <span class="n">profiles_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DBT_PROFILES_DIR&quot;</span><span class="p">,</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.dbt&quot;</span><span class="p">)</span>
+        <span class="n">profiles_dir</span> <span class="o">=</span> <span class="n">relative_path_to_current_platform</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">profiles_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># https://docs.getdbt.com/dbt-cli/configure-your-profile</span>
+        <span class="c1"># Note that the file always needs to be called profiles.yml,</span>
+        <span class="c1"># regardless of which directory it is in.</span>
+        <span class="n">profiles_path</span> <span class="o">=</span> <span class="n">profiles_dir</span> <span class="o">/</span> <span class="s2">&quot;profiles.yml&quot;</span>
+        <span class="n">overwrite_profiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_profiles</span>
+        <span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbt_cli_profile</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">profiles_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">overwrite_profiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dbt_cli_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Since overwrite_profiles is True or profiles_path is empty, &quot;</span>
+                    <span class="s2">&quot;need `dbt_cli_profile` to write a profile&quot;</span>
+                <span class="p">)</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">dbt_cli_profile</span><span class="o">.</span><span class="n">get_profile</span><span class="p">()</span>
+            <span class="n">profiles_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">profiles_path</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dbt_cli_profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Since overwrite_profiles is False and profiles_path </span><span class="si">{</span><span class="n">profiles_path</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;already exists, the profile within dbt_cli_profile couldn&#39;t be used; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;if the existing profile is satisfactory, do not set dbt_cli_profile&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">profiles_dir</span>
+
+    <span class="k">def</span> <span class="nf">_append_dirs_to_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profiles_dir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append profiles_dir and project_dir options to dbt commands.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">project_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_dir</span>
+
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">commands</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --profiles-dir </span><span class="si">{</span><span class="n">profiles_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">project_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+                <span class="n">command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --project-dir </span><span class="si">{</span><span class="n">project_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">commands</span>
+
+    <span class="k">def</span> <span class="nf">_compile_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">open_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to compile the kwargs for `open_process` so it&#39;s not repeated</span>
+<span class="sd">        across the run and trigger methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">profiles_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_valid_profiles_dir</span><span class="p">()</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_dirs_to_commands</span><span class="p">(</span><span class="n">profiles_dir</span><span class="o">=</span><span class="n">profiles_dir</span><span class="p">)</span>
+
+        <span class="c1"># _compile_kwargs is called within trigger() and run(), prior to execution.</span>
+        <span class="c1"># However _compile_kwargs directly uses self.commands, but here we modified</span>
+        <span class="c1"># the commands without saving back to self.commands so we need to create a copy.</span>
+        <span class="c1"># was also thinking of using env vars but DBT_PROJECT_DIR is not supported yet.</span>
+        <span class="n">modified_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">modified_self</span><span class="o">.</span><span class="n">commands</span> <span class="o">=</span> <span class="n">commands</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">modified_self</span><span class="p">)</span><span class="o">.</span><span class="n">_compile_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">open_kwargs</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
 <h2 id="prefect_dbt.cli.commands-functions">Functions</h2>
 
 <div class="doc doc-object doc-function">
@@ -946,8 +1527,7 @@ in <code>shell_run_command_kwargs</code> is True.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_dbt/cli/commands.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
-<span class="normal"> 15</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
 <span class="normal"> 18</span>
@@ -1087,11 +1667,7 @@ in <code>shell_run_command_kwargs</code> is True.</p></td>
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">trigger_dbt_cli_command</span><span class="p">(</span>
     <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">profiles_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1186,12 +1762,7 @@ in <code>shell_run_command_kwargs</code> is True.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
     <span class="c1"># check if variable is set, if not check env, if not use expected default</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">get_run_logger</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">which</span><span class="p">(</span><span class="s2">&quot;dbt&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;dbt-core needs to be installed to use this task; run &quot;</span>
-            <span class="s1">&#39;`pip install &quot;prefect-dbt[cli]&quot;&#39;</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="n">command</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dbt&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">command</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dbt&quot;</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">shell_run_command</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s2">&quot;dbt --help&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;Command is not a valid dbt sub-command; see dbt --help above,&quot;</span>
@@ -1395,7 +1966,7 @@ in <code>shell_run_command_kwargs</code> is True.</p></td>
     <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>
