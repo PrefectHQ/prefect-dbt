@@ -25,6 +25,14 @@ class DbtConfigs(Block, abc.ABC):
             "but available in dbt."
         ),
     )
+    override_fields: bool = Field(
+        default=False,
+        description=(
+            "If True, will allow new keys to override existing keys, with keys "
+            "from TargetConfigs taking precedence, rather than raising an error "
+            "when there are duplicate keys"
+        ),
+    )
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
 
     def _populate_configs_json(
@@ -36,6 +44,9 @@ class DbtConfigs(Block, abc.ABC):
         """
         Recursively populate configs_json.
         """
+        # if override_fields is True keys from TargetConfigs take precedence
+        override_configs_json = {}
+
         for field_name, field in fields.items():
             if model is not None:
                 # get actual value from model
@@ -49,7 +60,7 @@ class DbtConfigs(Block, abc.ABC):
             else:
                 field_value = field
 
-            if field_value is None:
+            if field_value is None or field_name == "override_fields":
                 # do not add to configs json if no value or default is set
                 continue
 
@@ -58,9 +69,13 @@ class DbtConfigs(Block, abc.ABC):
                     configs_json, field_value.__fields__, model=field_value
                 )
             elif field_name == "extras":
-                configs_json = self._populate_configs_json(configs_json, field_value)
+                configs_json = self._populate_configs_json(
+                    configs_json,
+                    field_value,
+                )
+                override_configs_json.update(configs_json)
             else:
-                if field_name in configs_json.keys():
+                if field_name in configs_json.keys() and not self.override_fields:
                     raise ValueError(
                         f"The keyword, {field_name}, has already been provided in "
                         f"TargetConfigs; remove duplicated keywords to continue"
@@ -69,6 +84,10 @@ class DbtConfigs(Block, abc.ABC):
                     field_value = field_value.get_secret_value()
                 configs_json[field_name] = field_value
 
+                if self.override_fields and model is self or model is None:
+                    override_configs_json[field_name] = field_value
+
+        configs_json.update(override_configs_json)
         return configs_json
 
     def get_configs(self) -> Dict[str, Any]:
