@@ -1,6 +1,7 @@
 """Module containing models for base configs"""
 
 import abc
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
@@ -67,6 +68,8 @@ class DbtConfigs(Block, abc.ABC):
                     )
                 if isinstance(field_value, SecretField):
                     field_value = field_value.get_secret_value()
+                elif isinstance(field_value, Path):
+                    field_value = str(field_value)
                 configs_json[field_name] = field_value
 
         return configs_json
