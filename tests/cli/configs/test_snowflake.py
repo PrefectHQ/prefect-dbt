@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from prefect_snowflake.credentials import SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector
 from pydantic import SecretBytes, SecretStr
