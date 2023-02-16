@@ -46,7 +46,7 @@ def test_snowflake_target_configs_get_configs_private_key_path():
     credentials = SnowflakeCredentials(
         account="account",
         user="user",
-        private_key_path="path/to/key",
+        private_key_path=Path("path/to/key"),
     )
     snowflake_connector = SnowflakeConnector(
         schema="schema",
@@ -62,7 +62,7 @@ def test_snowflake_target_configs_get_configs_private_key_path():
     expected = dict(
         account="account",
         user="user",
-        private_key_path="path/to/key",
+        private_key_path=str(Path("path/to/key")),
         type="snowflake",
         schema="schema",
         database="database",
