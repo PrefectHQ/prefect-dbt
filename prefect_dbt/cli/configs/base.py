@@ -1,7 +1,7 @@
 """Module containing models for base configs"""
 
 import abc
-from pathlib import PosixPath
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
