@@ -1,4 +1,4 @@
-from pathlib import PosixPath
+from pathlib import Path
 
 import pytest
 
@@ -13,7 +13,7 @@ def test_target_configs_get_configs():
         extras={
             "extra_input": 1,
             "null_input": None,
-            "key_path": PosixPath("path/to/key"),
+            "key_path": Path("path/to/key"),
         },
     )
     assert hasattr(target_configs, "_is_anonymous")
@@ -23,7 +23,7 @@ def test_target_configs_get_configs():
         schema="schema_input",
         threads=5,
         extra_input=1,
-        key_path="path/to/key",
+        key_path=str(Path("path/to/key")),
     )
 
 
