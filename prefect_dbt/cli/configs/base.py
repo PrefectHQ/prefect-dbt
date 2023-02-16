@@ -31,7 +31,7 @@ class DbtConfigs(Block, abc.ABC):
         description=(
             "If True, will allow new keys to override existing keys, with keys "
             "from TargetConfigs taking precedence, rather than raising an error "
-            "when there are duplicate keys"
+            "when there are duplicate keys."
         ),
     )
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
