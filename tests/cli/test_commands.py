@@ -272,15 +272,18 @@ class TestDbtCoreOperation:
     ):
         mock_named_temporary_file = MagicMock(name="tempfile")
         monkeypatch.setattr("tempfile.NamedTemporaryFile", mock_named_temporary_file)
-        with DbtCoreOperation(
-            commands=["dbt debug"],
-            profiles_dir=tmp_path,
-            project_dir=tmp_path,
-            dbt_cli_profile=dbt_cli_profile,
-        ) as op:
-            op.run()
+        try:
+            with DbtCoreOperation(
+                commands=["dbt debug"],
+                profiles_dir=tmp_path,
+                project_dir=tmp_path,
+                dbt_cli_profile=dbt_cli_profile,
+            ) as op:
+                op.run()
+        except (FileNotFoundError, TypeError):  # py37 raises TypeError
+            pass  # we're mocking the tempfile; this is expected
 
-        mock_write = mock_named_temporary_file.return_value.__enter__.return_value.write
+        mock_write = mock_named_temporary_file.return_value.write
         assert (
             mock_write.call_args_list[0][0][0]
             == f"dbt debug --profiles-dir {tmp_path} --project-dir {tmp_path}".encode()

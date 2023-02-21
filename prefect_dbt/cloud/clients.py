@@ -27,6 +27,7 @@ class DbtCloudAdministrativeClient:
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "user-agent": f"prefect-{prefect.__version__}",
+                "x-dbt-partner-source": "prefect",
             },
             base_url=f"https://{domain}/api/v2/accounts/{account_id}",
         )
@@ -205,6 +206,7 @@ class DbtCloudMetadataClient:
             base_headers={
                 "Authorization": f"Bearer {api_key}",
                 "user-agent": f"prefect-{prefect.__version__}",
+                "x-dbt-partner-source": "prefect",
                 "content-type": "application/json",
             },
             url=f"https://{domain}/graphql",
