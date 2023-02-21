@@ -112,4 +112,7 @@ class PostgresTargetConfigs(BaseTargetConfigs):
             # rename key to something dbt profile expects
             dbt_key = rename_keys.get(key) or key
             configs_json[dbt_key] = all_configs_json[key]
+        port = configs_json.get("port")
+        if port is not None:
+            configs_json["port"] = int(port)
         return configs_json
