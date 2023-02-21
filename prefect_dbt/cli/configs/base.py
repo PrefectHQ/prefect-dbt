@@ -26,6 +26,13 @@ class DbtConfigs(Block, abc.ABC):
             "but available in dbt."
         ),
     )
+    allow_field_overrides: bool = Field(
+        default=False,
+        description=(
+            "If enabled, fields from dbt target configs will override "
+            "fields provided in extras and credentials."
+        ),
+    )
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
 
     def _populate_configs_json(
@@ -37,6 +44,9 @@ class DbtConfigs(Block, abc.ABC):
         """
         Recursively populate configs_json.
         """
+        # if allow_field_overrides is True keys from TargetConfigs take precedence
+        override_configs_json = {}
+
         for field_name, field in fields.items():
             if model is not None:
                 # get actual value from model
@@ -50,7 +60,7 @@ class DbtConfigs(Block, abc.ABC):
             else:
                 field_value = field
 
-            if field_value is None:
+            if field_value is None or field_name == "allow_field_overrides":
                 # do not add to configs json if no value or default is set
                 continue
 
@@ -59,9 +69,13 @@ class DbtConfigs(Block, abc.ABC):
                     configs_json, field_value.__fields__, model=field_value
                 )
             elif field_name == "extras":
-                configs_json = self._populate_configs_json(configs_json, field_value)
+                configs_json = self._populate_configs_json(
+                    configs_json,
+                    field_value,
+                )
+                override_configs_json.update(configs_json)
             else:
-                if field_name in configs_json.keys():
+                if field_name in configs_json.keys() and not self.allow_field_overrides:
                     raise ValueError(
                         f"The keyword, {field_name}, has already been provided in "
                         f"TargetConfigs; remove duplicated keywords to continue"
@@ -72,6 +86,10 @@ class DbtConfigs(Block, abc.ABC):
                     field_value = str(field_value)
                 configs_json[field_name] = field_value
 
+                if self.allow_field_overrides and model is self or model is None:
+                    override_configs_json[field_name] = field_value
+
+        configs_json.update(override_configs_json)
         return configs_json
 
     def get_configs(self) -> Dict[str, Any]:
