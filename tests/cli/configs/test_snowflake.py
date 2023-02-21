@@ -79,3 +79,40 @@ def test_snowflake_target_configs_get_configs_private_key_path():
         )
         expected_v = expected[k]
         assert actual_v == expected_v
+
+
+def test_snowflake_target_configs_allow_field_overrides():
+    credentials = SnowflakeCredentials(
+        user="user",
+        account="account.region.aws",
+        password="my_password",
+        role="role",
+    )
+
+    connector = SnowflakeConnector(
+        schema="public",
+        database="database",
+        warehouse="warehouse",
+        credentials=credentials,
+    )
+
+    target_configs = SnowflakeTargetConfigs(
+        connector=connector,
+        schema="OVERRIDE",
+        extras={"database": "my_database"},
+        allow_field_overrides=True,
+    )
+    actual = target_configs.get_configs()
+    expected = {
+        "schema": "OVERRIDE",
+        "type": "snowflake",
+        "threads": 4,
+        "account": "account.region.aws",
+        "user": "user",
+        "password": "my_password",
+        "authenticator": "snowflake",
+        "role": "role",
+        "database": "my_database",
+        "warehouse": "warehouse",
+    }
+    assert actual == expected
