@@ -81,7 +81,7 @@ def test_snowflake_target_configs_get_configs_private_key_path():
         assert actual_v == expected_v
 
 
-def test_snowflake_target_configs_override_fields():
+def test_snowflake_target_configs_allow_field_overrides():
     credentials = SnowflakeCredentials(
         user="user",
         account="account.region.aws",
@@ -100,7 +100,7 @@ def test_snowflake_target_configs_override_fields():
         connector=connector,
         schema="OVERRIDE",
         extras={"database": "my_database"},
-        override_fields=True,
+        allow_field_overrides=True,
     )
     actual = target_configs.get_configs()
     expected = {

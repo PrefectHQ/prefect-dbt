@@ -44,7 +44,7 @@ class DbtConfigs(Block, abc.ABC):
         """
         Recursively populate configs_json.
         """
-        # if override_fields is True keys from TargetConfigs take precedence
+        # if allow_field_overrides is True keys from TargetConfigs take precedence
         override_configs_json = {}
 
         for field_name, field in fields.items():
@@ -60,7 +60,7 @@ class DbtConfigs(Block, abc.ABC):
             else:
                 field_value = field
 
-            if field_value is None or field_name == "override_fields":
+            if field_value is None or field_name == "allow_field_overrides":
                 # do not add to configs json if no value or default is set
                 continue
 
@@ -75,7 +75,7 @@ class DbtConfigs(Block, abc.ABC):
                 )
                 override_configs_json.update(configs_json)
             else:
-                if field_name in configs_json.keys() and not self.override_fields:
+                if field_name in configs_json.keys() and not self.allow_field_overrides:
                     raise ValueError(
                         f"The keyword, {field_name}, has already been provided in "
                         f"TargetConfigs; remove duplicated keywords to continue"
@@ -86,7 +86,7 @@ class DbtConfigs(Block, abc.ABC):
                     field_value = str(field_value)
                 configs_json[field_name] = field_value
 
-                if self.override_fields and model is self or model is None:
+                if self.allow_field_overrides and model is self or model is None:
                     override_configs_json[field_name] = field_value
 
         configs_json.update(override_configs_json)

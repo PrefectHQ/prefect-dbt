@@ -34,7 +34,7 @@ Breaking: `BigQueryTargetConfigs.get_configs` is no longer synchronous and the i
 - `DbtCloudJob` block and `run_dbt_cloud_job` flow - [#101](https://github.com/PrefectHQ/prefect-dbt/pull/101)
 - `DbtCoreOperation` block - [#119](https://github.com/PrefectHQ/prefect-dbt/pull/119)
 - `SqlAlchemyConnector` support for use for `PostgresTargetConfigs` - [#123](https://github.com/PrefectHQ/prefect-dbt/pull/123)
-- Added `override_fields` option to allow users to override underlying blocks' fields - [#128](https://github.com/PrefectHQ/prefect-dbt/pull/128)
+- Added `allow_field_overrides` option to allow users to override underlying blocks' fields - [#128](https://github.com/PrefectHQ/prefect-dbt/pull/128)
 
 ### Changed
 
