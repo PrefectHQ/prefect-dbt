@@ -62,7 +62,7 @@ def test_postgres_target_configs_get_configs_for_sqlalchemy_connector():
         "user": "prefect",
         "password": "prefect_password",
         "host": "host",
-        "port": "8080",
+        "port": 8080,
         "retries": 1,
     }
     for k, v in actual.items():
