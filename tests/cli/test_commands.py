@@ -280,7 +280,7 @@ class TestDbtCoreOperation:
                 dbt_cli_profile=dbt_cli_profile,
             ) as op:
                 op.run()
-        except FileNotFoundError:
+        except (FileNotFoundError, TypeError):  # py37 raises TypeError
             pass  # we're mocking the tempfile; this is expected
 
         mock_write = mock_named_temporary_file.return_value.write
