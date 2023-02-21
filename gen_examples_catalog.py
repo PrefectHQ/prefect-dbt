@@ -103,7 +103,7 @@ for module_name, module_obj in module_tuples:
             code_examples_grouping[module_obj.__name__] |= get_code_examples(method_obj)
 
     # find all function examples
-    for function_name, function_obj in getmembers(module_obj, isfunction):
+    for function_name, function_obj in getmembers(module_obj, callable):
         if skip_parsing(function_name, function_obj, module_nesting):
             continue
         code_examples_grouping[module_obj.__name__] |= get_code_examples(function_obj)
