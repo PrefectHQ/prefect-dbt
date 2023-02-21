@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Casting `PostgresTargetConfigs.port` as `int` from `str` so `dbt run` works - [#132](https://github.com/PrefectHQ/prefect-dbt/pull/132)
+
 ### Security
 
 ## 0.3.0
