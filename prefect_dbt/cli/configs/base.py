@@ -26,12 +26,10 @@ class DbtConfigs(Block, abc.ABC):
             "but available in dbt."
         ),
     )
-    override_fields: bool = Field(
+    allow_field_overrides: bool = Field(
         default=False,
         description=(
-            "If True, will allow new keys to override existing keys, with keys "
-            "from TargetConfigs taking precedence, rather than raising an error "
-            "when there are duplicate keys."
+            "If enabled, fields from dbt target configs will override fields provided in extras"
         ),
     )
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
