@@ -16,7 +16,7 @@ from griffe.dataclasses import Docstring
 from griffe.docstrings.dataclasses import DocstringSectionKind
 from griffe.docstrings.parsers import Parser, parse
 from prefect.logging.loggers import disable_logger
-from prefect.utilities.importtools import to_qualified_name
+from prefect.utilities.importtools import load_module, to_qualified_name
 
 import prefect_dbt
 
