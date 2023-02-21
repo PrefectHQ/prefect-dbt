@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Adds `x-dbt-partner-source` header to admin and metadata clients - [#130](https://github.com/PrefectHQ/prefect-dbt/pull/130)
+
 ### Changed
 
 ### Deprecated
