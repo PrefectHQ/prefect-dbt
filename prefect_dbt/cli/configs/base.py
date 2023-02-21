@@ -29,7 +29,8 @@ class DbtConfigs(Block, abc.ABC):
     allow_field_overrides: bool = Field(
         default=False,
         description=(
-            "If enabled, fields from dbt target configs will override fields provided in extras"
+            "If enabled, fields from dbt target configs will override "
+            "fields provided in extras and credentials."
         ),
     )
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.DbtConfigs"  # noqa
