@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.3.0
 
-Released on February 15th, 2023.
+Released on February 16th, 2023.
 
 Breaking: `BigQueryTargetConfigs.get_configs` is no longer synchronous and the input type of `GlobalConfigs.log_format` is now string.
 
@@ -47,6 +47,7 @@ Breaking: `BigQueryTargetConfigs.get_configs` is no longer synchronous and the i
 
 - Preventing `TargetConfigs` from being dropped upon loading a `DbtCliProfile` - [#115](https://github.com/PrefectHQ/prefect-dbt/pull/115)
 - Breaking: The input type of `GlobalConfigs.log_format` [#118](https://github.com/PrefectHQ/prefect-dbt/pull/118)
+- Properly casting `SnowflakeCredentials.private_key_path` to string before using `yaml.dump` - [#127](https://github.com/PrefectHQ/prefect-dbt/pull/127)
 
 ## 0.2.7
 

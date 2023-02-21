@@ -26,7 +26,7 @@ Check out the examples below to get started!
 
 ## Getting Started
 
-Be sure to install [prefect-dbt](#installation) and [save to block](#saving-credentials-to-block) to run the examples below!
+Be sure to install [prefect-dbt](#installation) and [save a block](#saving-credentials-to-block) to run the examples below!
 
 ### Integrate dbt Cloud jobs with Prefect flows
 
