@@ -104,7 +104,7 @@ def trigger_dbt_flow():
         profiles_dir="PROFILES-DIRECTORY-PLACEHOLDER",
         dbt_cli_profile=dbt_cli_profile,
     ) as dbt_operation:
-        dbt_process = dbt_op.trigger()
+        dbt_process = dbt_operation.trigger()
         # do other things before waiting for completion
         dbt_process.wait_for_completion()
         result = dbt_process.fetch_result()
