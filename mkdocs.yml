@@ -4,6 +4,7 @@ repo_url: https://github.com/prefecthq/prefect-dbt
 edit_uri: edit/main/docs/
 theme:
   name: material
+  custom_dir: docs/overrides
   favicon: img/favicon.ico
   palette:
     - media: "(prefers-color-scheme)"

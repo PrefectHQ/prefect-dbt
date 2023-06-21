@@ -1,0 +1,9 @@
+diff a/.github/workflows/windows-tests.yml b/.github/workflows/windows-tests.yml	(rejected hunks)
+@@ -29,6 +29,6 @@ jobs:
+           python -m pip install --upgrade --upgrade-strategy eager -e ".[dev]"
+       - name: Run tests
+         env:
+-          PREFECT_ORION_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./orion-tests.db"
++          PREFECT_SERVER_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./collection-tests.db"
+         run: |
+           pytest tests -vv

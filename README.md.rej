@@ -1,0 +1,33 @@
+diff a/README.md b/README.md	(rejected hunks)
+@@ -7,7 +7,7 @@
+         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-dbt?color=0052FF&labelColor=090422"></a>
+     <a href="https://github.com/PrefectHQ/prefect-dbt/" alt="Stars">
+         <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+-    <a href="https://pepy.tech/badge/prefect-dbt/" alt="Downloads">
++    <a href="https://pypistats.org/packages/prefect-dbt/" alt="Downloads">
+         <img src="https://img.shields.io/pypi/dm/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+     <a href="https://github.com/PrefectHQ/prefect-dbt/pulse" alt="Activity">
+         <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+@@ -37,7 +37,7 @@ from prefect import flow, get_run_logger
+ 
+ ## Resources
+ 
+-For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://orion-docs.prefect.io/collections/usage/)!
++For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://docs.prefect.io/collections/usage/)!
+ 
+ ### Installation
+ 
+@@ -51,11 +51,11 @@ Requires an installation of Python 3.7+.
+ 
+ We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.
+ 
+-These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the [Prefect documentation](https://orion-docs.prefect.io/).
++These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the [Prefect documentation](https://docs.prefect.io/).
+ 
+ <!--- ### Saving credentials to block
+ 
+-Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
++Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://docs.prefect.io/ui/blocks/).
+ 
+ Below is a walkthrough on saving block documents through code.
+ 
