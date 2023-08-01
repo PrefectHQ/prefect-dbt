@@ -209,7 +209,6 @@ class DbtCoreOperation(ShellOperation):
             target="dev",
             target_configs=target_configs,
         )
-        profile = dbt_cli_profile.get_profile()
         dbt_init = DbtCoreOperation(
             commands=["dbt debug", "dbt list"],
             dbt_cli_profile=dbt_cli_profile,
