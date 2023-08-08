@@ -199,7 +199,7 @@ from prefect_dbt.cloud import DbtCloudCredentials
 DbtCloudCredentials(
     api_key="API-KEY-PLACEHOLDER",
     account_id="ACCOUNT-ID-PLACEHOLDER"
-).save("BLOCK-NAME-PLACEHOLDER")
+).save("CREDENTIALS-BLOCK-NAME-PLACEHOLDER")
 ```
 
 Then, to create a dbt Cloud job block:
@@ -213,11 +213,11 @@ Then, to create a dbt Cloud job block:
 ```python
 from prefect_dbt.cloud import DbtCloudCredentials, DbtCloudJob
 
-dbt_cloud_credentials = DbtCloudCredentials.load("BLOCK-NAME-PLACEHOLDER")
-dbt_cloud_job = DbtCloudJob.load(
+dbt_cloud_credentials = DbtCloudCredentials.load("CREDENTIALS-BLOCK-NAME-PLACEHOLDER")
+dbt_cloud_job = DbtCloudJob(
     dbt_cloud_credentials=dbt_cloud_credentials,
     job_id="JOB-ID-PLACEHOLDER"
-)
+).save("JOB-BLOCK-NAME-PLACEHOLDER")
 ```
 
 Congrats! You can now easily load the saved block, which holds your credentials:
@@ -225,7 +225,7 @@ Congrats! You can now easily load the saved block, which holds your credentials:
 ```python
 from prefect_dbt.cloud import DbtCloudJob
 
-DbtCloudJob.load("BLOCK-NAME-PLACEHOLDER")
+DbtCloudJob.load("JOB-BLOCK-NAME-PLACEHOLDER")
 ```
 
 #### dbt Core CLI
