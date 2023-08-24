@@ -161,7 +161,7 @@ async def trigger_dbt_cloud_job_run(
                     steps_override=[
                         "dbt seed",
                         "dbt run --fail-fast",
-                        "dbt test --fail fast",
+                        "dbt test --fail-fast",
                     ],
                 ),
             )
