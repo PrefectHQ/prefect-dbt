@@ -61,9 +61,11 @@ jobs:
       - name: Run integration tests
         env:
           PREFECT_API_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./orion-tests.db"
-          DBT_CLOUD_JOB_ID: ${{ secrets.DBT_CLOUD_JOB_ID }}
-          DBT_CLOUD_ACCOUNT_ID: ${{ secrets.DBT_CLOUD_ACCOUNT_ID }}
-          DBT_CLOUD_API_KEY: ${{ secrets.DBT_CLOUD_API_KEY }}
+          # Note: our dbt Cloud test account has been cleared out, so we will need to
+          # recreate that before we can run the integration tests against the real thing
+          # DBT_CLOUD_JOB_ID: ${{ secrets.DBT_CLOUD_JOB_ID }}
+          # DBT_CLOUD_ACCOUNT_ID: ${{ secrets.DBT_CLOUD_ACCOUNT_ID }}
+          # DBT_CLOUD_API_KEY: ${{ secrets.DBT_CLOUD_API_KEY }}
         run: |
           pytest tests -vv -m integration
 
