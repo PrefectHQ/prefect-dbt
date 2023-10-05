@@ -2,7 +2,13 @@
 import warnings
 from typing import Any, Dict, Union
 
-from pydantic import Field
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field
+else:
+    from pydantic import Field
+
 from typing_extensions import Literal
 
 from prefect_dbt.cli.configs.base import BaseTargetConfigs, MissingExtrasRequireError

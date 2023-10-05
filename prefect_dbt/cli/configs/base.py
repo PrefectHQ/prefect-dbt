@@ -5,7 +5,12 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import BaseModel, Field, SecretField
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import BaseModel, Field, SecretField
+else:
+    from pydantic import BaseModel, Field, SecretField
 
 
 class DbtConfigs(Block, abc.ABC):

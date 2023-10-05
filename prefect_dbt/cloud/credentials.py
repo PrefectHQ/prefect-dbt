@@ -2,7 +2,13 @@
 from typing import Union
 
 from prefect.blocks.abstract import CredentialsBlock
-from pydantic import Field, SecretStr
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field, SecretStr
+else:
+    from pydantic import Field, SecretStr
+
 from typing_extensions import Literal
 
 from prefect_dbt.cloud.clients import (

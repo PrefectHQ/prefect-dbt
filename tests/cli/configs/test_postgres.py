@@ -4,7 +4,12 @@ from prefect_sqlalchemy import (
     SqlAlchemyConnector,
     SyncDriver,
 )
-from pydantic import SecretStr
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import SecretStr
+else:
+    from pydantic import SecretStr
 
 from prefect_dbt.cli.configs import PostgresTargetConfigs
 
