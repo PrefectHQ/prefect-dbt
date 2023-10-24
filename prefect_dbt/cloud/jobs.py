@@ -10,7 +10,13 @@ from prefect import flow, get_run_logger, task
 from prefect.blocks.abstract import JobBlock, JobRun
 from prefect.context import FlowRunContext
 from prefect.utilities.asyncutils import sync_compatible
-from pydantic import Field
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field
+else:
+    from pydantic import Field
+
 from typing_extensions import Literal
 
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
