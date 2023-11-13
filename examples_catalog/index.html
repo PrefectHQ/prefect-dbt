@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.bd3936ea.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
@@ -908,7 +908,38 @@
 <h1 id="examples-catalog">Examples Catalog</h1>
 <p>Below is a list of examples for <code>prefect-dbt</code>.</p>
 <h2 id="clicommands-module"><a class="autorefs autorefs-internal" href="../cli/commands/#prefect_dbt.cli.commands">Cli.Commands Module</a></h2>
-<p>Execute <code>dbt debug</code> with a pre-populated profiles.yml.
+<p>Load a configured block.
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
+
+<span class="n">dbt_op</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Execute short-lasting dbt debug and list with a custom DbtCliProfile.
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span><span class="p">,</span> <span class="n">DbtCliProfile</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="k">await</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;snowflake-connector&quot;</span><span class="p">)</span>
+<span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">snowflake_connector</span><span class="p">)</span>
+<span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jaffle_shop&quot;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
+    <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dbt_init</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
+    <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt list&quot;</span><span class="p">],</span>
+    <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span><span class="p">,</span>
+    <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">dbt_init</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></p>
+<p>Execute a longer-lasting dbt run as a context manager.
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">DbtCoreOperation</span><span class="p">(</span><span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt run&quot;</span><span class="p">])</span> <span class="k">as</span> <span class="n">dbt_run</span><span class="p">:</span>
+    <span class="n">dbt_process</span> <span class="o">=</span> <span class="n">dbt_run</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+    <span class="c1"># do other things</span>
+    <span class="n">dbt_process</span><span class="o">.</span><span class="n">wait_for_completion</span><span class="p">()</span>
+    <span class="n">dbt_output</span> <span class="o">=</span> <span class="n">dbt_process</span><span class="o">.</span><span class="n">fetch_result</span><span class="p">()</span>
+</code></pre></div>
+Execute <code>dbt debug</code> with a pre-populated profiles.yml.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 <span class="kn">from</span> <span class="nn">prefect_dbt.cli.commands</span> <span class="kn">import</span> <span class="n">trigger_dbt_cli_command</span>
 
@@ -956,37 +987,6 @@
     <span class="k">return</span> <span class="n">result</span>
 
 <span class="n">trigger_dbt_cli_command_flow</span><span class="p">()</span>
-</code></pre></div>
-Load a configured block.
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span>
-
-<span class="n">dbt_op</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span>
-</code></pre></div></p>
-<p>Execute short-lasting dbt debug and list with a custom DbtCliProfile.
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt</span> <span class="kn">import</span> <span class="n">DbtCoreOperation</span><span class="p">,</span> <span class="n">DbtCliProfile</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cli.configs</span> <span class="kn">import</span> <span class="n">SnowflakeTargetConfigs</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="k">await</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;snowflake-connector&quot;</span><span class="p">)</span>
-<span class="n">target_configs</span> <span class="o">=</span> <span class="n">SnowflakeTargetConfigs</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">snowflake_connector</span><span class="p">)</span>
-<span class="n">dbt_cli_profile</span> <span class="o">=</span> <span class="n">DbtCliProfile</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jaffle_shop&quot;</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
-    <span class="n">target_configs</span><span class="o">=</span><span class="n">target_configs</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">dbt_init</span> <span class="o">=</span> <span class="n">DbtCoreOperation</span><span class="p">(</span>
-    <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt debug&quot;</span><span class="p">,</span> <span class="s2">&quot;dbt list&quot;</span><span class="p">],</span>
-    <span class="n">dbt_cli_profile</span><span class="o">=</span><span class="n">dbt_cli_profile</span><span class="p">,</span>
-    <span class="n">overwrite_profiles</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-<span class="n">dbt_init</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</code></pre></div></p>
-<p>Execute a longer-lasting dbt run as a context manager.
-<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">DbtCoreOperation</span><span class="p">(</span><span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dbt run&quot;</span><span class="p">])</span> <span class="k">as</span> <span class="n">dbt_run</span><span class="p">:</span>
-    <span class="n">dbt_process</span> <span class="o">=</span> <span class="n">dbt_run</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
-    <span class="c1"># do other things</span>
-    <span class="n">dbt_process</span><span class="o">.</span><span class="n">wait_for_completion</span><span class="p">()</span>
-    <span class="n">dbt_output</span> <span class="o">=</span> <span class="n">dbt_process</span><span class="o">.</span><span class="n">fetch_result</span><span class="p">()</span>
 </code></pre></div></p>
 <h2 id="clicredentials-module"><a class="autorefs autorefs-internal" href="../cli/credentials/#prefect_dbt.cli.credentials">Cli.Credentials Module</a></h2>
 <p>Load stored dbt CLI profile:
@@ -1134,24 +1134,7 @@ Load stored dbt Cloud credentials:
 <span class="n">trigger_dbt_cloud_job_run_flow</span><span class="p">()</span>
 </code></pre></div></p>
 <h2 id="cloudjobs-module"><a class="autorefs autorefs-internal" href="../cloud/jobs/#prefect_dbt.cloud.jobs">Cloud.Jobs Module</a></h2>
-<p>Get status of a dbt Cloud job:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">get_job</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">get_job_flow</span><span class="p">():</span>
-    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span> <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">get_job</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
-        <span class="n">job_id</span><span class="o">=</span><span class="mi">42</span>
-    <span class="p">)</span>
-
-<span class="n">get_job_flow</span><span class="p">()</span>
-</code></pre></div>
-Trigger a dbt Cloud job run:
+<p>Trigger a dbt Cloud job run:
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
 <span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
@@ -1201,20 +1184,6 @@ Trigger a dbt Cloud job run:
 
 <span class="n">trigger_dbt_cloud_job_run</span><span class="p">()</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span><span class="p">,</span> <span class="n">DbtCloudJob</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">run_dbt_cloud_job</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">run_dbt_cloud_job_flow</span><span class="p">():</span>
-    <span class="n">dbt_cloud_credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;dbt-token&quot;</span><span class="p">)</span>
-    <span class="n">dbt_cloud_job</span> <span class="o">=</span> <span class="n">DbtCloudJob</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span> <span class="n">job_id</span><span class="o">=</span><span class="mi">154217</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">run_dbt_cloud_job</span><span class="p">(</span><span class="n">dbt_cloud_job</span><span class="o">=</span><span class="n">dbt_cloud_job</span><span class="p">)</span>
-
-<span class="n">run_dbt_cloud_job_flow</span><span class="p">()</span>
-</code></pre></div>
 Load a configured dbt Cloud job block.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudJob</span>
 
@@ -1237,44 +1206,6 @@ Load a configured dbt Cloud job block.
     <span class="k">return</span> <span class="n">dbt_cloud_job_run</span>
 
 <span class="n">dbt_cloud_job_flow</span><span class="p">()</span>
-</code></pre></div>
-Retry a subset of models in a dbt Cloud job run and wait for completion:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">():</span>
-    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
-    <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
-        <span class="n">run_id</span><span class="o">=</span><span class="mi">88640123</span><span class="p">,</span>
-    <span class="p">)</span>
-
-<span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">()</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">trigger_dbt_cloud_job_run</span><span class="p">,</span> <span class="n">get_run_id</span>
-
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">trigger_run_and_get_id</span><span class="p">():</span>
-    <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">DbtCloudCredentials</span><span class="p">(</span>
-            <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span>
-            <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span>
-        <span class="p">)</span>
-
-    <span class="n">triggered_run_data</span> <span class="o">=</span> <span class="n">trigger_dbt_cloud_job_run</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
-        <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">trigger_job_run_options</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">triggered_run_data</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">run_id</span>
-
-<span class="n">trigger_run_and_get_id</span><span class="p">()</span>
 </code></pre></div>
 Trigger a dbt Cloud job and wait for completion as a stand alone flow:
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">asyncio</span>
@@ -1339,9 +1270,95 @@ Trigger a dbt Cloud job and wait for completion as a stand alone flow:
         <span class="p">),</span>
     <span class="p">)</span>
 <span class="p">)</span>
+</code></pre></div>
+Retry a subset of models in a dbt Cloud job run and wait for completion:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">():</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+    <span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="mi">88640123</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">retry_dbt_cloud_job_run_subset_and_wait_for_completion_flow</span><span class="p">()</span>
+</code></pre></div>
+Get status of a dbt Cloud job:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">get_job</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">get_job_flow</span><span class="p">():</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span> <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_job</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">)</span>
+
+<span class="n">get_job_flow</span><span class="p">()</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">trigger_dbt_cloud_job_run</span><span class="p">,</span> <span class="n">get_run_id</span>
+
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">trigger_run_and_get_id</span><span class="p">():</span>
+    <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">DbtCloudCredentials</span><span class="p">(</span>
+            <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span>
+            <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span>
+        <span class="p">)</span>
+
+    <span class="n">triggered_run_data</span> <span class="o">=</span> <span class="n">trigger_dbt_cloud_job_run</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">trigger_job_run_options</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">triggered_run_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">run_id</span>
+
+<span class="n">trigger_run_and_get_id</span><span class="p">()</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span><span class="p">,</span> <span class="n">DbtCloudJob</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">run_dbt_cloud_job</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">run_dbt_cloud_job_flow</span><span class="p">():</span>
+    <span class="n">dbt_cloud_credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;dbt-token&quot;</span><span class="p">)</span>
+    <span class="n">dbt_cloud_job</span> <span class="o">=</span> <span class="n">DbtCloudJob</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">dbt_cloud_credentials</span><span class="p">,</span> <span class="n">job_id</span><span class="o">=</span><span class="mi">154217</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">run_dbt_cloud_job</span><span class="p">(</span><span class="n">dbt_cloud_job</span><span class="o">=</span><span class="n">dbt_cloud_job</span><span class="p">)</span>
+
+<span class="n">run_dbt_cloud_job_flow</span><span class="p">()</span>
 </code></pre></div></p>
 <h2 id="cloudruns-module"><a class="autorefs autorefs-internal" href="../cloud/runs/#prefect_dbt.cloud.runs">Cloud.Runs Module</a></h2>
-<p>Get an artifact of a dbt Cloud job run:
+<p>List artifacts of a dbt Cloud job run:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">list_dbt_cloud_run_artifacts</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">list_artifacts_flow</span><span class="p">():</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span> <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">list_dbt_cloud_run_artifacts</span><span class="p">(</span>
+        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">)</span>
+
+<span class="n">list_artifacts_flow</span><span class="p">()</span>
+</code></pre></div>
+Get an artifact of a dbt Cloud job run:
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
 <span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
@@ -1381,23 +1398,6 @@ Trigger a dbt Cloud job and wait for completion as a stand alone flow:
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">get_run_artifact_result</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 
 <span class="n">get_artifact_flow</span><span class="p">()</span>
-</code></pre></div>
-List artifacts of a dbt Cloud job run:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud</span> <span class="kn">import</span> <span class="n">DbtCloudCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_dbt.cloud.jobs</span> <span class="kn">import</span> <span class="n">list_dbt_cloud_run_artifacts</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">list_artifacts_flow</span><span class="p">():</span>
-    <span class="n">credentials</span> <span class="o">=</span> <span class="n">DbtCloudCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;my_api_key&quot;</span><span class="p">,</span> <span class="n">account_id</span><span class="o">=</span><span class="mi">123456789</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">list_dbt_cloud_run_artifacts</span><span class="p">(</span>
-        <span class="n">dbt_cloud_credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
-        <span class="n">run_id</span><span class="o">=</span><span class="mi">42</span>
-    <span class="p">)</span>
-
-<span class="n">list_artifacts_flow</span><span class="p">()</span>
 </code></pre></div>
 Get status of a dbt Cloud job run:
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
@@ -1618,7 +1618,7 @@ Get status of a dbt Cloud job run:
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.94c44541.min.js"></script>
+      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
     
   </body>
