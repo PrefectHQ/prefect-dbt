@@ -150,7 +150,7 @@ class TargetConfigs(BaseTargetConfigs):
     """
 
     _block_type_name = "dbt CLI Target Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://cdn.sanity.io/images/3ugk85nk/production/f9d31c6978410fe25a70e75fc7e77b5c430b3178-180x162.png"  # noqa
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.TargetConfigs"  # noqa
 
 
@@ -194,7 +194,7 @@ class GlobalConfigs(DbtConfigs):
     """
 
     _block_type_name = "dbt CLI Global Configs"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/5zE9lxfzBHjw3tnEup4wWL/9a001902ed43a84c6c96d23b24622e19/dbt-bit_tm.png?h=250"  # noqa
+    _logo_url = "https://cdn.sanity.io/images/3ugk85nk/production/f9d31c6978410fe25a70e75fc7e77b5c430b3178-180x162.png"  # noqa
     _documentation_url = "https://prefecthq.github.io/prefect-dbt/cli/configs/base/#prefect_dbt.cli.configs.base.GlobalConfigs"  # noqa
 
     send_anonymous_usage_stats: Optional[bool] = Field(
