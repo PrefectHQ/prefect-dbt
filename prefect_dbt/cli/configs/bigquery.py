@@ -98,6 +98,9 @@ class BigQueryTargetConfigs(BaseTargetConfigs):
             "dataset": "schema",
             "method": "method",
             "project": "project",
+            "gcs_bucket": "gcs_bucket",
+            "dataproc_cluster_name": "dataproc_cluster_name",
+            "dataproc_region": "dataproc_region",
             # service-account
             "service_account_file": "keyfile",
             # service-account json
