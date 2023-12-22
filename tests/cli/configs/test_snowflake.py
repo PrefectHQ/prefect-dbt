@@ -87,7 +87,7 @@ def test_snowflake_target_configs_get_configs_private_key_path():
 
 
 def test_snowflake_target_configs_get_configs_private_key():
-    private_key_as_string = 'private-key'
+    private_key_as_string = "private-key"
 
     credentials = SnowflakeCredentials(
         account="account",
