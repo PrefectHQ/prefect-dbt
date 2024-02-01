@@ -2,77 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/blocks_catalog/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/examples_catalog/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/commands/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/credentials/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/configs/base/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/configs/bigquery/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/configs/postgres/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cli/configs/snowflake/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/clients/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/credentials/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/jobs/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/models/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/runs/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-dbt/cloud/utils/</loc>
-         <lastmod>2023-11-13</lastmod>
+         <lastmod>2024-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
