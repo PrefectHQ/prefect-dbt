@@ -7,7 +7,12 @@ import yaml
 from prefect import get_run_logger, task
 from prefect.utilities.filesystem import relative_path_to_current_platform
 from prefect_shell.commands import ShellOperation, shell_run_command
-from pydantic import Field, validator
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field, validator
+else:
+    from pydantic import Field, validator
 
 from prefect_dbt.cli.credentials import DbtCliProfile
 

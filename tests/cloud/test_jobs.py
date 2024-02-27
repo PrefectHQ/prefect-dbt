@@ -570,17 +570,26 @@ class TestRetryDbtCloudRunJobSubsetAndWaitForCompletion:
 
 @pytest.fixture
 def real_dbt_cloud_job_id():
-    return os.environ.get("DBT_CLOUD_JOB_ID")
+    job_id = os.environ.get("DBT_CLOUD_JOB_ID")
+    if not job_id:
+        pytest.skip("DBT_CLOUD_JOB_ID not set")
+    return job_id
 
 
 @pytest.fixture
 def real_dbt_cloud_api_key():
-    return os.environ.get("DBT_CLOUD_API_KEY")
+    api_key = os.environ.get("DBT_CLOUD_API_KEY")
+    if not api_key:
+        pytest.skip("DBT_CLOUD_API_KEY not set")
+    return api_key
 
 
 @pytest.fixture
 def real_dbt_cloud_account_id():
-    return os.environ.get("DBT_CLOUD_ACCOUNT_ID")
+    account_id = os.environ.get("DBT_CLOUD_ACCOUNT_ID")
+    if not account_id:
+        pytest.skip("DBT_CLOUD_ACCOUNT_ID not set")
+    return account_id
 
 
 @pytest.mark.integration
