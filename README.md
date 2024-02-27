@@ -1,21 +1,18 @@
-# Coordinate and use dbt in your dataflow with prefect-dbt
+# prefect-dbt
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/15331990/215649781-be317381-9ff0-4f45-85d4-a30e80514554.png" width=40% height=40%>
-    <br>
     <a href="https://pypi.python.org/pypi/prefect-dbt/" alt="PyPI version">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-dbt?color=0052FF&labelColor=090422"></a>
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-dbt?color=26272B&labelColor=090422"></a>
     <a href="https://github.com/prefecthq/prefect-dbt/" alt="Stars">
-        <img src="https://img.shields.io/github/stars/prefecthq/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/stars/prefecthq/prefect-dbt?color=26272B&labelColor=090422" /></a>
     <a href="https://pepy.tech/badge/prefect-dbt/" alt="Downloads">
-        <img src="https://img.shields.io/pypi/dm/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/pypi/dm/prefect-dbt?color=26272B&labelColor=090422" /></a>
     <a href="https://github.com/prefecthq/prefect-dbt/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/prefecthq/prefect-dbt?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/commit-activity/m/prefecthq/prefect-dbt?ccolor=26272B&labelColor=090422" /></a>
     <br>
     <a href="https://prefect-community.slack.com" alt="Slack">
-        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
-    <a href="https://discourse.prefect.io/" alt="Discourse">
-        <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
+        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=26272B&labelColor=090422&logo=slack" /></a>
+
 </p>
 
 Visit the full docs [here](https://PrefectHQ.github.io/prefect-dbt) to see additional examples and the API reference.
@@ -159,20 +156,20 @@ pip install "prefect-dbt[postgres]"
 
     Check out the [desired profile setup page](https://docs.getdbt.com/reference/profiles.yml) on the sidebar for others.
 
-Requires an installation of Python 3.7+.
+Requires an installation of Python 3.8+.
 
 We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.
 
-These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the [Prefect documentation](https://orion-docs.prefect.io/).
+These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the [Prefect documentation](https://docs.prefect.io/).
 
 ### Saving credentials to block
 
-Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
+Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://docs.prefect.io/ui/blocks/).
 
 !!! info "Registering blocks"
 
     Register blocks in this module to
-    [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
+    [view and edit them](https://docs.prefect.io/ui/blocks/)
     on Prefect Cloud:
 
     ```bash
@@ -294,9 +291,9 @@ DbtCoreOperation.load("DBT-CORE-OPERATION-BLOCK-NAME-PLACEHOLDER")
 
 If you encounter any bugs while using `prefect-dbt`, feel free to open an issue in the [prefect-dbt](https://github.com/PrefectHQ/prefect-dbt) repository.
 
-If you have any questions or issues while using `prefect-dbt`, you can find help in either the [Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
+If you have any questions or issues while using `prefect-dbt`, you can find help in the [Prefect Slack community](https://prefect.io/slack).
 
-Feel free to star or watch [`prefect-dbt`](https://github.com/PrefectHQ/prefect-dbt) for updates too!
+Feel free to star or watch [`prefect-dbt`](https://github.com/PrefectHQ/prefect-dbt) for updates, too!
 
 ### Contributing
 
