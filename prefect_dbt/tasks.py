@@ -1,6 +1,7 @@
 import os
-from pathlib import Path, PosixPath
+from pathlib import Path
 from prefect import task, get_run_logger
+from prefect.artifacts import create_markdown_artifact
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import VERSION as PYDANTIC_VERSION
@@ -33,7 +34,11 @@ def dbt_build_task(
     # run the command
     res: dbtRunnerResult = dbt.invoke(cli_args)
 
-    # inspect the results
-    for r in res.result:
-        logger.info(f"{r.node.name}: {r.status}")
+    markdown = f"""
+        result: {res.result}
+    """
+
+    create_markdown_artifact(
+        markdown=markdown,
+    )
 
