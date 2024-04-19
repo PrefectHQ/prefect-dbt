@@ -1,6 +1,9 @@
+"""Module containing pre-built tasks and flows that execute specific DBT CLI commands"""
+
 import os
 from pathlib import Path
 from typing import Optional, Union
+from uuid import UUID
 
 import yaml
 from dbt.cli.main import dbtRunner, dbtRunnerResult
@@ -27,6 +30,48 @@ def dbt_build_task(
     create_artifact: bool = True,
     artifact_key: str = "dbt-build-task-summary",
 ):
+    """
+    Executes the 'dbt build' command within a Prefect task,
+    and optionally creates a Prefect artifact summarizing the dbt build results.
+
+    Args:
+        profiles_dir: The directory to search for the profiles.yml file. Setting this
+            appends the `--profiles-dir` option to the command provided.
+            If this is not set, will try using the DBT_PROFILES_DIR env variable,
+            but if that's also not set, will use the default directory `$HOME/.dbt/`.
+        project_dir: The directory to search for the dbt_project.yml file.
+            Default is the current working directory and its parents.
+        overwrite_profiles: Whether the existing profiles.yml file under profiles_dir
+            should be overwritten with a new profile.
+        dbt_cli_profile: Profiles class containing the profile written to profiles.yml.
+            Note! This is optional and will raise an error
+            if profiles.yml already exists under profile_dir
+            and overwrite_profiles is set to False.
+        dbt_client: An instance of a dbtRunner client to execute dbt commands. If None,
+            a new instance is created.
+        create_artifact: If True, creates a Prefect artifact on the task run
+            with the dbt build results using the specified artifact key.
+            Defaults to True.
+        artifact_key: The key under which to store
+            the dbt build results artifact in Prefect.
+            Defaults to 'dbt-build-task-summary'.
+
+    Example:
+    ```python
+        @flow
+        def dbt_test_flow():
+            dbt_build_task(
+                project_dir="/Users/test/my_dbt_project_dir"
+            )
+    ```
+
+    Raises:
+        ValueError: If required dbt_cli_profile is not provided
+                    when needed for profile writing.
+        RuntimeError: If the dbt build fails for any reason,
+                    it will be indicated by the exception raised.
+    """
+
     logger = get_run_logger()
     logger.info("Running dbt build task.")
 
@@ -55,7 +100,7 @@ def dbt_build_task(
         logger.info(f"Wrote profile to {profiles_path}")
     elif dbt_cli_profile is not None:
         raise ValueError(
-            f"Since overwrite_profiles is False and profiles_path ({profiles_path}) "
+            f"Since overwrite_profiles is False and profiles_path ({profiles_path!r})"
             f"already exists, the profile within dbt_cli_profile could not be used; "
             f"if the existing profile is satisfactory, do not pass dbt_cli_profile"
         )
@@ -78,52 +123,63 @@ def dbt_build_task(
         logger.error(f"dbt build task failed with exception: {res.exception}")
         raise res.exception
 
-    if res.success:
+    if create_artifact:
+        artifact_id = create_dbt_task_artifact(artifact_key=artifact_key, results=res)
+
+    if res.success and artifact_id:
         logger.info("dbt build task succeeded.")
     else:
         logger.error("dbt build task failed.")
 
-    if create_artifact:
-        create_dbt_task_artifact(artifact_key=artifact_key, results=res, mode="Build")
 
-
-def create_dbt_task_artifact(
-    artifact_key: str, results: dbtRunnerResult, mode: str = "Build"
-):
+def create_dbt_task_artifact(artifact_key: str, results: dbtRunnerResult) -> UUID:
+    """
+    Creates a Prefect task artifact summarizing the results
+    of the above predefined prefrect-dbt task.
+    """
     # Create Summary Markdown Artifact
-    successful_runs = []
-    failed_runs = []
-    skipped_runs = []
+    run_statuses: dict[str, list[str]] = {
+        "successful": [],
+        "failed": [],
+        "skipped": [],
+    }
+
     for r in results.result.results:
         if r.status == NodeStatus.Success or r.status == NodeStatus.Pass:
-            successful_runs.append(r)
+            run_statuses["successful"].append(r)
         elif (
             r.status == NodeStatus.Fail
             or r.status == NodeStatus.Error
             or r.status == NodeStatus.RuntimeErr
         ):
-            failed_runs.append(r)
+            run_statuses["failed"].append(r)
         elif r.status == NodeStatus.Skipped:
-            skipped_runs.append(r)
+            run_statuses["skipped"].append(r)
 
     markdown = "# DBT Build Task Summary"
 
-    if failed_runs != []:
+    if run_statuses["failed"] != []:
         failed_runs_str = ""
-        for r in failed_runs:
-            failed_runs_str += f"**{r.node.name}**\nNode Type: {r.node.resource_type}\nNode Path: {r.node.original_file_path}"
+        for r in run_statuses["failed"]:
+            failed_runs_str += f"**{r.node.name}**\n \
+                Node Type: {r.node.resource_type}\n \
+                Node Path: {r.node.original_file_path}"
             if r.message:
                 message = r.message.replace("\n", ".")
                 failed_runs_str += f"\nError Message: {message}\n"
         markdown += f"""\n## Failed Runs\n\n{failed_runs_str}\n\n"""
 
-    successful_runs_str = "\n".join([f"**{r.node.name}**" for r in successful_runs])
+    successful_runs_str = "\n".join(
+        [f"**{r.node.name}**" for r in run_statuses["successful"]]
+    )
     markdown += f"""\n## Successful Runs\n\n{successful_runs_str}\n\n"""
 
-    skipped_runs_str = "\n".join([f"**{r.node.name}**" for r in skipped_runs])
+    skipped_runs_str = "\n".join(
+        [f"**{r.node.name}**" for r in run_statuses["skipped"]]
+    )
     markdown += f"""## Skipped Runs\n{skipped_runs_str}\n\n"""
 
-    create_markdown_artifact(
+    return create_markdown_artifact(
         markdown=markdown,
         key=artifact_key,
     )
