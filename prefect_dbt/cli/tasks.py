@@ -10,14 +10,8 @@ from dbt.cli.main import dbtRunner, dbtRunnerResult
 from dbt.contracts.results import NodeStatus
 from prefect import get_run_logger, task
 from prefect.artifacts import create_markdown_artifact
-from pydantic import VERSION as PYDANTIC_VERSION
 
 from prefect_dbt.cli.credentials import DbtCliProfile
-
-if PYDANTIC_VERSION.startswith("2."):
-    pass
-else:
-    pass
 
 
 @task
