@@ -3,15 +3,14 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Type, Union
 
-import yaml
 from prefect.blocks.core import Block
 from pydantic import VERSION as PYDANTIC_VERSION
 from typing_extensions import Self
 
 if PYDANTIC_VERSION.startswith("2."):
-    from pydantic.v1 import Field, validator
+    from pydantic.v1 import Field
 else:
-    from pydantic import Field, validator
+    from pydantic import Field
 
 from prefect_dbt.cli.configs import GlobalConfigs, TargetConfigs
 

@@ -21,6 +21,8 @@ from prefect_dbt.cli.configs.base import GlobalConfigs, TargetConfigs
 from prefect_dbt.cli.credentials import DbtCliProfile
 from prefect_dbt.cloud.credentials import DbtCloudCredentials
 
+from dbt.cli.main import dbtRunner
+
 
 @pytest.fixture
 def dbt_cloud_credentials():
