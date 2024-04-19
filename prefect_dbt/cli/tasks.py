@@ -95,19 +95,16 @@ def create_dbt_task_artifact(
     failed_runs = []
     skipped_runs = []
     for r in results.result.results:
-        match r.status:
-            case NodeStatus.Success:
-                successful_runs.append(r)
-            case NodeStatus.Pass:
-                successful_runs.append(r)
-            case NodeStatus.Fail:
-                failed_runs.append(r)
-            case NodeStatus.Error:
-                failed_runs.append(r)
-            case NodeStatus.RuntimeErr:
-                failed_runs.append(r)
-            case NodeStatus.Skipped:
-                skipped_runs.append(r)
+        if r.status == NodeStatus.Success or r.status == NodeStatus.Pass:
+            successful_runs.append(r)
+        elif (
+            r.status == NodeStatus.Fail
+            or r.status == NodeStatus.Error
+            or r.status == NodeStatus.RuntimeErr
+        ):
+            failed_runs.append(r)
+        elif r.status == NodeStatus.Skipped:
+            skipped_runs.append(r)
 
     markdown = "# DBT Build Task Summary"
 
