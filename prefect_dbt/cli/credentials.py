@@ -29,8 +29,6 @@ try:
 except ImportError:
     PostgresTargetConfigs = None
 
-DEFAULT_PROFILE_PATH = "~/.dbt/profiles.yml"
-
 
 class DbtCliProfile(Block):
     """
