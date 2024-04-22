@@ -126,6 +126,132 @@ def dbt_build_task(
         logger.error("dbt build task failed.")
 
 
+@task
+def dbt_run_task(
+    profiles_dir: Optional[Union[Path, str]] = None,
+    project_dir: Optional[Union[Path, str]] = None,
+    overwrite_profiles: bool = False,
+    dbt_cli_profile: Optional[DbtCliProfile] = None,
+    dbt_client: Optional[dbtRunner] = None,
+    create_artifact: bool = True,
+    artifact_key: str = "dbt-run-task-summary",
+):
+    """
+    pass
+    """
+
+
+@task
+def dbt_test_task(
+    profiles_dir: Optional[Union[Path, str]] = None,
+    project_dir: Optional[Union[Path, str]] = None,
+    overwrite_profiles: bool = False,
+    dbt_cli_profile: Optional[DbtCliProfile] = None,
+    dbt_client: Optional[dbtRunner] = None,
+    create_artifact: bool = True,
+    artifact_key: str = "dbt-test-task-summary",
+):
+    """
+    pass
+    """
+
+
+@task
+def dbt_snapshot_task(
+    profiles_dir: Optional[Union[Path, str]] = None,
+    project_dir: Optional[Union[Path, str]] = None,
+    overwrite_profiles: bool = False,
+    dbt_cli_profile: Optional[DbtCliProfile] = None,
+    dbt_client: Optional[dbtRunner] = None,
+    create_artifact: bool = True,
+    artifact_key: str = "dbt-snapshot-task-summary",
+):
+    """
+    pass
+    """
+
+
+@task
+def dbt_seed_task(
+    profiles_dir: Optional[Union[Path, str]] = None,
+    project_dir: Optional[Union[Path, str]] = None,
+    overwrite_profiles: bool = False,
+    dbt_cli_profile: Optional[DbtCliProfile] = None,
+    dbt_client: Optional[dbtRunner] = None,
+    create_artifact: bool = True,
+    artifact_key: str = "dbt-seed-task-summary",
+):
+    """
+    pass
+    """
+    logger = get_run_logger()
+    logger.info("Running dbt build task.")
+
+    # Initialize client if not passed in
+    if not dbt_client:
+        dbt_client = dbtRunner()
+
+    if profiles_dir is None:
+        profiles_dir = os.getenv("DBT_PROFILES_DIR", Path.home() / ".dbt")
+    profiles_dir = Path(profiles_dir).expanduser()
+
+    # https://docs.getdbt.com/dbt-cli/configure-your-profile
+    # Note that the file always needs to be called profiles.yml,
+    # regardless of which directory it is in.
+    profiles_path = profiles_dir / "profiles.yml"
+    logger.debug(f"Using this profiles path: {profiles_path}")
+
+    # write the profile if overwrite or no profiles exist
+    if overwrite_profiles or not profiles_path.exists():
+        if dbt_cli_profile is None:
+            raise ValueError("Provide `dbt_cli_profile` keyword for writing profiles")
+        profile = dbt_cli_profile.get_profile()
+        profiles_dir.mkdir(exist_ok=True)
+        with open(profiles_path, "w+") as f:
+            yaml.dump(profile, f, default_flow_style=False)
+        logger.info(f"Wrote profile to {profiles_path}")
+    elif dbt_cli_profile is not None:
+        raise ValueError(
+            f"Since overwrite_profiles is False and profiles_path ({profiles_path!r})"
+            f"already exists, the profile within dbt_cli_profile could not be used; "
+            f"if the existing profile is satisfactory, do not pass dbt_cli_profile"
+        )
+
+    # create CLI args as a list of strings
+    cli_args = ["seed"]
+
+    # append the options
+    cli_args.append("--profiles-dir")
+    cli_args.append(profiles_dir)
+    if project_dir is not None:
+        project_dir = Path(project_dir).expanduser()
+        cli_args.append("--project-dir")
+        cli_args.append(project_dir)
+
+    # run the command
+    res: dbtRunnerResult = dbt_client.invoke(cli_args)
+
+    if res.exception is not None:
+        logger.error(f"dbt build task failed with exception: {res.exception}")
+        raise res.exception
+
+    if create_artifact:
+        artifact_id = create_dbt_task_artifact(artifact_key=artifact_key, results=res)
+
+    if res.success and artifact_id:
+        logger.info("dbt build task succeeded.")
+    else:
+        logger.error("dbt build task failed.")
+
+
+def dbt_run(
+    mode: str = "build",
+):
+    """
+    pass
+    """
+
+
 def create_dbt_task_artifact(artifact_key: str, results: dbtRunnerResult) -> UUID:
     """
     Creates a Prefect task artifact summarizing the results
