@@ -1,4 +1,5 @@
 """Module containing credentials for interacting with dbt CLI"""
+
 from typing import Any, Dict, Optional, Union
 
 from prefect.blocks.core import Block
