@@ -1,11 +1,9 @@
 """Module containing credentials for interacting with dbt CLI"""
 
-from pathlib import Path
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Union
 
 from prefect.blocks.core import Block
 from pydantic import VERSION as PYDANTIC_VERSION
-from typing_extensions import Self
 
 if PYDANTIC_VERSION.startswith("2."):
     from pydantic.v1 import Field
@@ -143,35 +141,6 @@ class DbtCliProfile(Block):
             "mismatch or a failing model."
         ),
     )
-
-    @validator("config", pre=True)
-    def parse_yaml_config(cls, value):
-        if isinstance(value, str):
-            return yaml.safe_load(value)
-        return value
-
-    @classmethod
-    def from_file(cls: Type[Self], path: Path = None, context_name: str = None) -> Self:
-        """
-        Create DBTCLIProfile blocks from a dbt profile file.
-
-        By default, the default profile localtion is used (~/.dbt/profiles.yml).
-
-        An alternative file or context may be specified.
-
-        The entire config file will be loaded and stored.
-        """
-
-        path = Path(path or DEFAULT_PROFILE_PATH)
-        path = path.expanduser().resolve()
-
-        # Load the entire config file
-        profile_file_contents = path.read_text()
-        config_dict = yaml.safe_load(profile_file_contents)
-
-        print(config_dict)
-
-        return cls(config=config_dict, context_name=context_name)
 
     def get_profile(self) -> Dict[str, Any]:
         """
